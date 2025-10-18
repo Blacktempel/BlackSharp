@@ -1,0 +1,43 @@
+<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:ctrl="using:BlackSharp.UI.Avalonia.Controls">
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<ctrl:BusyPanel IsBusy="True" BusyMessage="Please wait">
+				<StackPanel>
+					<TextBlock Text="Test"/>
+					<TextBlock Text="Test"/>
+					<TextBlock Text="Test"/>
+					<TextBlock Text="Test"/>
+					<TextBlock Text="Test"/>
+				</StackPanel>
+			</ctrl:BusyPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<Style Selector="ctrl|BusyPanel">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ctrl:BusyPanel">
+					<Grid>
+						<ContentPresenter Content="{TemplateBinding Content}"/>
+						<Grid IsVisible="{TemplateBinding IsBusy}">
+							<Grid Background="LightBlue" Opacity="0.3"/>
+							<Border Background="#C8FFC8" Opacity="0.8"
+									BorderThickness="1"
+									HorizontalAlignment="Center" VerticalAlignment="Center"
+									IsVisible="{TemplateBinding ShowProgressRing}">
+								<StackPanel>
+									<Label Content="{TemplateBinding BusyMessage}"
+										   MinHeight="50"
+										   FontWeight="SemiBold"
+										   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+								</StackPanel>
+							</Border>
+						</Grid>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+</Styles>

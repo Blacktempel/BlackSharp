@@ -1,0 +1,88 @@
+name: Build master
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    env:
+      Solution_Name: BlackSharp.sln
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup MSBuild on Windows
+      if: runner.os == 'Windows'
+      uses: microsoft/setup-msbuild@v2
+      with:
+        msbuild-architecture: x64
+
+    - name: Install .NET Core 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Install .NET Core 9
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: NuGet restore Windows
+      if: runner.os == 'Windows'
+      run: nuget restore $env:Solution_Name
+
+    - name: Dotnet restore Linux
+      if: runner.os == 'Linux'
+      run: dotnet restore
+
+    # Create the app package by building and packaging the Windows Application Packaging project
+    - name: Build Windows Release
+      if: runner.os == 'Windows'
+      run: msbuild $env:Solution_Name /p:Configuration=Release /p:Platform="Any CPU" -m
+
+    - name: Build Linux Release
+      if: runner.os == 'Linux'
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run Unit Tests
+      run: dotnet test
+
+    - name: Publish net472 for Windows
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: BlackSharp-net472
+        path: bin/Release/net472
+
+    - name: Publish net481 for Windows
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: BlackSharp-net481
+        path: bin/Release/net481
+
+    - name: Publish net8
+      uses: actions/upload-artifact@v4
+      with:
+        name: BlackSharp-net8
+        path: bin/Release/net8
+
+    - name: Publish net9
+      uses: actions/upload-artifact@v4
+      with:
+        name: BlackSharp-net9
+        path: bin/Release/net9
