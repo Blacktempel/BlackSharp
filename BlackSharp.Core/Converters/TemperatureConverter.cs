@@ -14,6 +14,8 @@ namespace BlackSharp.Core.Converters
     /// </summary>
     public static class TemperatureConverter
     {
+        #region Public
+
         /// <summary>
         /// Converts given celsius temperature to fahrenheit.
         /// </summary>
@@ -33,5 +35,27 @@ namespace BlackSharp.Core.Converters
         {
             return 5.0f / 9.0f * (temperature - 32);
         }
+
+        /// <summary>
+        /// Converts given celsius temperature to kelvin.
+        /// </summary>
+        /// <param name="temperature">Temperature in celsius.</param>
+        /// <returns>Returns temperature in kelvin.</returns>
+        public static float CelsiusToKelvin(float temperature)
+        {
+            return temperature + 273.15f;
+        }
+
+        /// <summary>
+        /// Converts given kelvin temperature to celsius.
+        /// </summary>
+        /// <param name="temperature">Temperature in kelvin.</param>
+        /// <returns>Returns temperature in celsius.</returns>
+        public static float KelvinToCelsius(float temperature)
+        {
+            return temperature - 273.15f;
+        }
+
+        #endregion
     }
 }

@@ -33,7 +33,7 @@ namespace BlackSharp.Core.Extensions
                 throw new ArgumentNullException(nameof(value));
             }
 
-            return str.IndexOf(str, comparison) >= 0;
+            return str.IndexOf(value, comparison) >= 0;
         }
 
         /// <summary>

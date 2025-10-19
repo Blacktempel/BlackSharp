@@ -20,6 +20,8 @@ namespace BlackSharp.Core.Tests.Extensions
             const string TestString = "This is a CoMpLeX test string.";
 
             Assert.IsTrue(StringExtensions.Contains(TestString, "complex", StringComparison.OrdinalIgnoreCase));
+
+            Assert.IsFalse(StringExtensions.Contains(TestString, "complex", StringComparison.Ordinal));
         }
 
         [TestMethod]

@@ -25,5 +25,17 @@ namespace BlackSharp.Core.Tests.Utilities
         {
             Assert.AreEqual(0, TemperatureConverter.FahrenheitToCelsius(32));
         }
+
+        [TestMethod]
+        public void CelsiusToKelvin()
+        {
+            Assert.AreEqual(273.15f, TemperatureConverter.CelsiusToKelvin(0));
+        }
+
+        [TestMethod]
+        public void KelvinToCelsius()
+        {
+            Assert.AreEqual(-273.15f, TemperatureConverter.KelvinToCelsius(0));
+        }
     }
 }
