@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackSharp.UI.Avalonia", "B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackSharp.MVVM", "BlackSharp.MVVM\BlackSharp.MVVM.csproj", "{6B60BA61-549C-49A0-8853-02E59276B3EB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackSharp.Core.Tests", "BlackSharp.Core.Tests\BlackSharp.Core.Tests.csproj", "{BC2F72B3-24AF-40FD-A92D-90E2134DD5B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +31,16 @@ Global
 		{6B60BA61-549C-49A0-8853-02E59276B3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B60BA61-549C-49A0-8853-02E59276B3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B60BA61-549C-49A0-8853-02E59276B3EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC2F72B3-24AF-40FD-A92D-90E2134DD5B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC2F72B3-24AF-40FD-A92D-90E2134DD5B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC2F72B3-24AF-40FD-A92D-90E2134DD5B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC2F72B3-24AF-40FD-A92D-90E2134DD5B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BC2F72B3-24AF-40FD-A92D-90E2134DD5B4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E354AE4D-9DD4-4F78-979F-3F347A61AFA4}

@@ -11,6 +11,8 @@ namespace BlackSharp.Core.Extensions
 {
     public static class TypeExtensions
     {
+        #region Public
+
         /// <summary>
         /// Checks if <see cref="Type"/> is subclass or same <see cref="Type"/> of given <see cref="Type"/>.
         /// </summary>
@@ -21,5 +23,7 @@ namespace BlackSharp.Core.Extensions
         {
             return t == c || t.IsSubclassOf(c);
         }
+
+        #endregion
     }
 }
