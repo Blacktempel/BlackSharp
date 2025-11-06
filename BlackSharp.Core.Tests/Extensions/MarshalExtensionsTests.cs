@@ -21,7 +21,7 @@ namespace BlackSharp.Core.Tests.Extensions
             ushort value = 60000;
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<ushort>());
 
-            Assert.IsTrue(ptr != IntPtr.Zero);
+            Assert.AreNotEqual(IntPtr.Zero, ptr);
 
             MarshalExtensions.WriteUInt16(ptr, value);
 
@@ -36,7 +36,7 @@ namespace BlackSharp.Core.Tests.Extensions
             ushort value = 50000;
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<ushort>());
 
-            Assert.IsTrue(ptr != IntPtr.Zero);
+            Assert.AreNotEqual(IntPtr.Zero, ptr);
 
             MarshalExtensions.WriteUInt16(ptr, value);
 
@@ -50,7 +50,7 @@ namespace BlackSharp.Core.Tests.Extensions
             ulong value = ulong.MaxValue - 10;
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<ulong>());
 
-            Assert.IsTrue(ptr != IntPtr.Zero);
+            Assert.AreNotEqual(IntPtr.Zero, ptr);
 
             MarshalExtensions.WriteUInt64(ptr, value);
 
@@ -65,7 +65,7 @@ namespace BlackSharp.Core.Tests.Extensions
             ulong value = ulong.MaxValue - 1000;
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<ulong>());
 
-            Assert.IsTrue(ptr != IntPtr.Zero);
+            Assert.AreNotEqual(IntPtr.Zero, ptr);
 
             MarshalExtensions.WriteUInt64(ptr, value);
 

@@ -23,7 +23,7 @@ namespace BlackSharp.Core.Tests.Extensions
 
             ListExtensions.RemoveIf(list, i => i > 9 && i < 100);
 
-            Assert.AreEqual(sizeExpected, list.Count);
+            Assert.HasCount(sizeExpected, list);
         }
     }
 }

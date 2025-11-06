@@ -27,12 +27,12 @@ namespace BlackSharp.Core.Tests.Extensions
             {
                 var str = ExceptionExtensions.FullExceptionString(e);
 
-                Assert.IsTrue(str.Contains("Info:"));
-                Assert.IsTrue(str.Contains(exceptionStr));
+                Assert.Contains("Info:"     , str);
+                Assert.Contains(exceptionStr, str);
 
-                Assert.IsTrue(str.Contains("Details:"));
-                Assert.IsTrue(str.Contains(nameof(ExceptionExtensionsTests)));
-                Assert.IsTrue(str.Contains(nameof(FullExceptionString)));
+                Assert.Contains("Details:"                      , str);
+                Assert.Contains(nameof(ExceptionExtensionsTests), str);
+                Assert.Contains(nameof(FullExceptionString)     , str);
             }
         }
     }

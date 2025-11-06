@@ -25,9 +25,9 @@ namespace BlackSharp.Core.Tests.Utilities
             Assert.AreEqual(new DateTime(2025, 05, 12), two);
             Assert.AreEqual(new DateTime(2025, 12, 22), three);
 
-            Assert.IsTrue(one   .DayOfWeek == DayOfWeek.Monday);
-            Assert.IsTrue(two   .DayOfWeek == DayOfWeek.Monday);
-            Assert.IsTrue(three .DayOfWeek == DayOfWeek.Monday);
+            Assert.AreEqual(DayOfWeek.Monday, one   .DayOfWeek);
+            Assert.AreEqual(DayOfWeek.Monday, two   .DayOfWeek);
+            Assert.AreEqual(DayOfWeek.Monday, three .DayOfWeek);
         }
     }
 }

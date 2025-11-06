@@ -41,9 +41,9 @@ namespace BlackSharp.Core.Tests.Logging
                 str = Logger.Instance.ToString();
             }
 
-            Assert.IsTrue(str.Contains(message0));
-            Assert.IsTrue(str.Contains(message1));
-            Assert.IsTrue(str.Contains(message2));
+            Assert.Contains(message0, str);
+            Assert.Contains(message1, str);
+            Assert.Contains(message2, str);
         }
 
         [TestMethod]
@@ -64,7 +64,7 @@ namespace BlackSharp.Core.Tests.Logging
                 str = Logger.Instance.ToString();
             }
 
-            Assert.IsTrue(!str.Contains(message));
+            Assert.DoesNotContain(message, str);
         }
 
         [TestMethod]
