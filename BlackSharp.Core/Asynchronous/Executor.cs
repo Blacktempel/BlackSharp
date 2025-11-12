@@ -18,6 +18,11 @@ namespace BlackSharp.Core.Asynchronous
     {
         #region Public API
 
+        /// <summary>
+        /// Executes a specified action via <see cref="BackgroundWorker"/>.
+        /// </summary>
+        /// <param name="task">Task to execute.</param>
+        /// <param name="onError">Action to execute if an error occurs.</param>
         public static void Run(Func<Action> task, Action<AsyncCompletedEventArgs> onError = null)
         {
             var worker = new BackgroundWorker();

@@ -16,6 +16,10 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
     {
         #region Constructor
 
+        /// <summary>
+        /// Constructs a new object and locks given mutex.
+        /// </summary>
+        /// <param name="worldMutex">Mutex to automatically lock and unlock.</param>
         public WorldMutexGuard(WorldMutex worldMutex)
         {
             _WorldMutex = worldMutex;
@@ -33,6 +37,9 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
 
         #region Public
 
+        /// <summary>
+        /// Unlocks mutex which has been passed in constructor.
+        /// </summary>
         public void Dispose()
         {
             _WorldMutex.Unlock();

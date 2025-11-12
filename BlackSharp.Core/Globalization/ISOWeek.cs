@@ -9,6 +9,9 @@
 
 namespace BlackSharp.Core.Globalization
 {
+    /// <summary>
+    /// Represents ISOWeek functionality.
+    /// </summary>
     public static class ISOWeek
     {
         #region Public

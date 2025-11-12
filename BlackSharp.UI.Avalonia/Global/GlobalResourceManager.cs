@@ -17,6 +17,9 @@ using System.Linq.Expressions;
 
 namespace BlackSharp.UI.Avalonia.Global
 {
+    /// <summary>
+    /// Manager for global resources.
+    /// </summary>
     public class GlobalResourceManager
     {
         #region Constructor
@@ -40,6 +43,10 @@ namespace BlackSharp.UI.Avalonia.Global
 
         static object _LockObject_GFF = new object();
         static FontFamily _GlobalFontFamily = FontManager.Current.DefaultFontFamily;
+
+        /// <summary>
+        /// Gets or sets the global <see cref="FontFamily"/>.
+        /// </summary>
         public static FontFamily GlobalFontFamily
         {
             get
@@ -69,6 +76,10 @@ namespace BlackSharp.UI.Avalonia.Global
 
         static object _LockObject_GFS = new object();
         static double _GlobalFontSize = 12;
+
+        /// <summary>
+        /// Gets or sets the global font size.
+        /// </summary>
         public static double GlobalFontSize
         {
             get
@@ -136,16 +147,29 @@ namespace BlackSharp.UI.Avalonia.Global
 
         #region Static NotifyPropertyChanged
 
+        /// <summary>
+        /// Notifies that a static property has changed.
+        /// </summary>
+        /// <param name="propertyName">Name of static property, which has changed.</param>
         public static void NotifyStaticPropertyChanged(string propertyName)
         {
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
         }
 
+        /// <summary>
+        /// Notifies that all static properies have changed.
+        /// </summary>
         public void NotifyAllStaticPropertyChanged()
         {
             NotifyStaticPropertyChanged(string.Empty);
         }
 
+        /// <summary>
+        /// Notifies that a static property has changed.
+        /// </summary>
+        /// <typeparam name="T">Type parameter.</typeparam>
+        /// <param name="property">Expression of property, which has changed.</param>
+        /// <exception cref="ArgumentException">Throws if given expression is used improperly.</exception>
         public static void NotifyStaticPropertyChanged<T>(Expression<Func<T>> property)
         {
             var expr = property.Body as MemberExpression;
@@ -154,6 +178,9 @@ namespace BlackSharp.UI.Avalonia.Global
             NotifyStaticPropertyChanged(expr.Member.Name);
         }
 
+        /// <summary>
+        /// Property changed event.
+        /// </summary>
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
 
         #endregion

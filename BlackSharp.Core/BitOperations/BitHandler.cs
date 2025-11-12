@@ -7,6 +7,8 @@
  *
  */
 
+#pragma warning disable CS8500
+
 namespace BlackSharp.Core.BitOperations
 {
     /// <summary>
@@ -139,6 +141,16 @@ namespace BlackSharp.Core.BitOperations
         }
 #endif
 
+        /// <summary>
+        /// Sets specified bit range on given value.
+        /// </summary>
+        /// <typeparam name="T">Integer type parameter.</typeparam>
+        /// <param name="value">Value to set bits of.</param>
+        /// <param name="bits">Representation of target value bits.</param>
+        /// <param name="fromBit">Specifies start of bits to set (index).</param>
+        /// <param name="toBit">Specifies end of bits to set (index).</param>
+        /// <returns>Returns new value which bits have been changed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Throws if from and/or to is/are out of range.</exception>
 #if NET8_0_OR_GREATER
         public static T SetBits<T>(T value, T bits, int fromBit, int toBit)
             where T : System.Numerics.IBinaryInteger<T>
@@ -204,6 +216,16 @@ namespace BlackSharp.Core.BitOperations
         }
 #endif
 
+        /// <summary>
+        /// Sets specified bit range on given value.
+        /// </summary>
+        /// <typeparam name="T">Integer type parameter.</typeparam>
+        /// <param name="value">Value to set bits of.</param>
+        /// <param name="fromBit">Specifies start of bits to set (index).</param>
+        /// <param name="toBit">Specifies end of bits to set (index).</param>
+        /// <param name="set">Whether bits in specified range shall be set or unset.</param>
+        /// <returns>Returns new value which bits have been changed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Throws if from and/or to is/are out of range.</exception>
 #if NET8_0_OR_GREATER
         public static T SetBits<T>(T value, int fromBit, int toBit, bool set = true)
             where T : System.Numerics.IBinaryInteger<T>
@@ -269,6 +291,13 @@ namespace BlackSharp.Core.BitOperations
         }
 #endif
 
+        /// <summary>
+        /// Extracts bits at given positions and constructs a single value out of them.
+        /// </summary>
+        /// <typeparam name="T">Integer type parameter.</typeparam>
+        /// <param name="value">Value to extract bits of.</param>
+        /// <param name="bitPositions">Positions of bits to extract.</param>
+        /// <returns>Constructed new value.</returns>
         public static unsafe T ExtractBits<T>(T value, params int[] bitPositions)
             where T : struct
         {
@@ -313,3 +342,5 @@ namespace BlackSharp.Core.BitOperations
         #endregion
     }
 }
+
+#pragma warning restore CS8500

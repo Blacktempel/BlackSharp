@@ -9,6 +9,9 @@
 
 namespace BlackSharp.Core.Extensions
 {
+    /// <summary>
+    /// Extension class for basic types.
+    /// </summary>
     public static class BasicTypeExtensions
     {
         #region Public

@@ -9,6 +9,9 @@
 
 namespace BlackSharp.Core.Extensions
 {
+    /// <summary>
+    /// Extension class for <see cref="string"/>.
+    /// </summary>
     public static class StringExtensions
     {
         #region Public

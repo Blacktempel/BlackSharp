@@ -32,9 +32,15 @@ namespace BlackSharp.UI.Avalonia.Behaviors
 
         #region XAML Properties
 
+        /// <summary>
+        /// This property determines if this behavior is active.
+        /// </summary>
         public static readonly AttachedProperty<bool> EnableProperty =
             AvaloniaProperty.RegisterAttached<TextBlock, bool>("Enable", typeof(AutoWrapWidthAttached));
 
+        /// <summary>
+        /// Optionally, a right margin can be set for this behavior.
+        /// </summary>
         public static readonly AttachedProperty<double> RightMarginProperty =
             AvaloniaProperty.RegisterAttached<TextBlock, double>("RightMargin", typeof(AutoWrapWidthAttached), 0d);
 
@@ -45,13 +51,35 @@ namespace BlackSharp.UI.Avalonia.Behaviors
 
         #region Public
 
+        /// <summary>
+        /// Sets value of <see cref="EnableProperty"/>.
+        /// </summary>
+        /// <param name="element">Element to set value to.</param>
+        /// <param name="value">Value to set.</param>
         public static void SetEnable(AvaloniaObject element, bool value) =>
             element.SetValue(EnableProperty, value);
+
+        /// <summary>
+        /// Gets value of <see cref="EnableProperty"/>.
+        /// </summary>
+        /// <param name="element">Element to get value of.</param>
+        /// <returns>Value of property.</returns>
         public static bool GetEnable(AvaloniaObject element) =>
             element.GetValue(EnableProperty);
 
+        /// <summary>
+        /// Sets value of <see cref="RightMarginProperty"/>.
+        /// </summary>
+        /// <param name="element">Element to set value to.</param>
+        /// <param name="value">Value to set.</param>
         public static void SetRightMargin(AvaloniaObject element, double value) =>
             element.SetValue(RightMarginProperty, value);
+
+        /// <summary>
+        /// Gets value of <see cref="RightMarginProperty"/>.
+        /// </summary>
+        /// <param name="element">Element to get value of.</param>
+        /// <returns>Value of property.</returns>
         public static double GetRightMargin(AvaloniaObject element) =>
             element.GetValue(RightMarginProperty);
 

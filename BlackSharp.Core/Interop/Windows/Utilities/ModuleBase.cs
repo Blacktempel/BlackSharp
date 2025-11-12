@@ -20,6 +20,10 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
     {
         #region Constructor
 
+        /// <summary>
+        /// Constructs a new object, loads module based on <see cref="GetModuleFilename"/> and loads functions via <see cref="LoadLibraryFunctions"/>.
+        /// </summary>
+        /// <remarks>If successful, <see cref="IsModuleLoaded"/> is set to true.</remarks>
         public ModuleBase()
         {
             var moduleFilename = GetModuleFilename();
@@ -44,12 +48,18 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
 
         #region Properties
 
+        /// <summary>
+        /// Identifies whether the module was loaded properly.
+        /// </summary>
         public bool IsModuleLoaded { get; private set; }
 
         #endregion
 
         #region Public
 
+        /// <summary>
+        /// Unloads the module.
+        /// </summary>
         public virtual void Dispose()
         {
             if (!_Disposed)
@@ -57,6 +67,7 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
                 if (_Module != IntPtr.Zero)
                 {
                     Kernel32.FreeLibrary(_Module);
+                    _Module = IntPtr.Zero;
                 }
 
                 _Disposed = true;
@@ -67,14 +78,29 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
 
         #region Abstract
 
+        /// <summary>
+        /// Gets filename of module to load via <see cref="Kernel32.LoadLibrary"/>.
+        /// </summary>
+        /// <returns>Filename of module</returns>
         protected abstract string GetModuleFilename();
 
+        /// <summary>
+        /// Loads functions of loaded module.
+        /// </summary>
+        /// <returns>Returns boolean value to determine whether all necessary functions were loaded correctly.</returns>
+        /// <remarks>Use <see cref="GetDelegate"/> for simple loading.</remarks>
         protected abstract bool LoadLibraryFunctions();
 
         #endregion
 
         #region Protected
 
+        /// <summary>
+        /// Load function via <see cref="DynamicLoader"/> and return delegate type, ready for use.
+        /// </summary>
+        /// <typeparam name="T">Delegate type for given function.</typeparam>
+        /// <param name="procName">Function to load.</param>
+        /// <returns><inheritdoc cref="DynamicLoader.GetDelegate"/></returns>
         protected T GetDelegate<T>(string procName)
             where T : Delegate
         {

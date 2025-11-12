@@ -13,6 +13,9 @@ using BlackSharp.Core.Extensions;
 
 namespace BlackSharp.UI.Avalonia.Controls
 {
+    /// <summary>
+    /// Extension of a standard <see cref="Grid"/>, which automatically adds a margin between its childs.
+    /// </summary>
     public class GridEx : Grid
     {
         #region Constructor
@@ -42,22 +45,34 @@ namespace BlackSharp.UI.Avalonia.Controls
 
         #region XAML Properties
 
+        /// <summary>
+        /// Desired margin of children.
+        /// </summary>
         public static readonly AvaloniaProperty<Thickness> ChildMarginProperty =
             AvaloniaProperty.Register<GridEx, Thickness>(nameof(ChildMargin), DefaultChildMargin);
 
+        /// <summary>
+        /// Offset for left margin.
+        /// </summary>
         public static readonly AvaloniaProperty<int> ChildMarginOffsetProperty =
-            AvaloniaProperty.Register<GridEx, int>(nameof(ChildMargin), DefaultChildMarginOffset);
+            AvaloniaProperty.Register<GridEx, int>(nameof(ChildMarginOffset), DefaultChildMarginOffset);
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// <inheritdoc cref="ChildMarginProperty"/>
+        /// </summary>
         public Thickness ChildMargin
         {
             get { return (Thickness)GetValue(ChildMarginProperty); }
             set { SetValue(ChildMarginProperty, value); }
         }
 
+        /// <summary>
+        /// <inheritdoc cref="ChildMarginOffsetProperty"/>
+        /// </summary>
         public int ChildMarginOffset
         {
             get { return (int)GetValue(ChildMarginOffsetProperty); }
@@ -68,6 +83,7 @@ namespace BlackSharp.UI.Avalonia.Controls
 
         #region Protected
 
+        /// <inheritdoc cref="Grid.MeasureOverride"/>
         protected override Size MeasureOverride(Size constraint)
         {
             UpdateChildMargins();

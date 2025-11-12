@@ -16,6 +16,10 @@ namespace BlackSharp.Core.Asynchronous
     {
         #region Constructor
 
+        /// <summary>
+        /// Constructs a new object of this class and locks given parameter object.
+        /// </summary>
+        /// <param name="lockObject">Object to lock and unlock automatically.</param>
         public LockGuard(object lockObject)
         {
             _LockObject = lockObject;
@@ -33,6 +37,9 @@ namespace BlackSharp.Core.Asynchronous
 
         #region Public
 
+        /// <summary>
+        /// Unlocks object which was passed in constructor.
+        /// </summary>
         public void Dispose()
         {
             Monitor.Exit(_LockObject);

@@ -23,6 +23,11 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
     {
         #region Constructor
 
+        /// <summary>
+        /// Constructs a new global mutex with specified name.
+        /// </summary>
+        /// <param name="mutexName">Name of mutex.</param>
+        /// <exception cref="PlatformNotSupportedException">Throws if not on Windows.</exception>
         public WorldMutex(string mutexName)
         {
             if (!OS.IsWindows())
@@ -34,6 +39,9 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
             _WorldMutex = CreateWorldMutex(mutexName);
         }
 
+        /// <summary>
+        /// Destructs the object.
+        /// </summary>
         ~WorldMutex()
         {
             //Cleanup for Handle

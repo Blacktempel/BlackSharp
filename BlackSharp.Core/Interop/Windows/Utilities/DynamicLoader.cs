@@ -19,12 +19,21 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
     {
         #region Public
 
+        /// <inheritdoc cref="GetDelegate(IntPtr, string, Type)"/>
         public static T GetDelegate<T>(IntPtr module, string procName)
             where T : Delegate
         {
             return GetDelegate(module, procName, typeof(T)) as T;
         }
 
+        /// <summary>
+        /// Loads function from given module and casts it to specified delegate.
+        /// </summary>
+        /// <param name="module">Module to load function from.</param>
+        /// <param name="procName">Name of function to load.</param>
+        /// <param name="delegateType">Type of delegate to cast to.</param>
+        /// <returns>Returns loaded and casted delegate, ready for use.<br/>
+        /// May return null if signature of delegate did not match function to load.</returns>
         public static Delegate GetDelegate(IntPtr module, string procName, Type delegateType)
         {
             IntPtr ptr = Kernel32.GetProcAddress(module, procName);

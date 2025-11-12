@@ -7,6 +7,8 @@
  *
  */
 
+#pragma warning disable CS1591
+
 using BlackSharp.Core.Interop.Windows.Structures;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -77,3 +79,5 @@ namespace BlackSharp.Core.Interop.Windows.Native
         #endregion
     }
 }
+
+#pragma warning restore CS1591

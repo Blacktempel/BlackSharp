@@ -7,6 +7,8 @@
  *
  */
 
+#pragma warning disable CS1591
+
 using System.Runtime.InteropServices;
 
 namespace BlackSharp.Core.Interop.Windows.Structures
@@ -19,3 +21,5 @@ namespace BlackSharp.Core.Interop.Windows.Structures
         public bool bInheritHandle;
     }
 }
+
+#pragma warning restore CS1591

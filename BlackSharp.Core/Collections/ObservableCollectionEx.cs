@@ -78,6 +78,9 @@ namespace BlackSharp.Core.Collections
 
         #region Fields
 
+        /// <summary>
+        /// Specifies invalid index. This is used by e.g. <see cref="FindIndex"/>.
+        /// </summary>
         public const int InvalidIndex = -1;
 
         const string CountString = "Count";
@@ -440,12 +443,22 @@ namespace BlackSharp.Core.Collections
 
         #region Protected
 
+        /// <summary>
+        /// Disallow reentrant attempts to change this collection. E.g. a event handler
+        /// of the CollectionChanged event is not allowed to make changes to this collection.
+        /// </summary>
+        /// <returns></returns>
         protected IDisposable BlockReentrancy()
         {
             Monitor.Enter();
             return Monitor;
         }
 
+        /// <summary>
+        /// Check and assert for reentrant attempts to change this collection.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Raised when changing the collection
+        /// while another collection change is still being notified to other listeners.</exception>
         protected void CheckReentrancy()
         {
             if (Monitor.Busy)
@@ -571,8 +584,19 @@ namespace BlackSharp.Core.Collections
 
         #region INotifyCollectionChanged
 
+        /// <summary>
+        /// Occurs when the collection changes, either by adding or removing an item.
+        /// </summary>
         public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
 
+        /// <summary>
+        /// Raise CollectionChanged event to any listeners.<br/>
+        /// Properties/methods modifying this ObservableCollection will raise
+        /// a collection changed event through this virtual method.
+        /// </summary>
+        /// <param name="e">The event.</param>
+        /// <remarks>When overriding this method, either call its base implementation
+        /// or call to guard against reentrant collection changes.</remarks>
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (CollectionChanged != null && AreNotifyEventsEnabled)
@@ -650,8 +674,15 @@ namespace BlackSharp.Core.Collections
 
         #region INotifyPropertyChanged
 
+        /// <summary>
+        /// Property changed event.
+        /// </summary>
         public virtual event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Notifies that a property has changed.
+        /// </summary>
+        /// <param name="propertyName">Name of property which has changed.</param>
         protected void NotifyPropertyChanged(string propertyName)
         {
             if (AreNotifyEventsEnabled)
@@ -671,6 +702,11 @@ namespace BlackSharp.Core.Collections
     public class FunctorComparer<T> : IComparer<T>, IComparer
     {
         #region Constructor
+        /// <summary>
+        /// Constructs a new object.
+        /// </summary>
+        /// <param name="comparisation">Comparison parameter.</param>
+        /// <exception cref="ArgumentNullException">Throws if parameter is null.</exception>
         public FunctorComparer(Comparison<T> comparisation)
         {
             if (comparisation == null)

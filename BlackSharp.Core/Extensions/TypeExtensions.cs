@@ -9,6 +9,9 @@
 
 namespace BlackSharp.Core.Extensions
 {
+    /// <summary>
+    /// Extension class for <see cref="Type"/>.
+    /// </summary>
     public static class TypeExtensions
     {
         #region Public

@@ -68,6 +68,12 @@ namespace BlackSharp.Core.Logging
     public class LogItem
     {
         #region Constructor
+        /// <summary>
+        /// Constructs new object.
+        /// </summary>
+        /// <param name="level">Log level.</param>
+        /// <param name="message">Message to log.</param>
+        /// <param name="time">Time to log.</param>
         public LogItem(LogLevel level, string message, DateTime? time)
         {
             Level = level;
@@ -77,12 +83,24 @@ namespace BlackSharp.Core.Logging
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Log level of this object.
+        /// </summary>
         public LogLevel Level { get; }
+
+        /// <summary>
+        /// Time of this item.
+        /// </summary>
         public DateTime? Time { get; }
+
+        /// <summary>
+        /// Message to log.
+        /// </summary>
         public string Message { get; }
         #endregion
 
         #region ToString
+        /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
             var time = Time?.ToString("[dd/MM/yyyy HH:mm:ss.fff] ");
@@ -112,6 +130,9 @@ namespace BlackSharp.Core.Logging
 
         #region Properties
         static Logger _Instance;
+        /// <summary>
+        /// Gets singleton instance of this logger.
+        /// </summary>
         public static Logger Instance
         {
             get
@@ -241,6 +262,7 @@ namespace BlackSharp.Core.Logging
         #endregion
 
         #region ToString
+        /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
             //if (Debugger.IsAttached)
