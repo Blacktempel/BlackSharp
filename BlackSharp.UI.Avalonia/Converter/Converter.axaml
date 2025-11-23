@@ -1,0 +1,8 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:avaloniaConverters="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls"
+                    xmlns:conv="using:BlackSharp.UI.Avalonia.Converter">
+
+    <conv:DoubleMultiplyConverter x:Key="DoubleMultiplyConverter"/>
+
+</ResourceDictionary>
