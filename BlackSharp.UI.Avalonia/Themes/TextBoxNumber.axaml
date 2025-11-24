@@ -1,0 +1,9 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:ctrl="using:BlackSharp.UI.Avalonia.Controls">
+	<Design.PreviewWith>
+	</Design.PreviewWith>
+
+	<ControlTheme x:Key="{x:Type ctrl:TextBoxNumber}" TargetType="{x:Type ctrl:TextBoxNumber}" BasedOn="{StaticResource {x:Type TextBox}}"/>
+
+</ResourceDictionary>

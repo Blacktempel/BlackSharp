@@ -7,6 +7,9 @@
  *
  */
 
+using BlackSharp.Core.Extensions.Helper;
+using System.Reflection;
+
 namespace BlackSharp.Core.Extensions
 {
     /// <summary>
@@ -25,6 +28,31 @@ namespace BlackSharp.Core.Extensions
         public static bool IsTypeOrSubclassOf(this Type t, Type c)
         {
             return t == c || t.IsSubclassOf(c);
+        }
+
+        /// <summary>
+        /// Determines whether the specified type represents a floating-point numeric type.
+        /// </summary>
+        /// <param name="t">The type to evaluate for floating-point numeric representation. Cannot be null.</param>
+        /// <returns>true if the type is float, double, or decimal; otherwise, false.</returns>
+        public static bool IsFloatingType(this Type t)
+        {
+            return t.Any(typeof(float),
+                         typeof(double),
+                         typeof(decimal));
+        }
+
+        /// <summary>
+        /// Gets default value for current type.
+        /// </summary>
+        /// <param name="t">This type.</param>
+        /// <returns>Default value for type.</returns>
+        public static dynamic GetDefault(this Type t)
+        {
+            var type = typeof(Default<>).MakeGenericType(t);
+            var prop = type.GetProperty(nameof(Default<int>.Value), BindingFlags.Static | BindingFlags.Public);
+            var get = prop.GetGetMethod();
+            return get.Invoke(null, null);
         }
 
         #endregion

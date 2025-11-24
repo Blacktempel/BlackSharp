@@ -61,6 +61,23 @@ namespace BlackSharp.Core.Extensions
             return Join<object>(separator, values);
         }
 
+        /// <summary>
+        /// Replaces a substring (range) in current string with specified string.
+        /// </summary>
+        /// <param name="str">This object.</param>
+        /// <param name="startIndex">The zero-based starting character position of the substring in this instance.</param>
+        /// <param name="length">The number of characters in the substring.</param>
+        /// <param name="instead">The string to replace the specified substring (range).</param>
+        /// <returns>The new string.</returns>
+        public static string ReplaceAtIndex(this string str, int startIndex, int length, string instead)
+        {
+            string strnew = string.Empty;
+            string temp0 = str.Substring(0, startIndex);
+            int index = startIndex + length;
+            string temp2 = str.Substring(index, str.Length - index);
+            return temp0 + instead + temp2;
+        }
+
         #endregion
     }
 }

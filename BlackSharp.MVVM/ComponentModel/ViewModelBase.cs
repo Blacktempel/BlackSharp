@@ -25,6 +25,14 @@ namespace BlackSharp.MVVM.ComponentModel
             return SetProperty(ref field, newValue, propertyName);
         }
 
+        /// <summary>
+        /// Raises property change notifications for all properties on the object.
+        /// </summary>
+        public void NotifyAllPropertyChanged()
+        {
+            OnPropertyChanged(string.Empty);
+        }
+
         #endregion
     }
 }

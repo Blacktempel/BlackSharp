@@ -17,6 +17,16 @@ namespace BlackSharp.Core.Converters
         #region Public
 
         /// <summary>
+        /// Converts given byte value into megabytes.
+        /// </summary>
+        /// <param name="bytes">Bytes to convert.</param>
+        /// <returns>Returns converted value.</returns>
+        public static decimal ByteToMegabyte(ulong bytes)
+        {
+            return bytes == 0 ? 0M : bytes / 1000M / 1000M;
+        }
+
+        /// <summary>
         /// Converts given byte value into gigabytes.
         /// </summary>
         /// <param name="bytes">Bytes to convert.</param>

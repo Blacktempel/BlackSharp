@@ -36,13 +36,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaXaml Remove="Themes\BusyPanel.axaml" />
-    <AvaloniaXaml Remove="Themes\Styles.axaml" />
+    <AvaloniaXaml Remove="Styles\BusyPanel.axaml" />
+    <AvaloniaXaml Remove="Styles\Styles.axaml" />
+    <AvaloniaXaml Remove="Themes\TextBoxNumber.axaml" />
+    <AvaloniaXaml Remove="Themes\Themes.axaml" />
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Themes\BusyPanel.axaml" />
-    <AvaloniaResource Include="Themes\Styles.axaml" />
+    <AvaloniaResource Include="Styles\BusyPanel.axaml" />
+    <AvaloniaResource Include="Styles\Styles.axaml" />
+    <AvaloniaResource Include="Themes\TextBoxNumber.axaml" />
+    <AvaloniaResource Include="Themes\Themes.axaml" />
   </ItemGroup>
 
   <ItemGroup>
