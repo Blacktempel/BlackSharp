@@ -22,6 +22,14 @@ namespace BlackSharp.Core.Tests.Extensions
             Assert.IsTrue(StringExtensions.Contains(TestString, "complex", StringComparison.OrdinalIgnoreCase));
 
             Assert.IsFalse(StringExtensions.Contains(TestString, "complex", StringComparison.Ordinal));
+
+            Assert.IsFalse(StringExtensions.Contains(null      , "complex", StringComparison.OrdinalIgnoreCase));
+            Assert.IsFalse(StringExtensions.Contains(TestString, null     , StringComparison.OrdinalIgnoreCase));
+            Assert.IsFalse(StringExtensions.Contains(null      , null     , StringComparison.OrdinalIgnoreCase));
+
+            Assert.IsFalse(StringExtensions.Contains(string.Empty, null        , StringComparison.OrdinalIgnoreCase));
+            Assert.IsFalse(StringExtensions.Contains(null        , string.Empty, StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue (StringExtensions.Contains(string.Empty, string.Empty, StringComparison.OrdinalIgnoreCase));
         }
 
         [TestMethod]

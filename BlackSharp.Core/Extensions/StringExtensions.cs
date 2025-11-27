@@ -26,14 +26,9 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="ArgumentNullException"></exception>
         public static bool Contains(this string str, string value, StringComparison comparison)
         {
-            if (str == null)
+            if (str == null || value == null)
             {
-                throw new ArgumentNullException(nameof(str));
-            }
-
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
+                return false;
             }
 
             return str.IndexOf(value, comparison) >= 0;
