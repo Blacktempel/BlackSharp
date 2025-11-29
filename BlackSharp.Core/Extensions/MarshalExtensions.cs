@@ -17,6 +17,22 @@ namespace BlackSharp.Core.Extensions
     {
         #region Public
 
+        [System.Security.SecurityCritical]
+        public static unsafe void Copy(IntPtr source, IntPtr destination, int startIndex, int length)
+        {
+            if (source == IntPtr.Zero || destination == IntPtr.Zero)
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (startIndex < 0 || length < 0)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            Buffer.MemoryCopy((source + startIndex).ToPointer(), destination.ToPointer(), length, length);
+        }
+
         #region UInt16
 
         /// <summary>
