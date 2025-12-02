@@ -3,6 +3,9 @@
                     xmlns:avaloniaConverters="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls"
                     xmlns:conv="using:BlackSharp.UI.Avalonia.Converter">
 
-    <conv:DoubleMultiplyConverter x:Key="DoubleMultiplyConverter"/>
+    <conv:DoubleMultiplyConverter    x:Key="DoubleMultiplyConverter"   />
+    <conv:MultiStringEqualsConverter x:Key="MultiStringEqualsConverter"/>
+    <conv:StringEqualsConverter      x:Key="StringEqualsConverter"     />
+    <conv:StringToColorConverter     x:Key="StringToColorConverter"    />
 
 </ResourceDictionary>

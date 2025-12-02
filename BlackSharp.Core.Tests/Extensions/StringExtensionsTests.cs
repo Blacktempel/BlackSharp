@@ -45,9 +45,21 @@ namespace BlackSharp.Core.Tests.Extensions
 
             var result0 = StringExtensions.Join(Separator, list);
             var result1 = StringExtensions.Join(Separator, Elem0, Elem1, Elem2);
+            var result2 = StringExtensions.Join(Separator, []);
 
             Assert.AreEqual($"{Elem0}{Separator}{Elem1}{Separator}{Elem2}", result0);
             Assert.AreEqual($"{Elem0}{Separator}{Elem1}{Separator}{Elem2}", result1);
+        }
+
+        [TestMethod]
+        public void ReplaceAtIndex()
+        {
+            const string TestString = "ABCDEF";
+
+            Assert.AreEqual(string.Empty, StringExtensions.ReplaceAtIndex(TestString, 0, TestString.Length, string.Empty));
+            Assert.AreEqual(TestString  , StringExtensions.ReplaceAtIndex(TestString, 3, 0                , string.Empty));
+            Assert.AreEqual("ABC"       , StringExtensions.ReplaceAtIndex(TestString, 3, 3                , string.Empty));
+            Assert.AreEqual("ABCAAA"    , StringExtensions.ReplaceAtIndex(TestString, 3, 3                , "AAA"       ));
         }
     }
 }

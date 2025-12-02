@@ -47,7 +47,14 @@ namespace BlackSharp.Core.Extensions
             {
                 str += value + separator;
             }
-            return str?.Substring(0, str.Length - separator.Length);
+
+            var subStringIndex = str.Length - separator.Length;
+            if (subStringIndex < 0)
+            {
+                subStringIndex = 0;
+            }
+
+            return str?.Substring(0, subStringIndex);
         }
 
         /// <inheritdoc cref="Join{T}(string, IEnumerable{T})"/>
