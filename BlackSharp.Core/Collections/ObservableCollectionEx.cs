@@ -439,6 +439,24 @@ namespace BlackSharp.Core.Collections
             OnCollectionReset();
         }
 
+        /// <summary>
+        /// Attempts to insert an item at the specified index in the collection.
+        /// </summary>
+        /// <param name="index">The zero-based index at which the item should be inserted.<br/>
+        /// Must be greater than or equal to 0 and less than or equal to the current number of items.</param>
+        /// <param name="item">The item to insert into the collection.</param>
+        /// <returns>true if the item was successfully inserted; otherwise, false.</returns>
+        /// <remarks>This will fail if given index is not in a valid range.</remarks>
+        public bool TryInsert(int index, T item)
+        {
+            if (index < 0 || index > Count)
+                return false;
+
+            InsertItem(index, item);
+
+            return true;
+        }
+
         #endregion
 
         #region Protected
