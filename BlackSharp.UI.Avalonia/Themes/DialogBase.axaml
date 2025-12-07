@@ -20,14 +20,9 @@
 								<ItemsControl.ItemTemplate>
 									<DataTemplate x:DataType="dlgVM:DialogButton">
 										<Button IsDefault="{Binding IsDefault}" IsCancel="{Binding IsCancel}" Content="{Binding Content}"
-												MinWidth="85" Padding="10,4" Margin="8,0,0,0">
-											<Interaction.Behaviors>
-												<ButtonClickEventTriggerBehavior>
-													<InvokeCommandAction Command="{Binding DefaultButtonCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=dialog:DialogBase}}"
-																		 CommandParameter="{Binding DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"/>
-												</ButtonClickEventTriggerBehavior>
-											</Interaction.Behaviors>
-										</Button>
+												MinWidth="85" Padding="10,4" Margin="8,0,0,0"
+												Command="{Binding DefaultButtonCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=dialog:DialogBase}}"
+												CommandParameter="{Binding}"/>
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>
 								<ItemsControl.ItemsPanel>
