@@ -44,5 +44,6 @@
 	</ControlTheme>
 
 	<ControlTheme x:Key="{x:Type dialog:MessageBox}" TargetType="{x:Type dialog:MessageBox}" BasedOn="{StaticResource {x:Type dialog:DialogBase}}"/>
+	<ControlTheme x:Key="{x:Type dialog:TimeoutMessageBox}" TargetType="{x:Type dialog:TimeoutMessageBox}" BasedOn="{StaticResource {x:Type dialog:MessageBox}}"/>
 
 </ResourceDictionary>

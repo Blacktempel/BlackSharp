@@ -79,6 +79,13 @@ namespace BlackSharp.MVVM.Dialogs
             set { SetField(ref _CommandParameter, value); }
         }
 
+        object _UserData;
+        public object UserData
+        {
+            get { return _UserData; }
+            set { SetField(ref _UserData, value); }
+        }
+
         #endregion
 
         #region Public

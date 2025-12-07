@@ -14,6 +14,7 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
 using BlackSharp.MVVM.Dialogs;
 using BlackSharp.MVVM.Dialogs.Enums;
 using BlackSharp.UI.Avalonia.Windows.Dialogs.Enums;
@@ -344,7 +345,12 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
 
             if (dialog)
             {
-                ShowDialog(wnd);
+                //Block
+                using (var source = new CancellationTokenSource())
+                {
+                    ShowDialog(wnd).ContinueWith(t => source.Cancel(), TaskScheduler.FromCurrentSynchronizationContext());
+                    Dispatcher.UIThread.MainLoop(source.Token);
+                }
             }
             else
             {
