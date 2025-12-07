@@ -36,15 +36,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaXaml Remove="Styles\BusyPanel.axaml" />
-    <AvaloniaXaml Remove="Styles\Styles.axaml" />
-    <AvaloniaXaml Remove="Themes\TextBoxNumber.axaml" />
-    <AvaloniaXaml Remove="Themes\Themes.axaml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <AvaloniaResource Include="Styles\BusyPanel.axaml" />
     <AvaloniaResource Include="Styles\Styles.axaml" />
+    <AvaloniaResource Include="Themes\DialogBase.axaml" />
+    <AvaloniaResource Include="Themes\Geometries.axaml" />
     <AvaloniaResource Include="Themes\TextBoxNumber.axaml" />
     <AvaloniaResource Include="Themes\Themes.axaml" />
   </ItemGroup>

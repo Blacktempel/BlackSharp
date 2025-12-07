@@ -1,0 +1,24 @@
+<dialog:DialogBase xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   xmlns:dialog="using:BlackSharp.UI.Avalonia.Windows.Dialogs"
+                   x:Class="BlackSharp.UI.Avalonia.Windows.Dialogs.MessageBox"
+                   WindowStartupLocation="CenterOwner">
+    <dialog:DialogBase.Content>
+        <Grid ColumnDefinitions="Auto,*">
+		    <Image Grid.Column="0" Margin="10" Width="32" Height="32" VerticalAlignment="Top">
+                <Image.Source>
+                    <DrawingImage>
+				        <GeometryDrawing Geometry="{Binding IconData, RelativeSource={RelativeSource FindAncestor, AncestorType=dialog:DialogBase}}"
+                                         Brush="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+                    </DrawingImage>
+                </Image.Source>
+            </Image>
+            <TextBox Grid.Column="1" IsReadOnly="True" Focusable="False"
+                     Margin="0,12,0,0" BorderThickness="0" TextWrapping="Wrap"
+                     Text="{Binding Message, RelativeSource={RelativeSource FindAncestor, AncestorType=dialog:DialogBase}}"/>
+        </Grid>
+    </dialog:DialogBase.Content>
+</dialog:DialogBase>
