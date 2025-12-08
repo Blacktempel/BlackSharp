@@ -53,7 +53,7 @@ namespace BlackSharp.UI.Avalonia.Controls
         {
             var text = ProcessTextChange(e.Text);
 
-            if (!IsTextAllowed(e.Text))
+            if (!IsTextAllowed(text))
             {
                 e.Handled = true;
             }
@@ -86,11 +86,14 @@ namespace BlackSharp.UI.Avalonia.Controls
         string ProcessTextChange(string text)
         {
             var temp = string.Empty;
-            var selectionLength = Math.Abs(SelectionStart - SelectionEnd);
+            var selectionBegin = Math.Min(SelectionStart, SelectionEnd);
+            var selectionEnd = Math.Max(SelectionStart, SelectionEnd);
+
+            var selectionLength = selectionEnd - selectionBegin;
 
             if (selectionLength > 0)
             {
-                temp = Text.ReplaceAtIndex(SelectionStart - 1, selectionLength, text);
+                temp = Text.ReplaceAtIndex(selectionBegin, selectionLength, text);
             }
             else
             {

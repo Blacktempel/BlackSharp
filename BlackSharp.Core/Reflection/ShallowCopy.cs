@@ -50,9 +50,11 @@ namespace BlackSharp.Core.Reflection
             {
                 var value = prop.GetValue(source);
 
+                var typeOfValue = value?.GetType();
+
                 //If object type, check actual type of assigned value
                 if (prop.PropertyType == ObjectType
-                 && value?.GetType().IsValueType == false)
+                 && (typeOfValue?.IsValueType == false && typeOfValue != StringType))
                 {
                     continue;
                 }
