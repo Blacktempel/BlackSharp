@@ -11,6 +11,7 @@ using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Avalonia.Xaml.Interactions.DragAndDrop;
 using BlackSharp.MVVM.ComponentModel;
+using System.Collections;
 
 namespace BlackSharp.UI.Avalonia.Behaviors;
 
@@ -87,11 +88,12 @@ public abstract class BaseDataGridDropHandler<T> : DropHandlerBase
 
     #region Protected
 
+    protected abstract T MakeCopy(IList parentCollection, T item);
     protected abstract T MakeCopy(IList<T> parentCollection, T item);
 
     protected abstract bool Validate(DataGrid dg, DragEventArgs e, object sourceContext, object targetContext, bool bExecute);
 
-    protected bool RunDropAction(DataGrid dg, DragEventArgs e, bool bExecute, T sourceItem, T targetItem, IList<T> items)
+    protected bool RunDropAction(DataGrid dg, DragEventArgs e, bool bExecute, T sourceItem, T targetItem, IList items)
     {
         int sourceIndex = items.IndexOf(sourceItem);
         int targetIndex = items.IndexOf(targetItem);
@@ -130,6 +132,39 @@ public abstract class BaseDataGridDropHandler<T> : DropHandlerBase
             default:
                 return false;
         }
+    }
+
+    protected void InsertItem(IList items, T item, int index)
+    {
+        items.Insert(index, item);
+    }
+
+    protected void MoveItem(IList items, int sourceIndex, int targetIndex)
+    {
+        if (sourceIndex < targetIndex)
+        {
+            var item = items[sourceIndex];
+            items.RemoveAt(sourceIndex);
+            items.Insert(targetIndex, item);
+        }
+        else
+        {
+            var removeIndex = sourceIndex + 1;
+            if (items.Count + 1 > removeIndex)
+            {
+                var item = items[sourceIndex];
+                items.RemoveAt(removeIndex - 1);
+                items.Insert(targetIndex, item);
+            }
+        }
+    }
+
+    protected void SwapItem(IList items, int sourceIndex, int targetIndex)
+    {
+        var item1 = items[sourceIndex];
+        var item2 = items[targetIndex];
+        items[targetIndex] = item1;
+        items[sourceIndex] = item2;
     }
 
     #endregion

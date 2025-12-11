@@ -8,12 +8,16 @@ using Avalonia.Input;
 using Avalonia.VisualTree;
 using BlackSharp.Core.Interfaces;
 using BlackSharp.MVVM.ComponentModel;
+using System.Collections;
 
 namespace BlackSharp.UI.Avalonia.Behaviors
 {
     public class ItemsDataGridDropHandlerGen<TItemViewModel> : BaseDataGridDropHandler<TItemViewModel>
         where TItemViewModel : ViewModelBase, ICloneable<TItemViewModel>
     {
+        protected override TItemViewModel MakeCopy(IList parentCollection, TItemViewModel item) =>
+            item.Clone();
+
         protected override TItemViewModel MakeCopy(IList<TItemViewModel> parentCollection, TItemViewModel item) =>
             item.Clone();
 
@@ -29,7 +33,7 @@ namespace BlackSharp.UI.Avalonia.Behaviors
             }
 
             //return RunDropAction(dg, e, bExecute, sourceItem, targetItem, items);
-            return RunDropAction(dg, e, bExecute, sourceItem, targetItem, dg.ItemsSource.Cast<TItemViewModel>().ToList());
+            return RunDropAction(dg, e, bExecute, sourceItem, targetItem, dg.ItemsSource as IList);
         }
     }
 
