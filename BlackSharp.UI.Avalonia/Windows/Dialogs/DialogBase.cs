@@ -17,6 +17,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using BlackSharp.MVVM.Dialogs;
 using BlackSharp.MVVM.Dialogs.Enums;
+using BlackSharp.UI.Avalonia.Media;
 using BlackSharp.UI.Avalonia.Windows.Dialogs.Enums;
 using BlackSharp.UI.Avalonia.Windows.Media;
 using BlackSharp.UI.Avalonia.Windows.Media.Enums;
@@ -367,12 +368,10 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
 
         void SetBackgroundColor()
         {
-            if (Application.Current?.TryGetResource("SystemRegionBrush", Application.Current.RequestedThemeVariant, out var res) == true)
+            var b = SystemColors.GetSystemBackground();
+            if (b != null)
             {
-                if (res is SolidColorBrush b)
-                {
-                    Background = b;
-                }
+                Background = b;
             }
         }
 
