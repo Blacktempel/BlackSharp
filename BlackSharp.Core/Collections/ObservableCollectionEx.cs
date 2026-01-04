@@ -273,8 +273,13 @@ namespace BlackSharp.Core.Collections
         public void Remove(Predicate<T> match)
         {
             for (int i = 0; i < Count; ++i)
+            {
                 if (match(this[i]))
+                {
                     Remove(this[i]);
+                    --i;
+                }
+            }
             OnCollectionReset();
         }
 
