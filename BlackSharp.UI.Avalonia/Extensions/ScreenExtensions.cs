@@ -52,6 +52,11 @@ namespace BlackSharp.UI.Avalonia.Extensions
 
             var devicePath = GetDevicePath(screen);
 
+            if (devicePath == null)
+            {
+                return null;
+            }
+
             var match = _HWIDRegex.Match(devicePath);
 
             if (match.Success)
@@ -76,6 +81,10 @@ namespace BlackSharp.UI.Avalonia.Extensions
             }
 
             var devicePath = GetDevicePath(screen);
+            if (devicePath == null)
+            {
+                return null;
+            }
 
             //Get registry path
             var registryPath = GetRegistryPathFromDevicePath(devicePath);

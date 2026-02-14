@@ -7,17 +7,15 @@
  *
  */
 
-using BlackSharp.UI.Avalonia.Platform.Windows.Interop.Enums;
 using System.Runtime.InteropServices;
 
 namespace BlackSharp.UI.Avalonia.Platform.Windows.Interop.Structures
 {
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct DISPLAYCONFIG_MODE_INFO
+    [StructLayout(LayoutKind.Explicit)]
+    internal struct DISPLAYCONFIG_MODE_INFO_UNION
     {
-        public DISPLAYCONFIG_MODE_INFO_TYPE infoType;
-        public uint id;
-        public LUID adapterId;
-        public DISPLAYCONFIG_MODE_INFO_UNION modeInfo;
+        [FieldOffset(0)] public DISPLAYCONFIG_TARGET_MODE infoType;
+        [FieldOffset(0)] public DISPLAYCONFIG_SOURCE_MODE sourceMode;
+        [FieldOffset(0)] public DISPLAYCONFIG_DESKTOP_IMAGE_INFO desktopImageInfo;
     }
 }

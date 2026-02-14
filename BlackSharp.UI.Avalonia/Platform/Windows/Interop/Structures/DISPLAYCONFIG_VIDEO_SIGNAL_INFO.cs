@@ -13,18 +13,16 @@ using System.Runtime.InteropServices;
 namespace BlackSharp.UI.Avalonia.Platform.Windows.Interop.Structures
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct DISPLAYCONFIG_PATH_TARGET_INFO
+    internal struct DISPLAYCONFIG_VIDEO_SIGNAL_INFO
     {
-        public LUID adapterId;
-        public uint id;
-        public uint modeInfoIdx;
-        public DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY outputTechnology;
-        public DISPLAYCONFIG_ROTATION rotation;
-        public DISPLAYCONFIG_SCALING scaling;
-        public DISPLAYCONFIG_RATIONAL refreshRate;
+        public ulong pixelRate;
+        public DISPLAYCONFIG_RATIONAL hSyncFreq;
+        public DISPLAYCONFIG_RATIONAL vSyncFreq;
+        public DISPLAYCONFIG_2DREGION activeSize;
+        public DISPLAYCONFIG_2DREGION totalSize;
+
+        public uint videoStandard;
+
         public DISPLAYCONFIG_SCANLINE_ORDERING scanLineOrdering;
-        [MarshalAs(UnmanagedType.Bool)]
-        public bool targetAvailable;
-        public uint statusFlags;
     }
 }
