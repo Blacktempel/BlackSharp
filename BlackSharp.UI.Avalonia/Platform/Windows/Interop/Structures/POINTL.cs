@@ -7,8 +7,11 @@
  *
  */
 
+using System.Runtime.InteropServices;
+
 namespace BlackSharp.UI.Avalonia.Platform.Windows.Interop.Structures
 {
+    [StructLayout(LayoutKind.Sequential)]
     internal struct POINTL
     {
         public int x;
