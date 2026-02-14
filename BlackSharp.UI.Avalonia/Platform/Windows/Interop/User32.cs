@@ -7,6 +7,7 @@
  *
  */
 
+using BlackSharp.UI.Avalonia.Platform.Windows.Interop.Structures;
 using System.Runtime.InteropServices;
 
 namespace BlackSharp.UI.Avalonia.Platform.Windows.Interop
@@ -15,10 +16,35 @@ namespace BlackSharp.UI.Avalonia.Platform.Windows.Interop
     {
         const string DLL_NAME = "user32.dll";
 
+        public const int MONITOR_DEFAULTTONEAREST = 2;
+        public const uint QDC_ONLY_ACTIVE_PATHS = 0x00000002;
+
         [DllImport(DLL_NAME)]
         public static extern bool RegisterHotKey(IntPtr hwnd, int id, uint fsModifiers, uint vk);
 
         [DllImport(DLL_NAME)]
         public static extern bool UnregisterHotKey(IntPtr hwnd, int id);
+
+        [DllImport(DLL_NAME)]
+        public static extern IntPtr MonitorFromRect(ref RECT lprc, uint dwFlags);
+
+        [DllImport(DLL_NAME)]
+        public static extern int GetDisplayConfigBufferSizes(
+            uint flags,
+            out uint numPathArrayElements,
+            out uint numModeInfoArrayElements);
+
+        [DllImport(DLL_NAME)]
+        public static extern int QueryDisplayConfig(
+            uint flags,
+            ref uint numPathArrayElements,
+            [Out] DISPLAYCONFIG_PATH_INFO[] pathArray,
+            ref uint numModeInfoArrayElements,
+            [Out] DISPLAYCONFIG_MODE_INFO[] modeInfoArray,
+            IntPtr currentTopologyId);
+
+        [DllImport(DLL_NAME)]
+        public static extern int DisplayConfigGetDeviceInfo(
+            ref DISPLAYCONFIG_TARGET_DEVICE_NAME deviceName);
     }
 }
