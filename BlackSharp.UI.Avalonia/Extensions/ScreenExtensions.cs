@@ -16,7 +16,6 @@ using BlackSharp.UI.Avalonia.Platform.Windows.Interop.Structures;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 
 using OS = BlackSharp.Core.Platform.OperatingSystem;
 
@@ -28,12 +27,6 @@ namespace BlackSharp.UI.Avalonia.Extensions
     /// <remarks>Not all operating systems are supported yet.</remarks>
     public static class ScreenExtensions
     {
-        #region Fields
-
-        static readonly Regex _HWIDRegex = new(@"DISPLAY#([^#]+)", RegexOptions.IgnoreCase);
-
-        #endregion
-
         #region Public
 
         /// <summary>
@@ -43,28 +36,14 @@ namespace BlackSharp.UI.Avalonia.Extensions
         /// <returns>A <see cref="string"/> containing the hardware identifier for the specified screen, or <see langword="null"/> if the identifier cannot be
         /// determined.</returns>
         /// <exception cref="PlatformNotSupportedException">Thrown if the current operating system is not supported.</exception>
-        public static string GetHardwareID(this Screen screen)
+        public static string GetDevicePath(this Screen screen)
         {
             if (!OS.IsWindows())
             {
-                throw new PlatformNotSupportedException($"Support for {nameof(GetHardwareID)} has not been added for this operating system.");
+                throw new PlatformNotSupportedException($"Support for {nameof(GetDevicePath)} has not been added for this operating system.");
             }
 
-            var devicePath = GetDevicePath(screen);
-
-            if (devicePath == null)
-            {
-                return null;
-            }
-
-            var match = _HWIDRegex.Match(devicePath);
-
-            if (match.Success)
-            {
-                return match.Groups[1].Value;
-            }
-
-            return null;
+            return GetDevicePathString(screen);
         }
 
         /// <summary>
@@ -80,7 +59,7 @@ namespace BlackSharp.UI.Avalonia.Extensions
                 throw new PlatformNotSupportedException($"Support for {nameof(GetSerialNumber)} has not been added for this operating system.");
             }
 
-            var devicePath = GetDevicePath(screen);
+            var devicePath = GetDevicePathString(screen);
             if (devicePath == null)
             {
                 return null;
@@ -106,7 +85,7 @@ namespace BlackSharp.UI.Avalonia.Extensions
 
         #region Private
 
-        static string GetDevicePath(Screen screen)
+        static string GetDevicePathString(Screen screen)
         {
             var rect = new RECT
             {
@@ -116,9 +95,19 @@ namespace BlackSharp.UI.Avalonia.Extensions
                 bottom = screen.Bounds.Bottom
             };
 
+            //Get the monitor handle from the screens bounds
             var monitor = User32.MonitorFromRect(ref rect, User32.MONITOR_DEFAULTTONEAREST);
 
             if (monitor == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            var mi = new MONITORINFOEX();
+            mi.cbSize = (uint)Marshal.SizeOf<MONITORINFOEX>();
+
+            //Get the monitor info to obtain the device name
+            if (!User32.GetMonitorInfo(monitor, ref mi))
             {
                 return null;
             }
@@ -139,6 +128,24 @@ namespace BlackSharp.UI.Avalonia.Extensions
             foreach (var path in paths)
             {
                 var source = path.sourceInfo;
+
+                var sourceName = new DISPLAYCONFIG_SOURCE_DEVICE_NAME();
+                sourceName.header.type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
+                sourceName.header.size = (uint)Marshal.SizeOf<DISPLAYCONFIG_SOURCE_DEVICE_NAME>();
+                sourceName.header.adapterId = source.adapterId;
+                sourceName.header.id = source.id;
+
+                if (User32.DisplayConfigGetDeviceInfo(ref sourceName) != 0)
+                {
+                    continue;
+                }
+
+                //Check if this is the monitor we are looking for
+                if (mi.szDevice.CompareTo(sourceName.viewGdiDeviceName, StringComparison.OrdinalIgnoreCase) != 0)
+                {
+                    continue;
+                }
+
                 var target = path.targetInfo;
 
                 var name = new DISPLAYCONFIG_TARGET_DEVICE_NAME();

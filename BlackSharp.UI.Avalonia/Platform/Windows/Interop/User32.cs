@@ -28,6 +28,9 @@ namespace BlackSharp.UI.Avalonia.Platform.Windows.Interop
         [DllImport(DLL_NAME)]
         public static extern IntPtr MonitorFromRect(ref RECT lprc, uint dwFlags);
 
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode)]
+        public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFOEX lpmi);
+
         [DllImport(DLL_NAME)]
         public static extern int GetDisplayConfigBufferSizes(
             uint flags,
@@ -42,6 +45,10 @@ namespace BlackSharp.UI.Avalonia.Platform.Windows.Interop
             ref uint numModeInfoArrayElements,
             [Out] DISPLAYCONFIG_MODE_INFO[] modeInfoArray,
             IntPtr currentTopologyId);
+
+        [DllImport(DLL_NAME)]
+        public static extern int DisplayConfigGetDeviceInfo(
+            ref DISPLAYCONFIG_SOURCE_DEVICE_NAME deviceName);
 
         [DllImport(DLL_NAME)]
         public static extern int DisplayConfigGetDeviceInfo(
