@@ -13,8 +13,8 @@
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
     <PackageTags>framework; code; shared</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-    <AssemblyVersion>1.0.9</AssemblyVersion>
-    <FileVersion>1.0.9</FileVersion>
+    <AssemblyVersion>1.0.10</AssemblyVersion>
+    <FileVersion>1.0.10</FileVersion>
     <Version>$(AssemblyVersion)</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
@@ -72,6 +72,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="BlackSharp.Core.Tests"/>
   </ItemGroup>
 
 </Project>
