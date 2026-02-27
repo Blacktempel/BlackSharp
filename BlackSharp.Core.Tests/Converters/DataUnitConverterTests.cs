@@ -20,7 +20,7 @@ namespace BlackSharp.Core.Tests.Utilities
 
         [TestMethod]
         [DynamicData(nameof(GetAllConversionCases))]
-        public void Convert_AllUnitCombinations_ReturnsExpectedValue(ulong value, DataUnit sourceType, DataUnit targetType, bool expectOverflow, decimal expected)
+        public void Convert_AllUnitCombinations_ReturnsExpectedValue(decimal value, DataUnit sourceType, DataUnit targetType, bool expectOverflow, decimal expected)
         {
             if (expectOverflow)
             {
@@ -47,9 +47,8 @@ namespace BlackSharp.Core.Tests.Utilities
         [TestMethod]
         public void ShortcutMethods_AllTargets_MatchConvertResult()
         {
-            const ulong value = 1_000_000;
-
-            var targetMethods = new (DataUnit TargetType, Func<ulong, DataUnit, decimal> Method)[]
+            const decimal value = 1_000_000M;
+            var targetMethods = new (DataUnit TargetType, Func<decimal, DataUnit, decimal> Method)[]
             {
                 (DataUnit.Byte      , DataUnitConverter.ToByte      ),
                 (DataUnit.KiloByte  , DataUnitConverter.ToKiloByte  ),
@@ -133,9 +132,15 @@ namespace BlackSharp.Core.Tests.Utilities
             }
         }
 
+        [TestMethod]
+        public void Convert_FractionalInput_IsSupported()
+        {
+            Assert.AreEqual(1_500M, DataUnitConverter.Convert(1.5M, DataUnit.KiloByte, DataUnit.Byte));
+        }
+
         public static IEnumerable<object[]> GetAllConversionCases()
         {
-            const ulong value = 1_000_000;
+            const decimal value = 1_000_000M;
 
             foreach (var sourceType in Enum.GetValues<DataUnit>())
             {
@@ -157,7 +162,7 @@ namespace BlackSharp.Core.Tests.Utilities
 
         #region Private
 
-        static bool TryCalculateExpected(ulong value, DataUnit sourceType, DataUnit targetType, out decimal expected)
+        static bool TryCalculateExpected(decimal value, DataUnit sourceType, DataUnit targetType, out decimal expected)
         {
             expected = 0M;
 
@@ -172,19 +177,21 @@ namespace BlackSharp.Core.Tests.Utilities
             }
         }
 
-        static decimal CalculateExpected(ulong value, DataUnit sourceType, DataUnit targetType)
+        static decimal CalculateExpected(decimal value, DataUnit sourceType, DataUnit targetType)
         {
             if (sourceType == targetType)
             {
                 return value;
             }
 
+            DataUnitConverter.GetDecimalAsFraction(value, out var valueNumerator, out var valueDenominator);
+
             var sourceFactor = DataUnitConverter.GetFactorInBits(sourceType);
             var targetFactor = DataUnitConverter.GetFactorInBits(targetType);
 
-            var numerator = (BigInteger)value * sourceFactor;
-
-            var integralPart = BigInteger.DivRem(numerator, targetFactor, out var remainder);
+            var numerator = valueNumerator * sourceFactor;
+            var denominator = valueDenominator * targetFactor;
+            var integralPart = BigInteger.DivRem(numerator, denominator, out var remainder);
 
             var integralDecimal = (decimal)integralPart;
 
@@ -193,7 +200,7 @@ namespace BlackSharp.Core.Tests.Utilities
                 return integralDecimal;
             }
 
-            return integralDecimal + (decimal)remainder / (decimal)targetFactor;
+            return integralDecimal + (decimal)remainder / (decimal)denominator;
         }
 
         #endregion

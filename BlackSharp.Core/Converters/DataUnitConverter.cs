@@ -35,20 +35,29 @@ namespace BlackSharp.Core.Converters
         /// <param name="targetType">Target unit for the conversion.</param>
         /// <returns>Converted value in the target unit.</returns>
         /// <exception cref="OverflowException">Thrown when the conversion result exceeds the range of the <see cref="decimal"/> type.</exception>
-        public static decimal Convert(ulong value, DataUnit typeOfValue, DataUnit targetType)
+        public static decimal Convert(decimal value, DataUnit typeOfValue, DataUnit targetType)
         {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Value must be greater than or equal to zero.");
+            }
+
             //If the original unit and target unit are the same, return the original value
             if (typeOfValue == targetType)
             {
                 return value;
             }
 
-            //Convert the original value to bits, then convert from bits to the target unit
-            var valueInBits = (BigInteger)value * GetFactorInBits(typeOfValue);
+            GetDecimalAsFraction(value, out var valueNumerator, out var valueDenominator);
+
+            var sourceFactor = GetFactorInBits(typeOfValue);
             var targetFactor = GetFactorInBits(targetType);
 
+            var numerator = valueNumerator * sourceFactor;
+            var denominator = valueDenominator * targetFactor;
+
             //Perform the division to get the integral part and the remainder for the fractional part
-            var integralPart = BigInteger.DivRem(valueInBits, targetFactor, out var remainder);
+            var integralPart = BigInteger.DivRem(numerator, denominator, out var remainder);
 
             try
             {
@@ -61,7 +70,7 @@ namespace BlackSharp.Core.Converters
                 }
 
                 //Calculate the fractional part by dividing the remainder by the target factor and add it to the integral part
-                return integralDecimal + (decimal)remainder / (decimal)targetFactor;
+                return integralDecimal + (decimal)remainder / (decimal)denominator;
             }
             catch (OverflowException)
             {
@@ -70,92 +79,92 @@ namespace BlackSharp.Core.Converters
         }
 
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToByte      (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.Byte      );
+        public static decimal ToByte      (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.Byte      );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToKiloByte  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.KiloByte  );
+        public static decimal ToKiloByte  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.KiloByte  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToMegaByte  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.MegaByte  );
+        public static decimal ToMegaByte  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.MegaByte  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToGigaByte  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.GigaByte  );
+        public static decimal ToGigaByte  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.GigaByte  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToTeraByte  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.TeraByte  );
+        public static decimal ToTeraByte  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.TeraByte  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToPetaByte  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.PetaByte  );
+        public static decimal ToPetaByte  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.PetaByte  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToExaByte   (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ExaByte   );
+        public static decimal ToExaByte   (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ExaByte   );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToZettaByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ZettaByte );
+        public static decimal ToZettaByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ZettaByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToYottaByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.YottaByte );
+        public static decimal ToYottaByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.YottaByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToRonnaByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.RonnaByte );
+        public static decimal ToRonnaByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.RonnaByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToQuettaByte(ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.QuettaByte);
+        public static decimal ToQuettaByte(decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.QuettaByte);
 
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToKibiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.KibiByte );
+        public static decimal ToKibiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.KibiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToMebiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.MebiByte );
+        public static decimal ToMebiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.MebiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToGibiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.GibiByte );
+        public static decimal ToGibiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.GibiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToTebiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.TebiByte );
+        public static decimal ToTebiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.TebiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToPebiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.PebiByte );
+        public static decimal ToPebiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.PebiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToExbiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ExbiByte );
+        public static decimal ToExbiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ExbiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToZebiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ZebiByte );
+        public static decimal ToZebiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ZebiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToYobiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.YobiByte );
+        public static decimal ToYobiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.YobiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToRobiByte (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.RobiByte );
+        public static decimal ToRobiByte (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.RobiByte );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToQuebiByte(ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.QuebiByte);
+        public static decimal ToQuebiByte(decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.QuebiByte);
 
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToBit      (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.Bit      );
+        public static decimal ToBit      (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.Bit      );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToKiloBit  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.KiloBit  );
+        public static decimal ToKiloBit  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.KiloBit  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToMegaBit  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.MegaBit  );
+        public static decimal ToMegaBit  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.MegaBit  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToGigaBit  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.GigaBit  );
+        public static decimal ToGigaBit  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.GigaBit  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToTeraBit  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.TeraBit  );
+        public static decimal ToTeraBit  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.TeraBit  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToPetaBit  (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.PetaBit  );
+        public static decimal ToPetaBit  (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.PetaBit  );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToExaBit   (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ExaBit   );
+        public static decimal ToExaBit   (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ExaBit   );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToZettaBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ZettaBit );
+        public static decimal ToZettaBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ZettaBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToYottaBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.YottaBit );
+        public static decimal ToYottaBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.YottaBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToRonnaBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.RonnaBit );
+        public static decimal ToRonnaBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.RonnaBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToQuettaBit(ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.QuettaBit);
+        public static decimal ToQuettaBit(decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.QuettaBit);
 
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToKibiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.KibiBit );
+        public static decimal ToKibiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.KibiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToMebiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.MebiBit );
+        public static decimal ToMebiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.MebiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToGibiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.GibiBit );
+        public static decimal ToGibiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.GibiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToTebiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.TebiBit );
+        public static decimal ToTebiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.TebiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToPebiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.PebiBit );
+        public static decimal ToPebiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.PebiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToExbiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ExbiBit );
+        public static decimal ToExbiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ExbiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToZebiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ZebiBit );
+        public static decimal ToZebiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.ZebiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToYobiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.YobiBit );
+        public static decimal ToYobiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.YobiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToRobiBit (ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.RobiBit );
+        public static decimal ToRobiBit (decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.RobiBit );
         ///<inheritdoc cref="Convert"/>
-        public static decimal ToQuebiBit(ulong value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.QuebiBit);
+        public static decimal ToQuebiBit(decimal value, DataUnit typeOfValue) => Convert(value, typeOfValue, DataUnit.QuebiBit);
 
         #endregion
 
@@ -237,6 +246,18 @@ namespace BlackSharp.Core.Converters
 
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
             };
+        }
+
+        internal static void GetDecimalAsFraction(decimal value, out BigInteger numerator, out BigInteger denominator)
+        {
+            int[] bits = decimal.GetBits(value);
+
+            numerator = (uint)bits[0];
+            numerator += (BigInteger)(uint)bits[1] << 32;
+            numerator += (BigInteger)(uint)bits[2] << 64;
+
+            int scale = (bits[3] >> 16) & 0xFF;
+            denominator = BigInteger.Pow(10, scale);
         }
 
         #endregion
