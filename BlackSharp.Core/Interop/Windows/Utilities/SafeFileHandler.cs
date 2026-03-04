@@ -7,6 +7,7 @@
  *
  */
 
+using BlackSharp.Core.Interop.Windows.Enums;
 using BlackSharp.Core.Interop.Windows.Native;
 
 namespace BlackSharp.Core.Interop.Windows.Utilities
@@ -26,6 +27,17 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
         public static IntPtr OpenHandle(string physicalPath)
         {
             return Kernel32.CreateFile(physicalPath, Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE, Kernel32.FILE_SHARE_READ | Kernel32.FILE_SHARE_WRITE, IntPtr.Zero, Kernel32.OPEN_EXISTING, 0, IntPtr.Zero);
+        }
+
+        /// <summary>
+        /// Opens a handle with given physical path.
+        /// </summary>
+        /// <param name="physicalPath">Physical path to open handle for.</param>
+        /// <param name="fileFlagsAndAttributes">File flags and attributes to use when opening the handle.</param>
+        /// <returns>Returns opened handle.</returns>
+        public static IntPtr OpenHandle(string physicalPath, FileFlagsAndAttributes fileFlagsAndAttributes)
+        {
+            return Kernel32.CreateFile(physicalPath, Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE, Kernel32.FILE_SHARE_READ | Kernel32.FILE_SHARE_WRITE, IntPtr.Zero, Kernel32.OPEN_EXISTING, (uint)fileFlagsAndAttributes, IntPtr.Zero);
         }
 
         /// <summary>
