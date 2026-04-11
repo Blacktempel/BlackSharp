@@ -25,6 +25,15 @@ namespace BlackSharp.Core.Converters
     /// <see cref="OverflowException"/> is thrown.</remarks>
     public static class DataUnitConverter
     {
+        #region Private
+
+        /// <summary>
+        /// Cached <see cref="decimal.MaxValue"/> as <see cref="BigInteger"/> to avoid repeated allocations during pre-checks.
+        /// </summary>
+        private static readonly BigInteger DecimalMaxValue = (BigInteger)decimal.MaxValue;
+
+        #endregion
+
         #region Public
 
         /// <summary>
@@ -59,23 +68,29 @@ namespace BlackSharp.Core.Converters
             //Perform the division to get the integral part and the remainder for the fractional part
             var integralPart = BigInteger.DivRem(numerator, denominator, out var remainder);
 
-            try
-            {
-                var integralDecimal = (decimal)integralPart;
-
-                //If there is no remainder, return the integral part as the final result
-                if (remainder.IsZero)
-                {
-                    return integralDecimal;
-                }
-
-                //Calculate the fractional part by dividing the remainder by the target factor and add it to the integral part
-                return integralDecimal + (decimal)remainder / (decimal)denominator;
-            }
-            catch (OverflowException)
+            //Pre-check: integral part exceeds decimal range -> result is genuinely too large
+            if (integralPart > DecimalMaxValue)
             {
                 throw new OverflowException($"Converted value exceeds {nameof(Decimal)} range.");
             }
+
+            var integralDecimal = (decimal)integralPart;
+
+            //If there is no remainder, return the integral part as the final result
+            if (remainder.IsZero)
+            {
+                return integralDecimal;
+            }
+
+            //Pre-check: denominator exceeds decimal range -> fractional part (remainder / denominator < 1)
+            //cannot be represented and effectively underflows to 0; return only the integral part
+            if (denominator > DecimalMaxValue)
+            {
+                return integralDecimal;
+            }
+
+            //Calculate the fractional part by dividing the remainder by the target factor and add it to the integral part
+            return integralDecimal + (decimal)remainder / (decimal)denominator;
         }
 
         ///<inheritdoc cref="Convert"/>

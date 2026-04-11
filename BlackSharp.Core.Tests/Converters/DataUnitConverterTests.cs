@@ -120,6 +120,55 @@ namespace BlackSharp.Core.Tests.Utilities
                 DataUnitConverter.Convert(ulong.MaxValue, DataUnit.TebiByte, DataUnit.Bit));
         }
 
+        #endregion
+
+        #region Overflow pre-check (integral result too large -> OverflowException)
+
+        [TestMethod]
+        [DataRow(DataUnit.QuettaByte, DataUnit.Bit )] //1 QuettaByte = 8×10^30 bits  >> decimal.MaxValue
+        [DataRow(DataUnit.QuettaByte, DataUnit.Byte)] //1 QuettaByte = 10^30   bytes >> decimal.MaxValue
+        [DataRow(DataUnit.QuettaBit , DataUnit.Bit )] //1 QuettaBit  = 10^30   bits  >> decimal.MaxValue
+        [DataRow(DataUnit.QuebiByte , DataUnit.Bit )] //1 QuebiByte  = 8×2^100 bits  >> decimal.MaxValue
+        [DataRow(DataUnit.QuebiBit  , DataUnit.Bit )] //1 QuebiBit   = 2^100   bits  >> decimal.MaxValue
+        public void Convert_OverflowPreCheck_ThrowsOverflowException(DataUnit sourceType, DataUnit targetType)
+        {
+            //integral part exceeds decimal.MaxValue -> pre-check throws before any cast
+            Assert.ThrowsExactly<OverflowException>(() =>
+                DataUnitConverter.Convert(1m, sourceType, targetType));
+        }
+
+        #endregion
+
+        #region Underflow pre-check (denominator too large -> returns 0 instead of OverflowException)
+
+        [TestMethod]
+        [DataRow(DataUnit.Bit     , DataUnit.QuettaByte)] //1 bit   << 8×10^30 bits per QuettaByte
+        [DataRow(DataUnit.Bit     , DataUnit.QuettaBit )] //1 bit   << 10^30   bits per QuettaBit
+        [DataRow(DataUnit.Byte    , DataUnit.QuettaByte)] //1 Byte  << 8×10^30 bits per QuettaByte
+        [DataRow(DataUnit.KiloByte, DataUnit.QuettaByte)] //1 KB    << 8×10^30 bits per QuettaByte
+        [DataRow(DataUnit.KiloBit , DataUnit.QuettaBit )] //1 Kbit  << 10^30   bits per QuettaBit
+        [DataRow(DataUnit.KibiByte, DataUnit.QuebiByte )] //1 KiB   << 8×2^100 bits per QuebiByte
+        [DataRow(DataUnit.Bit     , DataUnit.QuebiBit  )] //1 bit   << 2^100   bits per QuebiBit
+        public void Convert_UnderflowPreCheck_ReturnsZero(DataUnit sourceType, DataUnit targetType)
+        {
+            //denominator exceeds decimal.MaxValue -> fractional part (< 1) cannot be represented;
+            //integral part is 0 -> method returns 0 instead of throwing OverflowException
+            Assert.AreEqual(0m, DataUnitConverter.Convert(1m, sourceType, targetType));
+        }
+
+        [TestMethod]
+        public void Convert_UnderflowPreCheck_ShortcutMethods_ReturnZero()
+        {
+            Assert.AreEqual(0m, DataUnitConverter.ToQuettaByte(1m, DataUnit.Bit));
+            Assert.AreEqual(0m, DataUnitConverter.ToQuettaBit (1m, DataUnit.Bit));
+            Assert.AreEqual(0m, DataUnitConverter.ToQuebiByte (1m, DataUnit.Bit));
+            Assert.AreEqual(0m, DataUnitConverter.ToQuebiBit  (1m, DataUnit.Bit));
+        }
+
+        #endregion
+
+        #region General
+
         [TestMethod]
         public void Convert_Zero_ReturnsZero()
         {
@@ -193,9 +242,22 @@ namespace BlackSharp.Core.Tests.Utilities
             var denominator = valueDenominator * targetFactor;
             var integralPart = BigInteger.DivRem(numerator, denominator, out var remainder);
 
+            //Mirror the pre-checks of DataUnitConverter.Convert:
+            //integral overflow -> still a real OverflowException
+            if (integralPart > (BigInteger)decimal.MaxValue)
+            {
+                throw new OverflowException();
+            }
+
             var integralDecimal = (decimal)integralPart;
 
             if (remainder.IsZero)
+            {
+                return integralDecimal;
+            }
+
+            //denominator overflow -> fractional part underflows to 0; return integral part
+            if (denominator > (BigInteger)decimal.MaxValue)
             {
                 return integralDecimal;
             }
