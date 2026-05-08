@@ -85,14 +85,14 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
             {
                 if (!string.IsNullOrEmpty(Message))
                 {
-                    var clipboard = GetTopLevel(this)?.Clipboard;
+                    var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
 
                     if (clipboard == null)
                     {
                         return;
                     }
 
-                    await ClipboardExtensions.SetTextAsync(clipboard, Message);
+                    await clipboard.SetTextAsync(Message);
                 }
             });
 

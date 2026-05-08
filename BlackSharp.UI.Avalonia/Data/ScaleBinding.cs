@@ -36,8 +36,9 @@ namespace BlackSharp.UI.Avalonia.Data
         /// <param name="path">The binding path.</param>
         /// <param name="mode">The binding mode.</param>
         public ScaleBinding(string path, BindingMode mode = BindingMode.Default)
-            : base(path, mode)
+            : base(path)
         {
+            Mode = mode;
             base.Converter = _Converter;
             ConverterParameter = 1.0;
         }
@@ -66,7 +67,7 @@ namespace BlackSharp.UI.Avalonia.Data
             }
         }
 
-        /// <inheritdoc cref="BindingBase.Converter"/>
+        /// <inheritdoc cref="ReflectionBinding.Converter"/>
         public new IValueConverter Converter
         {
             get { return _Converter; }

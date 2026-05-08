@@ -20,6 +20,7 @@ namespace BlackSharp.UI.Avalonia.Behaviors
 
         private bool _Pressed;
         private Point _Start;
+        private PointerPressedEventArgs _PressedEvent;
 
         const string _RowMove = "row-move";
 
@@ -55,12 +56,18 @@ namespace BlackSharp.UI.Avalonia.Behaviors
             {
                 _Pressed = true;
                 _Start = e.GetPosition(AssociatedObject);
+                _PressedEvent = e;
+            }
+            else
+            {
+                _Pressed = false;
+                _PressedEvent = null;
             }
         }
 
         async void OnPointerMoved(object sender, PointerEventArgs e)
         {
-            if (!_Pressed)
+            if (!_Pressed || _PressedEvent == null)
             {
                 return;
             }
@@ -72,19 +79,19 @@ namespace BlackSharp.UI.Avalonia.Behaviors
             }
 
             _Pressed = false;
+            var pressedEvent = _PressedEvent;
+            _PressedEvent = null;
 
-            //Use the rows data context as source
-            var data = AssociatedObject.DataContext;
             var dragData = new DataTransfer();
-            dragData.Add(DataTransferItem.Create(DataFormat.Text, _RowMove));
+            dragData.Add(DataTransferItem.CreateText(_RowMove));
 
-            //Start drag-drop; sourceContext flows to DropHandler
-            await DragDrop.DoDragDropAsync(e, dragData, DragDropEffects.Move);
+            await DragDrop.DoDragDropAsync(pressedEvent, dragData, DragDropEffects.Move);
         }
 
         void OnPointerReleased(object sender, PointerReleasedEventArgs e)
         {
             _Pressed = false;
+            _PressedEvent = null;
         }
 
         #endregion

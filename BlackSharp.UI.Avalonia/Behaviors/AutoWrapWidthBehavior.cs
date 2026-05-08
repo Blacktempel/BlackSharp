@@ -118,7 +118,7 @@ namespace BlackSharp.UI.Avalonia.Behaviors
 
             void onAttach(object s, VisualTreeAttachmentEventArgs a)
             {
-                var wnd = tb.GetVisualRoot() as Window;
+                var wnd = TopLevel.GetTopLevel(tb) as Window;
                 if (wnd == null)
                 {
                     return;
@@ -152,7 +152,7 @@ namespace BlackSharp.UI.Avalonia.Behaviors
             tb.AttachedToVisualTree += onAttach;
 
             //Is attached to visual tree ?
-            if (tb.GetVisualRoot() != null)
+            if (TopLevel.GetTopLevel(tb) != null)
             {
                 onAttach(tb, default!);
             }
@@ -167,7 +167,7 @@ namespace BlackSharp.UI.Avalonia.Behaviors
         static void UpdateWidth(TextBlock tb)
         {
             //Get root
-            var wnd = tb.GetVisualRoot() as Window;
+            var wnd = TopLevel.GetTopLevel(tb) as Window;
             if (wnd == null)
             {
                 return;

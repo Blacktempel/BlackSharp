@@ -68,7 +68,7 @@ namespace BlackSharp.UI.Avalonia.Controls
                 return;
             }
 
-            var pastedText = ClipboardExtensions.TryGetTextAsync(clipboard).Result;
+            var pastedText = clipboard.TryGetTextAsync().GetAwaiter().GetResult();
 
             if (pastedText == null)
             {
