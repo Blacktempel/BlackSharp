@@ -7,11 +7,11 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Description>A framework to eliminate duplicate code across projects.</Description>
+    <Description>A System.IO.Ports-like API for serial communication and timeout-safe close handling.</Description>
     <Copyright>Florian K.</Copyright>
     <PackageProjectUrl>https://github.com/Blacktempel/BlackSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
-    <PackageTags>framework; code; shared</PackageTags>
+    <PackageTags>serial;serialport;com;uart;rs232;io;ports;communication;windows;linux;cross-platform</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <AssemblyVersion>1.1.0</AssemblyVersion>
     <FileVersion>1.1.0</FileVersion>
@@ -68,14 +68,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BlackSharp.Core\BlackSharp.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <InternalsVisibleTo Include="BlackSharp.Core.Tests" />
   </ItemGroup>
 
 </Project>

@@ -9,6 +9,7 @@
 
 #pragma warning disable CS1591
 
+using BlackSharp.Core.Interop.Windows.Enums;
 using BlackSharp.Core.Interop.Windows.Structures;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -33,14 +34,14 @@ namespace BlackSharp.Core.Interop.Windows.Native
 
         #region Public
 
-        [DllImport(DLL_NAME, SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport(DLL_NAME, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr CreateFile(
             string lpFileName,
-            uint dwDesiredAccess,
-            uint dwShareMode,
+            DesiredAccess dwDesiredAccess,
+            FileShareMode dwShareMode,
             IntPtr lpSecurityAttributes,
-            uint dwCreationDisposition,
-            uint dwFlagsAndAttributes,
+            FileCreationDisposition dwCreationDisposition,
+            FileFlagsAndAttributes dwFlagsAndAttributes,
             IntPtr hTemplateFile);
 
         [DllImport(DLL_NAME)]

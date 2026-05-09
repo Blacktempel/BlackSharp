@@ -26,7 +26,13 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
         /// <returns>Returns opened handle.</returns>
         public static IntPtr OpenHandle(string physicalPath)
         {
-            return Kernel32.CreateFile(physicalPath, Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE, Kernel32.FILE_SHARE_READ | Kernel32.FILE_SHARE_WRITE, IntPtr.Zero, Kernel32.OPEN_EXISTING, 0, IntPtr.Zero);
+            return Kernel32.CreateFile(physicalPath,
+                DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+                FileShareMode.Read | FileShareMode.Write,
+                IntPtr.Zero,
+                FileCreationDisposition.OpenExisting,
+                0,
+                IntPtr.Zero);
         }
 
         /// <summary>
@@ -37,7 +43,13 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
         /// <returns>Returns opened handle.</returns>
         public static IntPtr OpenHandle(string physicalPath, FileFlagsAndAttributes fileFlagsAndAttributes)
         {
-            return Kernel32.CreateFile(physicalPath, Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE, Kernel32.FILE_SHARE_READ | Kernel32.FILE_SHARE_WRITE, IntPtr.Zero, Kernel32.OPEN_EXISTING, (uint)fileFlagsAndAttributes, IntPtr.Zero);
+            return Kernel32.CreateFile(physicalPath,
+                DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
+                FileShareMode.Read | FileShareMode.Write,
+                IntPtr.Zero,
+                FileCreationDisposition.OpenExisting,
+                fileFlagsAndAttributes,
+                IntPtr.Zero);
         }
 
         /// <summary>
