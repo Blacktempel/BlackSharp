@@ -30,6 +30,40 @@ namespace BlackSharp.UI.Avalonia.Extensions
         #region Public
 
         /// <summary>
+        /// Retrieves a display name for the specified screen.
+        /// </summary>
+        /// <param name="screen">The screen for which to obtain the display name.</param>
+        /// <returns>The best available display name, or <see langword="null"/> if no display name could be determined.</returns>
+        /// <remarks>
+        /// Avalonia 12 can return empty display names on Windows. This method uses the Windows display configuration API as a fallback.
+        /// </remarks>
+        public static string GetDisplayName(this Screen screen)
+        {
+            if (!OS.IsWindows())
+            {
+                throw new PlatformNotSupportedException($"Support for {nameof(GetDisplayName)} has not been added for this operating system.");
+            }
+
+            ArgumentNullException.ThrowIfNull(screen);
+
+            var info = GetWindowsScreenDeviceInfo(screen);
+
+            var friendlyName = NormalizeDisplayName(info?.FriendlyName);
+            if (friendlyName != null)
+            {
+                return friendlyName;
+            }
+
+            var avaloniaName = NormalizeDisplayName(screen.DisplayName);
+            if (avaloniaName != null)
+            {
+                return avaloniaName;
+            }
+
+            return NormalizeDisplayName(info?.SourceName);
+        }
+
+        /// <summary>
         /// Retrieves a unique hardware identifier for the specified screen device.
         /// </summary>
         /// <param name="screen">The screen for which to obtain the hardware identifier.</param>
@@ -86,6 +120,11 @@ namespace BlackSharp.UI.Avalonia.Extensions
         #region Private
 
         static string GetDevicePathString(Screen screen)
+        {
+            return NormalizeDisplayName(GetWindowsScreenDeviceInfo(screen)?.DevicePath);
+        }
+
+        static WindowsScreenDeviceInfo GetWindowsScreenDeviceInfo(Screen screen)
         {
             var rect = new RECT
             {
@@ -159,10 +198,18 @@ namespace BlackSharp.UI.Avalonia.Extensions
                     continue;
                 }
 
-                return name.monitorDevicePath;
+                return new WindowsScreenDeviceInfo(
+                    name.monitorDevicePath,
+                    name.monitorFriendlyDeviceName,
+                    sourceName.viewGdiDeviceName);
             }
 
             return null;
+        }
+
+        static string NormalizeDisplayName(string displayName)
+        {
+            return string.IsNullOrWhiteSpace(displayName) ? null : displayName.Trim();
         }
 
         static string GetRegistryPathFromDevicePath(string devicePath)
@@ -219,6 +266,26 @@ namespace BlackSharp.UI.Avalonia.Extensions
               | (edid[15] << 24));
 
             return serial != 0 ? serial.ToString() : null;
+        }
+
+        #endregion
+
+        #region Nested types
+
+        sealed class WindowsScreenDeviceInfo
+        {
+            public WindowsScreenDeviceInfo(string devicePath, string friendlyName, string sourceName)
+            {
+                DevicePath = devicePath;
+                FriendlyName = friendlyName;
+                SourceName = sourceName;
+            }
+
+            public string DevicePath { get; }
+
+            public string FriendlyName { get; }
+
+            public string SourceName { get; }
         }
 
         #endregion

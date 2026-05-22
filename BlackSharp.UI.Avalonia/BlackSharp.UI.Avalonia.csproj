@@ -13,8 +13,8 @@
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
     <PackageTags>framework; code; shared</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
+    <AssemblyVersion>1.1.1</AssemblyVersion>
+    <FileVersion>1.1.1</FileVersion>
     <Version>$(AssemblyVersion)</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
@@ -53,13 +53,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.0.2" />
+    <PackageReference Include="Avalonia" Version="12.0.3" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.2" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.2" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.3" />
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.93.0" />
-    <PackageReference Include="Xaml.Behaviors" Version="12.0.0" />
+    <PackageReference Include="Xaml.Behaviors" Version="12.0.0.1" />
   </ItemGroup>
 
   <ItemGroup>
