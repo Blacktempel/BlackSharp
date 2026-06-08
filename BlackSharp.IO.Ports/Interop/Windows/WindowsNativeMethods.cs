@@ -31,15 +31,25 @@ internal static class WindowsNativeMethods
     public const uint Clrrts = 4;
     public const uint Setrts = 3;
 
-    public const byte Noparity = 0;
-    public const byte Oddparity = 1;
-    public const byte Evenparity = 2;
-    public const byte Markparity = 3;
+    public const int ErrorOperationAborted =  995;
+    public const int ErrorIoIncomplete     =  996;
+    public const int ErrorIoPending        =  997;
+    public const int ErrorNotFound         = 1168;
+
+    public const uint WaitObject0 = 0x00000000;
+    public const uint WaitTimeout = 0x00000102;
+    public const uint WaitFailed  = 0xFFFFFFFF;
+    public const uint Infinite    = 0xFFFFFFFF;
+
+    public const byte Noparity    = 0;
+    public const byte Oddparity   = 1;
+    public const byte Evenparity  = 2;
+    public const byte Markparity  = 3;
     public const byte Spaceparity = 4;
 
-    public const byte Onestopbit = 0;
+    public const byte Onestopbit   = 0;
     public const byte One5stopbits = 1;
-    public const byte Twostopbits = 2;
+    public const byte Twostopbits  = 2;
 
     #endregion
 
@@ -62,6 +72,42 @@ internal static class WindowsNativeMethods
         int nNumberOfBytesToWrite,
         out int lpNumberOfBytesWritten,
         IntPtr lpOverlapped);
+
+    [DllImport(DLL_NAME, EntryPoint = nameof(ReadFile), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool ReadFileOverlapped(
+        IntPtr hFile,
+        IntPtr lpBuffer,
+        int nNumberOfBytesToRead,
+        IntPtr lpNumberOfBytesRead,
+        IntPtr lpOverlapped);
+
+    [DllImport(DLL_NAME, EntryPoint = nameof(WriteFile), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool WriteFileOverlapped(
+        IntPtr hFile,
+        IntPtr lpBuffer,
+        int nNumberOfBytesToWrite,
+        IntPtr lpNumberOfBytesWritten,
+        IntPtr lpOverlapped);
+
+    [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr CreateEventW(
+        IntPtr lpEventAttributes,
+        [MarshalAs(UnmanagedType.Bool)] bool bManualReset,
+        [MarshalAs(UnmanagedType.Bool)] bool bInitialState,
+        string lpName);
+
+    [DllImport(DLL_NAME, SetLastError = true)]
+    public static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+    [DllImport(DLL_NAME, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetOverlappedResult(
+        IntPtr hFile,
+        IntPtr lpOverlapped,
+        out uint lpNumberOfBytesTransferred,
+        [MarshalAs(UnmanagedType.Bool)] bool bWait);
 
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

@@ -11,6 +11,7 @@ using BlackSharp.Core.Interop.Windows.Enums;
 using BlackSharp.Core.Interop.Windows.Native;
 using BlackSharp.IO.Ports.Interop.Windows;
 using BlackSharp.IO.Ports.Interop.Windows.Structures;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace BlackSharp.IO.Ports.Backends;
@@ -19,22 +20,33 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 {
     #region Fields
 
+    private const int CancelCompletionWaitMilliseconds = 250;
+
+    private readonly object _stateLock = new object();
     private IntPtr _handle = WindowsNativeMethods.InvalidHandleValue;
     private SerialPortSettings _settings;
+    private bool _closing;
 
     #endregion
 
     #region Properties
 
-    public bool IsOpen => _handle != WindowsNativeMethods.InvalidHandleValue;
+    public bool IsOpen
+    {
+        get
+        {
+            lock (_stateLock)
+                return _handle != WindowsNativeMethods.InvalidHandleValue && !_closing;
+        }
+    }
 
     public int BytesToRead
     {
         get
         {
-            EnsureOpen();
+            var context = GetOpenOperationContext();
 
-            if (!WindowsNativeMethods.ClearCommError(_handle, out _, out var stat))
+            if (!WindowsNativeMethods.ClearCommError(context.Handle, out _, out var stat))
             {
                 throw CreateIOException($"{nameof(WindowsNativeMethods.ClearCommError)} failed.");
             }
@@ -62,7 +74,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
             FileShareMode.None,
             IntPtr.Zero,
             FileCreationDisposition.OpenExisting,
-            FileFlagsAndAttributes.Normal,
+            FileFlagsAndAttributes.Normal | FileFlagsAndAttributes.Overlapped,
             IntPtr.Zero);
 
         if (handle == WindowsNativeMethods.InvalidHandleValue)
@@ -70,77 +82,106 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
             throw CreateIOException($"Could not open serial port '{settings.PortName}'.");
         }
 
-        _handle = handle;
-        _settings = settings.Clone();
+        lock (_stateLock)
+        {
+            _handle = handle;
+            _settings = settings.Clone();
+            _closing = false;
+        }
 
         try
         {
-            WindowsNativeMethods.SetupComm(_handle, 4096, 4096);
-            Configure(settings);
-            ApplyTimeouts(settings);
+            WindowsNativeMethods.SetupComm(handle, 4096, 4096);
+
+            Configure(handle, settings);
+            ApplyTimeouts(handle, settings);
+
             SetDtr(settings.DtrEnable);
             SetRts(settings.RtsEnable);
         }
         catch
         {
-            CloseCore();
+            SerialPortCloseWorker.Close(this, TimeSpan.Zero, out _);
             throw;
         }
     }
 
     public int Read(byte[] buffer, int offset, int count)
     {
-        EnsureOpen();
+        var context = GetOpenOperationContext();
 
         if (count == 0)
         {
             return 0;
         }
 
-        var temp = new byte[count];
+        using var operation = new OverlappedIoOperation(count);
 
-        if (!WindowsNativeMethods.ReadFile(_handle, temp, count, out int bytesRead, IntPtr.Zero))
-        {
-            throw CreateIOException($"{nameof(WindowsNativeMethods.ReadFile)} failed.");
-        }
+        bool completedSynchronously = WindowsNativeMethods.ReadFileOverlapped(
+            context.Handle,
+            operation.Buffer,
+            count,
+            IntPtr.Zero,
+            operation.Overlapped);
 
-        if (bytesRead == 0)
+        int error = Marshal.GetLastWin32Error();
+        uint bytesTransferred = CompleteOverlappedOperation(
+            context.Handle,
+            operation,
+            completedSynchronously,
+            error,
+            context.Settings.ReadTimeout,
+            "read");
+
+        if (bytesTransferred == 0)
         {
             throw new TimeoutException("The serial port read operation timed out.");
         }
 
-        Buffer.BlockCopy(temp, 0, buffer, offset, bytesRead);
+        int bytesRead = checked((int)bytesTransferred);
+        Marshal.Copy(operation.Buffer, buffer, offset, bytesRead);
         return bytesRead;
     }
 
     public void Write(byte[] buffer, int offset, int count)
     {
-        EnsureOpen();
+        var context = GetOpenOperationContext();
 
         if (count == 0)
         {
             return;
         }
 
-        var temp = new byte[count];
-        Buffer.BlockCopy(buffer, offset, temp, 0, count);
+        using var operation = new OverlappedIoOperation(count);
+        Marshal.Copy(buffer, offset, operation.Buffer, count);
 
-        if (!WindowsNativeMethods.WriteFile(_handle, temp, count, out int bytesWritten, IntPtr.Zero))
-        {
-            throw CreateIOException($"{nameof(WindowsNativeMethods.WriteFile)} failed.");
-        }
+        bool completedSynchronously = WindowsNativeMethods.WriteFileOverlapped(
+            context.Handle,
+            operation.Buffer,
+            count,
+            IntPtr.Zero,
+            operation.Overlapped);
 
-        if (bytesWritten != count)
+        int error = Marshal.GetLastWin32Error();
+        uint bytesTransferred = CompleteOverlappedOperation(
+            context.Handle,
+            operation,
+            completedSynchronously,
+            error,
+            context.Settings.WriteTimeout,
+            "write");
+
+        if (bytesTransferred != count)
         {
-            throw new TimeoutException($"The serial port write operation timed out after writing {bytesWritten} of {count} bytes.");
+            throw new TimeoutException($"The serial port write operation timed out after writing {bytesTransferred} of {count} bytes.");
         }
     }
 
     public void DiscardInBuffer()
     {
-        EnsureOpen();
+        var context = GetOpenOperationContext();
 
-        if (!WindowsNativeMethods.PurgeComm(_handle, WindowsNativeMethods.PurgeRxAbort | WindowsNativeMethods.PurgeRxClear))
+        if (!WindowsNativeMethods.PurgeComm(context.Handle, WindowsNativeMethods.PurgeRxAbort | WindowsNativeMethods.PurgeRxClear))
         {
             throw CreateIOException($"{nameof(WindowsNativeMethods.PurgeComm)}(RX) failed.");
         }
@@ -148,9 +189,9 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 
     public void DiscardOutBuffer()
     {
-        EnsureOpen();
+        var context = GetOpenOperationContext();
 
-        if (!WindowsNativeMethods.PurgeComm(_handle, WindowsNativeMethods.PurgeTxAbort | WindowsNativeMethods.PurgeTxClear))
+        if (!WindowsNativeMethods.PurgeComm(context.Handle, WindowsNativeMethods.PurgeTxAbort | WindowsNativeMethods.PurgeTxClear))
         {
             throw CreateIOException($"{nameof(WindowsNativeMethods.PurgeComm)}(TX) failed.");
         }
@@ -158,12 +199,13 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 
     public void SetDtr(bool enabled)
     {
-        if (!IsOpen)
+        var context = TryGetOperationContext();
+        if (!context.HasValue)
         {
             return;
         }
 
-        if (!WindowsNativeMethods.EscapeCommFunction(_handle, enabled ? WindowsNativeMethods.Setdtr : WindowsNativeMethods.Clrdtr))
+        if (!WindowsNativeMethods.EscapeCommFunction(context.Value.Handle, enabled ? WindowsNativeMethods.Setdtr : WindowsNativeMethods.Clrdtr))
         {
             throw CreateIOException(enabled
                 ? $"{nameof(WindowsNativeMethods.EscapeCommFunction)}({nameof(WindowsNativeMethods.Setdtr)}) failed."
@@ -173,17 +215,18 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 
     public void SetRts(bool enabled)
     {
-        if (!IsOpen)
+        var context = TryGetOperationContext();
+        if (!context.HasValue)
         {
             return;
         }
 
-        if (_settings?.Handshake == Handshake.RequestToSend || _settings?.Handshake == Handshake.RequestToSendXOnXOff)
+        if (context.Value.Settings.Handshake == Handshake.RequestToSend || context.Value.Settings.Handshake == Handshake.RequestToSendXOnXOff)
         {
             return;
         }
 
-        if (!WindowsNativeMethods.EscapeCommFunction(_handle, enabled ? WindowsNativeMethods.Setrts : WindowsNativeMethods.Clrrts))
+        if (!WindowsNativeMethods.EscapeCommFunction(context.Value.Handle, enabled ? WindowsNativeMethods.Setrts : WindowsNativeMethods.Clrrts))
         {
             throw CreateIOException(enabled
                 ? $"{nameof(WindowsNativeMethods.EscapeCommFunction)}({nameof(WindowsNativeMethods.Setrts)}) failed."
@@ -193,34 +236,39 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 
     public void RequestAbort()
     {
-        if (!IsOpen)
-        {
-            return;
-        }
+        IntPtr handle;
 
-        WindowsNativeMethods.SetCommMask(_handle, 0);
+        lock (_stateLock)
+        {
+            if (_handle == WindowsNativeMethods.InvalidHandleValue)
+            {
+                return;
+            }
+
+            _closing = true;
+            handle = _handle;
+        }
 
         try
         {
-            WindowsNativeMethods.CancelIoEx(_handle, IntPtr.Zero);
+            WindowsNativeMethods.CancelIoEx(handle, IntPtr.Zero);
         }
         catch (EntryPointNotFoundException)
         {
-            // CancelIoEx is Vista+. If unavailable, PurgeComm below is still attempted.
+            // CancelIoEx is Vista+. No fallback is used here because PurgeComm can itself hang on broken USB/VCP drivers.
         }
-
-        WindowsNativeMethods.PurgeComm(
-            _handle,
-            WindowsNativeMethods.PurgeTxAbort |
-            WindowsNativeMethods.PurgeRxAbort |
-            WindowsNativeMethods.PurgeTxClear |
-            WindowsNativeMethods.PurgeRxClear);
     }
 
     public void CloseCore()
     {
-        IntPtr handle = _handle;
-        _handle = WindowsNativeMethods.InvalidHandleValue;
+        IntPtr handle;
+
+        lock (_stateLock)
+        {
+            handle = _handle;
+            _handle = WindowsNativeMethods.InvalidHandleValue;
+            _closing = true;
+        }
 
         if (handle == WindowsNativeMethods.InvalidHandleValue)
         {
@@ -274,14 +322,128 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 
     #region Private
 
-    private void Configure(SerialPortSettings settings)
+    private uint CompleteOverlappedOperation(
+        IntPtr handle,
+        OverlappedIoOperation operation,
+        bool completedSynchronously,
+        int initialError,
+        int timeout,
+        string operationName)
+    {
+        if (completedSynchronously)
+        {
+            if (TryGetOverlappedResult(handle, operation.Overlapped, operationName, out uint completedBytes))
+            {
+                return completedBytes;
+            }
+        }
+        else if (initialError != WindowsNativeMethods.ErrorIoPending)
+        {
+            throw CreateIOException($"{operationName} operation failed.", initialError);
+        }
+
+        uint waitResult = WindowsNativeMethods.WaitForSingleObject(operation.EventHandle, ToWaitMilliseconds(timeout));
+
+        if (waitResult == WindowsNativeMethods.WaitObject0)
+        {
+            return GetCompletedOverlappedResult(handle, operation.Overlapped, operationName);
+        }
+
+        if (waitResult == WindowsNativeMethods.WaitTimeout)
+        {
+            CancelOverlappedOperation(handle, operation);
+            throw new TimeoutException($"The serial port {operationName} operation timed out.");
+        }
+
+        if (waitResult == WindowsNativeMethods.WaitFailed)
+        {
+            throw CreateIOException($"Waiting for the serial port {operationName} operation failed.");
+        }
+
+        throw new IOException($"Waiting for the serial port {operationName} operation returned unexpected result 0x{waitResult:X8}.");
+    }
+
+    private static bool TryGetOverlappedResult(IntPtr handle, IntPtr overlapped, string operationName, out uint bytesTransferred)
+    {
+        if (WindowsNativeMethods.GetOverlappedResult(handle, overlapped, out bytesTransferred, false))
+        {
+            return true;
+        }
+
+        int error = Marshal.GetLastWin32Error();
+        if (error == WindowsNativeMethods.ErrorIoIncomplete)
+        {
+            return false;
+        }
+
+        if (error == WindowsNativeMethods.ErrorOperationAborted)
+        {
+            throw new IOException($"The serial port {operationName} operation was aborted.");
+        }
+
+        throw CreateIOException($"Completing the serial port {operationName} operation failed.", error);
+    }
+
+    private static uint GetCompletedOverlappedResult(IntPtr handle, IntPtr overlapped, string operationName)
+    {
+        if (WindowsNativeMethods.GetOverlappedResult(handle, overlapped, out uint bytesTransferred, false))
+        {
+            return bytesTransferred;
+        }
+
+        int error = Marshal.GetLastWin32Error();
+        if (error == WindowsNativeMethods.ErrorOperationAborted)
+        {
+            throw new IOException($"The serial port {operationName} operation was aborted.");
+        }
+
+        throw CreateIOException($"Completing the serial port {operationName} operation failed.", error);
+    }
+
+    private static void CancelOverlappedOperation(IntPtr handle, OverlappedIoOperation operation)
+    {
+        try
+        {
+            if (!WindowsNativeMethods.CancelIoEx(handle, operation.Overlapped))
+            {
+                int cancelError = Marshal.GetLastWin32Error();
+                if (cancelError != WindowsNativeMethods.ErrorNotFound && cancelError != WindowsNativeMethods.ErrorOperationAborted)
+                {
+                    operation.AbandonResources();
+                    return;
+                }
+            }
+        }
+        catch (EntryPointNotFoundException)
+        {
+            // Vista+ API. If it does not exist, the bounded wait below still prevents the caller from blocking forever.
+        }
+
+        uint waitResult = WindowsNativeMethods.WaitForSingleObject(operation.EventHandle, CancelCompletionWaitMilliseconds);
+        if (waitResult != WindowsNativeMethods.WaitObject0)
+        {
+            operation.AbandonResources();
+        }
+    }
+
+    private static uint ToWaitMilliseconds(int timeout)
+    {
+        if (timeout == SerialPort.InfiniteTimeout)
+        {
+            return WindowsNativeMethods.Infinite;
+        }
+
+        return checked((uint)timeout);
+    }
+
+    private void Configure(IntPtr handle, SerialPortSettings settings)
     {
         var dcb = new Dcb
         {
             DCBlength = (uint)Marshal.SizeOf(typeof(Dcb))
         };
 
-        if (!WindowsNativeMethods.GetCommState(_handle, ref dcb))
+        if (!WindowsNativeMethods.GetCommState(handle, ref dcb))
         {
             throw CreateIOException($"{nameof(WindowsNativeMethods.GetCommState)} failed.");
         }
@@ -308,13 +470,13 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
         flags = SetFlag(flags, 14, false); // fAbortOnError
         dcb.Flags = flags;
 
-        if (!WindowsNativeMethods.SetCommState(_handle, ref dcb))
+        if (!WindowsNativeMethods.SetCommState(handle, ref dcb))
         {
             throw CreateIOException($"{nameof(WindowsNativeMethods.SetCommState)} failed.");
         }
     }
 
-    private void ApplyTimeouts(SerialPortSettings settings)
+    private void ApplyTimeouts(IntPtr handle, SerialPortSettings settings)
     {
         var timeouts = new CommTimeouts();
 
@@ -335,9 +497,33 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
         timeouts.WriteTotalTimeoutMultiplier = 0;
         timeouts.WriteTotalTimeoutConstant = settings.WriteTimeout == SerialPort.InfiniteTimeout ? 0 : checked((uint)settings.WriteTimeout);
 
-        if (!WindowsNativeMethods.SetCommTimeouts(_handle, ref timeouts))
+        if (!WindowsNativeMethods.SetCommTimeouts(handle, ref timeouts))
         {
             throw CreateIOException($"{nameof(WindowsNativeMethods.SetCommTimeouts)} failed.");
+        }
+    }
+
+    private OperationContext GetOpenOperationContext()
+    {
+        var context = TryGetOperationContext();
+        if (!context.HasValue)
+        {
+            throw new InvalidOperationException("The serial port backend is not open.");
+        }
+
+        return context.Value;
+    }
+
+    private OperationContext? TryGetOperationContext()
+    {
+        lock (_stateLock)
+        {
+            if (_handle == WindowsNativeMethods.InvalidHandleValue || _closing || _settings == null)
+            {
+                return null;
+            }
+
+            return new OperationContext(_handle, _settings.Clone());
         }
     }
 
@@ -423,18 +609,117 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
         return (flags & ~mask) | ((value << offset) & mask);
     }
 
-    private void EnsureOpen()
-    {
-        if (!IsOpen)
-        {
-            throw new InvalidOperationException("The serial port backend is not open.");
-        }
-    }
-
     private static IOException CreateIOException(string message)
     {
         var inner = WindowsNativeMethods.LastWin32Exception();
         return new IOException(message + " " + inner.Message, inner);
+    }
+
+    private static IOException CreateIOException(string message, int error)
+    {
+        var inner = new Win32Exception(error);
+        return new IOException(message + " " + inner.Message, inner);
+    }
+
+    #endregion
+
+    #region Nested types
+
+    private readonly struct OperationContext
+    {
+        public OperationContext(IntPtr handle, SerialPortSettings settings)
+        {
+            Handle = handle;
+            Settings = settings;
+        }
+
+        public IntPtr Handle { get; }
+
+        public SerialPortSettings Settings { get; }
+    }
+
+    private sealed class OverlappedIoOperation : IDisposable
+    {
+        #region Constructor
+
+        public OverlappedIoOperation(int bufferSize)
+        {
+            int effectiveBufferSize = Math.Max(1, bufferSize);
+            Buffer = Marshal.AllocHGlobal(effectiveBufferSize);
+
+            try
+            {
+                EventHandle = WindowsNativeMethods.CreateEventW(IntPtr.Zero, true, false, null);
+                if (EventHandle == IntPtr.Zero)
+                {
+                    throw CreateIOException($"{nameof(WindowsNativeMethods.CreateEventW)} failed.");
+                }
+
+                Overlapped = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(NativeOverlappedData)));
+
+                var overlapped = new NativeOverlappedData { hEvent = EventHandle };
+
+                Marshal.StructureToPtr(overlapped, Overlapped, false);
+            }
+            catch
+            {
+                Dispose();
+                throw;
+            }
+        }
+
+        #endregion
+
+        #region Fields
+
+        private bool _ownsResources = true;
+
+        #endregion
+
+        #region Properties
+
+        public IntPtr Buffer { get; private set; }
+
+        public IntPtr Overlapped { get; private set; }
+
+        public IntPtr EventHandle { get; private set; }
+
+        #endregion
+
+        #region Public
+
+        public void AbandonResources()
+        {
+            _ownsResources = false;
+        }
+
+        public void Dispose()
+        {
+            if (!_ownsResources)
+            {
+                return;
+            }
+
+            if (Overlapped != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(Overlapped);
+                Overlapped = IntPtr.Zero;
+            }
+
+            if (EventHandle != IntPtr.Zero)
+            {
+                Kernel32.CloseHandle(EventHandle);
+                EventHandle = IntPtr.Zero;
+            }
+
+            if (Buffer != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(Buffer);
+                Buffer = IntPtr.Zero;
+            }
+        }
+
+        #endregion
     }
 
     #endregion

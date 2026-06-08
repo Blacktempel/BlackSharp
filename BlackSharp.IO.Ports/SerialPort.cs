@@ -82,6 +82,8 @@ public class SerialPort : IDisposable
 
     private readonly object _sync = new object();
     private ISerialPortBackend _backend;
+    private bool _opening;
+    private bool _closeRequestedDuringOpen;
     private bool _disposed;
 
     #endregion
@@ -159,8 +161,7 @@ public class SerialPort : IDisposable
     {
         get
         {
-            lock (_sync)
-                return GetOpenBackend().BytesToRead;
+            return GetOpenBackendSnapshot().BytesToRead;
         }
     }
 
@@ -173,11 +174,15 @@ public class SerialPort : IDisposable
         get => _dtrEnable;
         set
         {
+            ISerialPortBackend backend;
+
             lock (_sync)
             {
                 _dtrEnable = value;
-                _backend?.SetDtr(value);
+                backend = _backend;
             }
+
+            backend?.SetDtr(value);
         }
     }
 
@@ -190,11 +195,15 @@ public class SerialPort : IDisposable
         get => _rtsEnable;
         set
         {
+            ISerialPortBackend backend;
+
             lock (_sync)
             {
                 _rtsEnable = value;
-                _backend?.SetRts(value);
+                backend = _backend;
             }
+
+            backend?.SetRts(value);
         }
     }
 
@@ -215,19 +224,57 @@ public class SerialPort : IDisposable
         ThrowIfDisposed();
         ValidateSettings();
 
+        SerialPortSettings settings;
+
         lock (_sync)
         {
-            if (_backend?.IsOpen == true)
+            if (_backend?.IsOpen == true || _opening)
             {
                 throw new InvalidOperationException("The serial port is already open.");
             }
 
-            var settings = CreateSettings();
-            var backend = CreateBackend();
+            settings = CreateSettings();
+            _closeRequestedDuringOpen = false;
+            _opening = true;
+        }
 
+        ISerialPortBackend backend = CreateBackend();
+        bool assigned = false;
+
+        try
+        {
             backend.Open(settings);
 
-            _backend = backend;
+            lock (_sync)
+            {
+                _opening = false;
+
+                if (_disposed || _closeRequestedDuringOpen)
+                {
+                    _closeRequestedDuringOpen = false;
+                    assigned = false;
+                }
+                else
+                {
+                    _backend = backend;
+                    assigned = true;
+                }
+            }
+
+            if (!assigned)
+            {
+                CloseDetached(backend, CloseTimeout);
+            }
+        }
+        catch
+        {
+            lock (_sync)
+            {
+                _opening = false;
+                _closeRequestedDuringOpen = false;
+            }
+
+            throw;
         }
     }
 
@@ -258,6 +305,11 @@ public class SerialPort : IDisposable
 
         lock (_sync)
         {
+            if (_opening && _backend == null)
+            {
+                _closeRequestedDuringOpen = true;
+            }
+
             backend = _backend;
             _backend = null;
         }
@@ -282,10 +334,8 @@ public class SerialPort : IDisposable
     {
         ValidateBuffer(buffer, offset, count);
 
-        lock (_sync)
-        {
-            return GetOpenBackend().Read(buffer, offset, count);
-        }
+        var backend = GetOpenBackendSnapshot();
+        return backend.Read(buffer, offset, count);
     }
 
     /// <summary>
@@ -331,10 +381,8 @@ public class SerialPort : IDisposable
     {
         ValidateBuffer(buffer, offset, count);
 
-        lock (_sync)
-        {
-            GetOpenBackend().Write(buffer, offset, count);
-        }
+        var backend = GetOpenBackendSnapshot();
+        backend.Write(buffer, offset, count);
     }
 
     /// <summary>
@@ -376,10 +424,8 @@ public class SerialPort : IDisposable
     /// <exception cref="InvalidOperationException">The port is not open.</exception>
     public void DiscardInBuffer()
     {
-        lock (_sync)
-        {
-            GetOpenBackend().DiscardInBuffer();
-        }
+        var backend = GetOpenBackendSnapshot();
+        backend.DiscardInBuffer();
     }
 
     /// <summary>
@@ -388,10 +434,8 @@ public class SerialPort : IDisposable
     /// <exception cref="InvalidOperationException">The port is not open.</exception>
     public void DiscardOutBuffer()
     {
-        lock (_sync)
-        {
-            GetOpenBackend().DiscardOutBuffer();
-        }
+        var backend = GetOpenBackendSnapshot();
+        backend.DiscardOutBuffer();
     }
 
     /// <summary>
@@ -488,16 +532,19 @@ public class SerialPort : IDisposable
         throw new PlatformNotSupportedException($"This {nameof(SerialPort)} implementation currently supports Windows and Linux.");
     }
 
-    private ISerialPortBackend GetOpenBackend()
+    private ISerialPortBackend GetOpenBackendSnapshot()
     {
         ThrowIfDisposed();
 
-        if (_backend == null || !_backend.IsOpen)
+        lock (_sync)
         {
-            throw new InvalidOperationException("The serial port is not open.");
-        }
+            if (_backend == null || !_backend.IsOpen)
+            {
+                throw new InvalidOperationException("The serial port is not open.");
+            }
 
-        return _backend;
+            return _backend;
+        }
     }
 
     private void ValidateSettings()

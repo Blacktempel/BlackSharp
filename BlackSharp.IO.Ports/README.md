@@ -7,7 +7,7 @@ The goal is to avoid the problematic managed cleanup path and to provide a `TryC
 
 ## Supported
 
-- Windows COM ports through Win32 `CreateFile`, `SetCommState`, `ReadFile`, `WriteFile`, `PurgeComm`, `CancelIoEx`, `CloseHandle`
+- Windows COM ports through Win32 `CreateFile(FILE_FLAG_OVERLAPPED)`, `SetCommState`, overlapped `ReadFile`/`WriteFile`, `CancelIoEx`, `CloseHandle`
 - Linux serial devices through libc/POSIX `open`, `termios`, `poll`, `read`, `write`, `tcflush`, `close`
 - Baud rate, data bits, parity, stop bits
 - None / XOnXOff / RTS-CTS / RTS-CTS + XOnXOff handshake
@@ -26,11 +26,11 @@ The goal is to avoid the problematic managed cleanup path and to provide a `TryC
 ## Important close semantics
 
 `TryClose(timeout)` returns `false` when the native close path did not complete in time.
-In that case the native close continues on a single process-wide background worker and the caller is not blocked.
+In that case the native close continues on the current close worker and the caller is not blocked.
 
 After `false`, discard the `SerialPort` instance.
 The OS/device may still keep the real port handle busy until the stuck close returns or the process exits.
-If the native driver blocks forever inside close, the single close worker can also remain occupied forever; this is the maximum robustness possible inside one process.
+The close worker is then abandoned and a fresh worker is created for future close requests. Pending close requests that were still waiting behind the stuck one are moved to the fresh worker. This avoids both the single-worker deadlock pattern and the unnecessary thread-per-close pattern, but a permanently blocked kernel driver can still leave one abandoned background thread behind until process exit.
 
 For a hard guarantee that the OS handle is gone even if a USB driver blocks forever, please use process isolation around the serial access.
 
