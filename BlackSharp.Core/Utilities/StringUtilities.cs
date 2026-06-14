@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
  * Copyright (c) 2026 Florian K.
- *
  */
 
 namespace BlackSharp.Core.Utilities

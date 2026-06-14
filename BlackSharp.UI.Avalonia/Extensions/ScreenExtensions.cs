@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
  * Copyright (c) 2025 Florian K.
- *
  */
 
 #pragma warning disable CA1416 // Platform compatibility warning

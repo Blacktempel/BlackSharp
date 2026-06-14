@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
  * Copyright (c) 2026 Florian K.
- *
  */
 
 #pragma warning disable MSTEST0032 // Review or remove the assertion as its condition is known to be always true
