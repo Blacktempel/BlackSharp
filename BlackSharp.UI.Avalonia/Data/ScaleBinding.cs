@@ -15,7 +15,7 @@ namespace BlackSharp.UI.Avalonia.Data
     /// <summary>
     /// Binding which scales to given <see cref="Factor"/>.
     /// </summary>
-    public class ScaleBinding : Binding
+    public class ScaleBinding : ReflectionBinding
     {
         #region Constructor
 
@@ -74,6 +74,25 @@ namespace BlackSharp.UI.Avalonia.Data
             {
                 throw new InvalidOperationException($"Cannot set Converter on {nameof(ScaleBinding)}. The converter is built-in.");
             }
+        }
+
+        #endregion
+
+        #region Public
+
+        /// <summary>
+        /// Provides this binding instance when the binding is used as an Avalonia XAML markup extension.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The XAML service provider supplied by Avalonia.<br/>
+        /// This binding does not require it because all binding configuration is already stored on the instance.
+        /// </param>
+        /// <returns>
+        /// The current <see cref="ScaleBinding"/> instance.
+        /// </returns>
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
         }
 
         #endregion
