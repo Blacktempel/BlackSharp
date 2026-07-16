@@ -51,7 +51,7 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
 
         #region Constants
 
-        internal const uint INFINITE_TIME = 0xFFFFFFFF;
+        internal const uint TWO_SECONDS = 2000;
 
         internal const int SECURITY_DESCRIPTOR_REVISION = 1;
         internal const int SECURITY_WORLD_RID = 0x00;
@@ -89,14 +89,18 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         #region Public
 
         /// <summary>
-        /// Lock the mutex.
+        /// Attempts to lock the mutex with specified timeout (default is 2 seconds).
         /// </summary>
-        public void Lock()
+        /// <param name="millisecondsTimeout">The timeout in milliseconds to wait for the mutex.</param>
+        /// <returns>Returns true if the mutex was successfully locked within the specified timeout, false otherwise.</returns>
+        public bool Lock(uint millisecondsTimeout = TWO_SECONDS)
         {
             if (_WorldMutex != IntPtr.Zero)
             {
-                Kernel32.WaitForSingleObject(_WorldMutex, INFINITE_TIME);
+                return Kernel32.WaitForSingleObject(_WorldMutex, millisecondsTimeout) == 0;
             }
+
+            return false;
         }
 
         /// <summary>
