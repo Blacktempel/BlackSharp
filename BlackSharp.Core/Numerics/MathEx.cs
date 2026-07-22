@@ -791,6 +791,24 @@ namespace BlackSharp.Core.Numerics
         }
 
         /// <summary>
+        /// Returns the larger of two nullable double-precision floating-point numbers.
+        /// </summary>
+        /// <param name="val1">First value.</param>
+        /// <param name="val2">Second value.</param>
+        /// <returns>The larger value, the present value, or <see langword="null"/> when neither is present.</returns>
+        public static double? Max(double? val1, double? val2)
+        {
+            if (!val2.HasValue)
+            {
+                return val1;
+            }
+
+            return val1.HasValue
+                ? Math.Max(val1.Value, val2.Value)
+                : val2;
+        }
+
+        /// <summary>
         /// Returns the larger magnitude of two double-precision floating-point numbers.
         /// </summary>
         /// <param name="x">First value.</param>

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -7,6 +7,7 @@
  */
 
 using BlackSharp.IO.Ports.Interop.Windows.Structures;
+using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
@@ -63,6 +64,15 @@ internal static class WindowsNativeMethods
         out int lpNumberOfBytesRead,
         IntPtr lpOverlapped);
 
+    [DllImport(DLL_NAME, EntryPoint = nameof(ReadFile), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool ReadFile(
+        SafeFileHandle hFile,
+        IntPtr lpBuffer,
+        uint nNumberOfBytesToRead,
+        out uint lpNumberOfBytesRead,
+        ref NativeOverlappedData lpOverlapped);
+
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool WriteFile(
@@ -71,6 +81,27 @@ internal static class WindowsNativeMethods
         int nNumberOfBytesToWrite,
         out int lpNumberOfBytesWritten,
         IntPtr lpOverlapped);
+
+    [DllImport(DLL_NAME, EntryPoint = nameof(WriteFile), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool WriteFile(
+        SafeFileHandle hFile,
+        IntPtr lpBuffer,
+        uint nNumberOfBytesToWrite,
+        out uint lpNumberOfBytesWritten,
+        ref NativeOverlappedData lpOverlapped);
+
+    [DllImport(DLL_NAME, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool DeviceIoControl(
+        SafeFileHandle hDevice,
+        uint dwIoControlCode,
+        IntPtr lpInBuffer,
+        uint nInBufferSize,
+        IntPtr lpOutBuffer,
+        uint nOutBufferSize,
+        out uint lpBytesReturned,
+        ref NativeOverlappedData lpOverlapped);
 
     [DllImport(DLL_NAME, EntryPoint = nameof(ReadFile), SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -108,6 +139,14 @@ internal static class WindowsNativeMethods
         out uint lpNumberOfBytesTransferred,
         [MarshalAs(UnmanagedType.Bool)] bool bWait);
 
+    [DllImport(DLL_NAME, EntryPoint = nameof(GetOverlappedResult), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetOverlappedResult(
+        SafeFileHandle hFile,
+        ref NativeOverlappedData lpOverlapped,
+        out uint lpNumberOfBytesTransferred,
+        [MarshalAs(UnmanagedType.Bool)] bool bWait);
+
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetupComm(IntPtr hFile, uint dwInQueue, uint dwOutQueue);
@@ -116,9 +155,17 @@ internal static class WindowsNativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool GetCommState(IntPtr hFile, ref Dcb lpDcb);
 
+    [DllImport(DLL_NAME, EntryPoint = nameof(GetCommState), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetCommState(SafeFileHandle hFile, ref Dcb lpDcb);
+
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetCommState(IntPtr hFile, ref Dcb lpDcb);
+
+    [DllImport(DLL_NAME, EntryPoint = nameof(SetCommState), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetCommState(SafeFileHandle hFile, ref Dcb lpDcb);
 
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -128,9 +175,17 @@ internal static class WindowsNativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetCommTimeouts(IntPtr hFile, ref CommTimeouts lpCommTimeouts);
 
+    [DllImport(DLL_NAME, EntryPoint = nameof(SetCommTimeouts), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetCommTimeouts(SafeFileHandle hFile, ref CommTimeouts lpCommTimeouts);
+
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool PurgeComm(IntPtr hFile, uint dwFlags);
+
+    [DllImport(DLL_NAME, EntryPoint = nameof(PurgeComm), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool PurgeComm(SafeFileHandle hFile, uint dwFlags);
 
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -143,6 +198,10 @@ internal static class WindowsNativeMethods
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool CancelIoEx(IntPtr hFile, IntPtr lpOverlapped);
+
+    [DllImport(DLL_NAME, EntryPoint = nameof(CancelIoEx), SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool CancelIoEx(SafeFileHandle hFile, ref NativeOverlappedData lpOverlapped);
 
     [DllImport(DLL_NAME, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

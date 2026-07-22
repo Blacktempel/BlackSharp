@@ -10,6 +10,7 @@ using BlackSharp.Core.Interop.Windows.Enums;
 using BlackSharp.Core.Interop.Windows.Native;
 using BlackSharp.IO.Ports.Interop.Windows;
 using BlackSharp.IO.Ports.Interop.Windows.Structures;
+using BlackSharp.IO.Ports.Models;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 

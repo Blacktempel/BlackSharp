@@ -27,6 +27,9 @@ namespace BlackSharp.Core.Tests.Extensions
             Assert.IsTrue(ObjectExtensions.Any(1, [1, 2, 3]));
             Assert.IsTrue(ObjectExtensions.Any(40, 2, 3, 40, 5));
             Assert.IsTrue(ObjectExtensions.Any(90, 5, 90));
+
+            Assert.IsTrue (ObjectExtensions.Any("NVMe", ["SATA", "nvme"], StringComparer.OrdinalIgnoreCase));
+            Assert.IsFalse(ObjectExtensions.Any("SAS" , ["SATA", "NVMe"], StringComparer.OrdinalIgnoreCase));
         }
 
         [TestMethod]

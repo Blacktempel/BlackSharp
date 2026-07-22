@@ -32,5 +32,15 @@ namespace BlackSharp.Core.Tests.Utilities
             Assert.AreEqual('A', StringUtilities.GetHexChar(10));
             Assert.AreEqual('F', StringUtilities.GetHexChar(15));
         }
+
+        [TestMethod]
+        public void FormatNullableInvariant()
+        {
+            string formatted = StringUtilities.FormatNullableInvariant<double>(12.5, "F2", "none");
+            string fallback  = StringUtilities.FormatNullableInvariant<double>(null, "F2", "none");
+
+            Assert.AreEqual("12.50", formatted);
+            Assert.AreEqual("none", fallback);
+        }
     }
 }

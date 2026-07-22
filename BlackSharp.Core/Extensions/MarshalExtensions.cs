@@ -6,17 +6,68 @@
  * Copyright (c) 2025 Florian K.
  */
 
+using System.Runtime.InteropServices;
+using System.Security;
+
 namespace BlackSharp.Core.Extensions
 {
     /// <summary>
-    /// Extension methods for <see cref="System.Runtime.InteropServices.Marshal"/>.<br/>
+    /// Extension methods for <see cref="Marshal"/>.<br/>
     /// </summary>
     /// <remarks>Implementations are based on Microsoft source code (referencesource).</remarks>
     public static class MarshalExtensions
     {
         #region Public
 
-        [System.Security.SecurityCritical]
+        /// <summary>
+        /// Copies a managed structure to a byte array.
+        /// </summary>
+        /// <typeparam name="T">The structure type.</typeparam>
+        /// <param name="structure">The structure to copy.</param>
+        /// <returns>A byte array containing the structure data.</returns>
+        public static byte[] GetBytes<T>(T structure)
+            where T : struct
+        {
+            int size = Marshal.SizeOf<T>();
+            var buffer = new byte[size];
+            IntPtr pointer = Marshal.AllocHGlobal(size);
+
+            try
+            {
+                Marshal.StructureToPtr(structure, pointer, false);
+                Marshal.Copy(pointer, buffer, 0, size);
+                return buffer;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(pointer);
+            }
+        }
+
+        /// <summary>
+        /// Copies bytes from a buffer to a managed structure.
+        /// </summary>
+        /// <typeparam name="T">The structure type.</typeparam>
+        /// <param name="buffer">The buffer containing the structure data.</param>
+        /// <returns>The structure read from the buffer.</returns>
+        public static T FromBytes<T>(byte[] buffer)
+            where T : struct
+        {
+            int size = Marshal.SizeOf<T>();
+            IntPtr pointer = Marshal.AllocHGlobal(size);
+
+            try
+            {
+                Marshal.Copy(buffer, 0, pointer, size);
+                return Marshal.PtrToStructure<T>(pointer);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(pointer);
+            }
+        }
+
+        [SecurityCritical]
         public static unsafe void Copy(IntPtr source, IntPtr destination, int startIndex, int length)
         {
             if (source == IntPtr.Zero || destination == IntPtr.Zero)
@@ -39,7 +90,9 @@ namespace BlackSharp.Core.Extensions
         /// </summary>
         /// <param name="ptr">The address in unmanaged memory from which to read.</param>
         /// <returns>The 16-bit signed integer read from unmanaged memory.</returns>
-        /// <exception cref="AccessViolationException">ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.</exception>
+        /// <exception cref="AccessViolationException">
+        /// ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.
+        /// </exception>
         [System.Security.SecurityCritical]
         public static ushort ReadUInt16(IntPtr ptr)
         {
@@ -52,7 +105,9 @@ namespace BlackSharp.Core.Extensions
         /// <param name="ptr">The base address in unmanaged memory from which to read.</param>
         /// <param name="ofs">An additional byte offset, which is added to the ptr parameter before reading.</param>
         /// <returns>The 16-bit signed integer read from unmanaged memory at the given offset.</returns>
-        /// <exception cref="AccessViolationException">Base address (ptr) plus offset byte (ofs) produces a null or invalid address.</exception>
+        /// <exception cref="AccessViolationException">
+        /// Base address (ptr) plus offset byte (ofs) produces a null or invalid address.
+        /// </exception>
         [System.Security.SecurityCritical]
         public static unsafe ushort ReadUInt16(IntPtr ptr, int ofs)
         {
@@ -86,7 +141,9 @@ namespace BlackSharp.Core.Extensions
         /// </summary>
         /// <param name="ptr">The address in unmanaged memory to write to.</param>
         /// <param name="val">The value to write.</param>
-        /// <exception cref="AccessViolationException">ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.</exception>
+        /// <exception cref="AccessViolationException">
+        /// ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.
+        /// </exception>
         [System.Security.SecurityCritical]
         public static void WriteUInt16(IntPtr ptr, ushort val)
         {
@@ -99,7 +156,9 @@ namespace BlackSharp.Core.Extensions
         /// <param name="ptr">The base address in the native heap to write to.</param>
         /// <param name="ofs">An additional byte offset, which is added to the ptr parameter before writing.</param>
         /// <param name="val">The value to write.</param>
-        /// <exception cref="AccessViolationException">Base address (ptr) plus offset byte (ofs) produces a null or invalid address.</exception>
+        /// <exception cref="AccessViolationException">
+        /// Base address (ptr) plus offset byte (ofs) produces a null or invalid address.
+        /// </exception>
         [System.Security.SecurityCritical]
         public static unsafe void WriteUInt16(IntPtr ptr, int ofs, ushort val)
         {
@@ -135,7 +194,9 @@ namespace BlackSharp.Core.Extensions
         /// </summary>
         /// <param name="ptr">The address in unmanaged memory from which to read.</param>
         /// <returns>The 64-bit signed integer read from unmanaged memory.</returns>
-        /// <exception cref="AccessViolationException">ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.</exception>
+        /// <exception cref="AccessViolationException">
+        /// ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.
+        /// </exception>
         [System.Security.SecurityCritical]
         public static ulong ReadUInt64(IntPtr ptr)
         {
@@ -148,7 +209,9 @@ namespace BlackSharp.Core.Extensions
         /// <param name="ptr">The base address in unmanaged memory from which to read.</param>
         /// <param name="ofs">An additional byte offset, which is added to the ptr parameter before reading.</param>
         /// <returns>The 64-bit signed integer read from unmanaged memory at the given offset.</returns>
-        /// <exception cref="AccessViolationException">Base address (ptr) plus offset byte (ofs) produces a null or invalid address.</exception>
+        /// <exception cref="AccessViolationException">
+        /// Base address (ptr) plus offset byte (ofs) produces a null or invalid address.
+        /// </exception>
         [System.Security.SecurityCritical]
         public static unsafe ulong ReadUInt64(IntPtr ptr, int ofs)
         {
@@ -188,7 +251,9 @@ namespace BlackSharp.Core.Extensions
         /// </summary>
         /// <param name="ptr">The address in unmanaged memory to write to.</param>
         /// <param name="val">The value to write.</param>
-        /// <exception cref="AccessViolationException">ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.</exception>
+        /// <exception cref="AccessViolationException">
+        /// ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.
+        /// </exception>
         [System.Security.SecurityCritical]
         public static void WriteUInt64(IntPtr ptr, ulong val)
         {
@@ -201,7 +266,9 @@ namespace BlackSharp.Core.Extensions
         /// <param name="ptr">The base address in the native heap to write to.</param>
         /// <param name="ofs">An additional byte offset, which is added to the ptr parameter before writing.</param>
         /// <param name="val">The value to write.</param>
-        /// <exception cref="AccessViolationException">Base address (ptr) plus offset byte (ofs) produces a null or invalid address.</exception>
+        /// <exception cref="AccessViolationException">
+        /// Base address (ptr) plus offset byte (ofs) produces a null or invalid address.
+        /// </exception>
         [System.Security.SecurityCritical]
         public static unsafe void WriteUInt64(IntPtr ptr, int ofs, ulong val)
         {

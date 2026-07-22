@@ -6,6 +6,8 @@
  * Copyright (c) 2026 Florian K.
  */
 
+using BlackSharp.IO.Ports.Models;
+
 namespace BlackSharp.IO.Ports;
 
 internal interface ISerialPortBackend

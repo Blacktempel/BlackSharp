@@ -198,6 +198,10 @@ namespace BlackSharp.Core.Tests.Numerics
         {
             Assert.AreEqual(new IntPtr(10), MathEx.Max(new IntPtr(-5), new IntPtr(10)));
             Assert.AreEqual(new UIntPtr(10U), MathEx.Max(new UIntPtr(5U), new UIntPtr(10U)));
+            Assert.AreEqual(10.0, MathEx.Max(5.0, 10.0));
+            Assert.AreEqual(5.0, MathEx.Max(5.0, null));
+
+            Assert.IsNull(MathEx.Max(null, null));
         }
 
         [TestMethod]

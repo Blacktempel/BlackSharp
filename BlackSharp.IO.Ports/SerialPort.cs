@@ -7,6 +7,7 @@
  */
 
 using BlackSharp.IO.Ports.Backends;
+using BlackSharp.IO.Ports.Models;
 using System.Text;
 using OS = BlackSharp.Core.Platform.OperatingSystem;
 

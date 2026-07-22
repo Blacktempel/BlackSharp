@@ -32,6 +32,22 @@ namespace BlackSharp.Core.Tests.Extensions
         }
 
         [TestMethod]
+        public void ContainsAny()
+        {
+            Assert.IsTrue (StringExtensions.ContainsAny("JMicron JMS583 bridge", StringComparison.OrdinalIgnoreCase, "rtl" , "jms583"));
+            Assert.IsFalse(StringExtensions.ContainsAny(null                   , StringComparison.OrdinalIgnoreCase, "NVMe"));
+            Assert.IsFalse(StringExtensions.ContainsAny("NVMe"                 , StringComparison.OrdinalIgnoreCase, null  , " "     ));
+        }
+
+        [TestMethod]
+        public void FirstNotNullOrWhiteSpace()
+        {
+            Assert.AreEqual("NVMe Drive", StringExtensions.FirstNotNullOrWhiteSpace(null, " ", "NVMe Drive"));
+            Assert.AreEqual(string.Empty, StringExtensions.FirstNotNullOrWhiteSpace(null, " "));
+            Assert.AreEqual(string.Empty, StringExtensions.FirstNotNullOrWhiteSpace(null));
+        }
+
+        [TestMethod]
         public void Join()
         {
             const int Elem0 =   123;
@@ -48,6 +64,14 @@ namespace BlackSharp.Core.Tests.Extensions
 
             Assert.AreEqual($"{Elem0}{Separator}{Elem1}{Separator}{Elem2}", result0);
             Assert.AreEqual($"{Elem0}{Separator}{Elem1}{Separator}{Elem2}", result1);
+            Assert.AreEqual(string.Empty, result2);
+        }
+
+        [TestMethod]
+        public void StartsWithAny()
+        {
+            Assert.IsTrue (StringExtensions.StartsWithAny("USBSTOR", StringComparison.OrdinalIgnoreCase, "PCI", "usb"));
+            Assert.IsFalse(StringExtensions.StartsWithAny("SCSI"   , StringComparison.OrdinalIgnoreCase, "PCI", "usb"));
         }
 
         [TestMethod]

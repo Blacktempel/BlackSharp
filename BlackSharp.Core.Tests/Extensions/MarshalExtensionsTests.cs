@@ -15,6 +15,23 @@ namespace BlackSharp.Core.Tests.Extensions
     public class MarshalExtensionsTests
     {
         [TestMethod]
+        public void GetBytes_FromBytes()
+        {
+            var expected = new TestStructure
+            {
+                First  = 0x1234,
+                Second = 0x89ABCDEF
+            };
+
+            byte[] buffer = MarshalExtensions.GetBytes(expected);
+            TestStructure actual = MarshalExtensions.FromBytes<TestStructure>(buffer);
+
+            Assert.HasCount(Marshal.SizeOf<TestStructure>(), buffer);
+            Assert.AreEqual(expected.First , actual.First );
+            Assert.AreEqual(expected.Second, actual.Second);
+        }
+
+        [TestMethod]
         public void Copy()
         {
             var size = 512;
@@ -105,6 +122,13 @@ namespace BlackSharp.Core.Tests.Extensions
             Marshal.WriteInt32(source, index * 4, value);
             MarshalExtensions.Copy(source, destination, index * 4, 4);
             Assert.AreEqual(value, Marshal.ReadInt32(destination));
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct TestStructure
+        {
+            public ushort First;
+            public uint Second;
         }
     }
 }

@@ -6,6 +6,8 @@
  * Copyright (c) 2026 Florian K.
  */
 
+using System.Globalization;
+
 namespace BlackSharp.Core.Utilities
 {
     /// <summary>
@@ -42,6 +44,25 @@ namespace BlackSharp.Core.Utilities
         public static char GetHexChar(int value)
         {
             return (char)(value < 10 ? '0' + value : 'A' + value - 10);
+        }
+
+        /// <summary>
+        /// Formats a nullable value with the invariant culture.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="value">The optional value.</param>
+        /// <param name="format">The format string, or <see langword="null"/> for the default format.</param>
+        /// <param name="nullValue">The text returned when the value is absent.</param>
+        /// <returns>The invariantly formatted value or the configured null text.</returns>
+        public static string FormatNullableInvariant<T>(
+            T? value,
+            string format,
+            string nullValue)
+            where T : struct, IFormattable
+        {
+            return value.HasValue
+                ? value.Value.ToString(format, CultureInfo.InvariantCulture)
+                : nullValue ?? string.Empty;
         }
 
         #endregion

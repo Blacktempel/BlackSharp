@@ -60,6 +60,33 @@ namespace BlackSharp.Core.Extensions
         }
 
         /// <summary>
+        /// Checks whether the current object matches any object in the specified collection using a comparer.
+        /// </summary>
+        /// <typeparam name="T">The type of the object and collection items.</typeparam>
+        /// <param name="obj">The current object.</param>
+        /// <param name="collection">A collection of objects to check for equality.</param>
+        /// <param name="comparer">The comparer to use.</param>
+        /// <returns><see langword="true"/> if any object in the collection is equal to the current object.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="comparer"/> is <see langword="null"/>.</exception>
+        public static bool Any<T>(this T obj, IEnumerable<T> collection, IEqualityComparer<T> comparer)
+        {
+            if (comparer == null)
+            {
+                throw new ArgumentNullException(nameof(comparer));
+            }
+
+            foreach (T value in collection)
+            {
+                if (comparer.Equals(obj, value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Checks if the current object matches (Equals) any of the specified objects.
         /// </summary>
         /// <param name="obj">The current object.</param>

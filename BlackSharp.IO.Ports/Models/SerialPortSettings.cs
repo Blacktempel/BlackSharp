@@ -8,7 +8,7 @@
 
 using BlackSharp.Core.Interfaces;
 
-namespace BlackSharp.IO.Ports;
+namespace BlackSharp.IO.Ports.Models;
 
 internal sealed class SerialPortSettings : ICloneable<SerialPortSettings>
 {

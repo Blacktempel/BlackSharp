@@ -8,6 +8,7 @@
 
 using BlackSharp.IO.Ports.Interop.Linux;
 using BlackSharp.IO.Ports.Interop.Linux.Structures;
+using BlackSharp.IO.Ports.Models;
 using System.Diagnostics;
 
 namespace BlackSharp.IO.Ports.Backends;
