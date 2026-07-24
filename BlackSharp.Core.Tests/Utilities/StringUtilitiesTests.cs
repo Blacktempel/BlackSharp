@@ -34,6 +34,17 @@ namespace BlackSharp.Core.Tests.Utilities
         }
 
         [TestMethod]
+        public void FormatHex()
+        {
+            Assert.AreEqual("0x0A", StringUtilities.FormatHex((byte)0x0A));
+            Assert.AreEqual("0x1234", StringUtilities.FormatHex((ushort)0x1234));
+            Assert.AreEqual("0x89ABCDEF", StringUtilities.FormatHex(0x89ABCDEFU));
+            Assert.AreEqual("0x0000000000001234", StringUtilities.FormatHex(0x1234UL, 8));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+                () => StringUtilities.FormatHex(0UL, 0));
+        }
+
+        [TestMethod]
         public void FormatNullableInvariant()
         {
             string formatted = StringUtilities.FormatNullableInvariant<double>(12.5, "F2", "none");
@@ -41,6 +52,41 @@ namespace BlackSharp.Core.Tests.Utilities
 
             Assert.AreEqual("12.50", formatted);
             Assert.AreEqual("none", fallback);
+        }
+
+        [TestMethod]
+        public void FormatNullOrEmpty()
+        {
+            Assert.AreEqual("value", StringUtilities.FormatNullOrEmpty("value", "null", "empty"));
+            Assert.AreEqual("null" , StringUtilities.FormatNullOrEmpty(null, "null", "empty"));
+            Assert.AreEqual("empty", StringUtilities.FormatNullOrEmpty(string.Empty, "null", "empty"));
+            Assert.AreEqual(string.Empty, StringUtilities.FormatNullOrEmpty(null, null, "empty"));
+            Assert.AreEqual(string.Empty, StringUtilities.FormatNullOrEmpty(string.Empty, "null", null));
+        }
+
+        [TestMethod]
+        public void TrimNullPadding()
+        {
+            Assert.AreEqual("value", StringUtilities.TrimNullPadding("  \0value  \0\0  "));
+            Assert.AreEqual(string.Empty, StringUtilities.TrimNullPadding(null));
+        }
+
+        [TestMethod]
+        public void SplitLines()
+        {
+            // Arrange
+            const string value = "first\r\nsecond\nthird\rfourth\r\n";
+
+            // Act
+            string[] lines = StringUtilities.SplitLines(value);
+
+            // Assert
+            CollectionAssert.AreEqual(
+                new[] { "first", "second", "third", "fourth", string.Empty },
+                lines);
+            CollectionAssert.AreEqual(
+                new[] { string.Empty },
+                StringUtilities.SplitLines(null));
         }
     }
 }

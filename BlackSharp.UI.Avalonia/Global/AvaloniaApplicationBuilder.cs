@@ -8,7 +8,7 @@
 
 using Avalonia;
 
-namespace BlackSharp.UI.Avalonia
+namespace BlackSharp.UI.Avalonia.Global
 {
     /// <summary>
     /// Creates consistently configured Avalonia desktop application builders.

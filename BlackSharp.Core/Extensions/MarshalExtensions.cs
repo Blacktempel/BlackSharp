@@ -30,13 +30,38 @@ namespace BlackSharp.Core.Extensions
         {
             int size = Marshal.SizeOf<T>();
             var buffer = new byte[size];
-            IntPtr pointer = Marshal.AllocHGlobal(size);
+
+            CopyToBytes(structure, buffer, 0);
+
+            return buffer;
+        }
+
+        /// <summary>
+        /// Copies a managed structure to a byte array at a specified offset.
+        /// </summary>
+        /// <typeparam name="T">The structure type.</typeparam>
+        /// <param name="structure">The structure to copy.</param>
+        /// <param name="buffer">The destination buffer.</param>
+        /// <param name="offset">The zero-based destination offset.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="buffer"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The structure does not fit in <paramref name="buffer"/> at <paramref name="offset"/>.
+        /// </exception>
+        public static void CopyToBytes<T>(T structure, byte[] buffer, int offset)
+            where T : struct
+        {
+            var size = Marshal.SizeOf<T>();
+
+            ValidateBufferRange(buffer, offset, size);
+
+            var pointer = Marshal.AllocHGlobal(size);
 
             try
             {
                 Marshal.StructureToPtr(structure, pointer, false);
-                Marshal.Copy(pointer, buffer, 0, size);
-                return buffer;
+                Marshal.Copy(pointer, buffer, offset, size);
             }
             finally
             {
@@ -53,12 +78,34 @@ namespace BlackSharp.Core.Extensions
         public static T FromBytes<T>(byte[] buffer)
             where T : struct
         {
-            int size = Marshal.SizeOf<T>();
-            IntPtr pointer = Marshal.AllocHGlobal(size);
+            return FromBytes<T>(buffer, 0);
+        }
+
+        /// <summary>
+        /// Copies bytes from a specified buffer offset to a managed structure.
+        /// </summary>
+        /// <typeparam name="T">The structure type.</typeparam>
+        /// <param name="buffer">The buffer containing the structure data.</param>
+        /// <param name="offset">The zero-based source offset.</param>
+        /// <returns>The structure read from the buffer.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="buffer"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The structure does not fit in <paramref name="buffer"/> at <paramref name="offset"/>.
+        /// </exception>
+        public static T FromBytes<T>(byte[] buffer, int offset)
+            where T : struct
+        {
+            var size = Marshal.SizeOf<T>();
+
+            ValidateBufferRange(buffer, offset, size);
+
+            var pointer = Marshal.AllocHGlobal(size);
 
             try
             {
-                Marshal.Copy(buffer, 0, pointer, size);
+                Marshal.Copy(buffer, offset, pointer, size);
                 return Marshal.PtrToStructure<T>(pointer);
             }
             finally
@@ -67,6 +114,19 @@ namespace BlackSharp.Core.Extensions
             }
         }
 
+        /// <summary>
+        /// Copies a byte range between unmanaged memory locations.
+        /// </summary>
+        /// <param name="source">The source memory address.</param>
+        /// <param name="destination">The destination memory address.</param>
+        /// <param name="startIndex">The source byte offset.</param>
+        /// <param name="length">The number of bytes to copy.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="source"/> or <paramref name="destination"/> is zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is negative.
+        /// </exception>
         [SecurityCritical]
         public static unsafe void Copy(IntPtr source, IntPtr destination, int startIndex, int length)
         {
@@ -93,7 +153,7 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="AccessViolationException">
         /// ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.
         /// </exception>
-        [System.Security.SecurityCritical]
+        [SecurityCritical]
         public static ushort ReadUInt16(IntPtr ptr)
         {
             return ReadUInt16(ptr, 0);
@@ -108,7 +168,7 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="AccessViolationException">
         /// Base address (ptr) plus offset byte (ofs) produces a null or invalid address.
         /// </exception>
-        [System.Security.SecurityCritical]
+        [SecurityCritical]
         public static unsafe ushort ReadUInt16(IntPtr ptr, int ofs)
         {
             try
@@ -144,7 +204,7 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="AccessViolationException">
         /// ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.
         /// </exception>
-        [System.Security.SecurityCritical]
+        [SecurityCritical]
         public static void WriteUInt16(IntPtr ptr, ushort val)
         {
             WriteUInt16(ptr, 0, val);
@@ -159,7 +219,7 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="AccessViolationException">
         /// Base address (ptr) plus offset byte (ofs) produces a null or invalid address.
         /// </exception>
-        [System.Security.SecurityCritical]
+        [SecurityCritical]
         public static unsafe void WriteUInt16(IntPtr ptr, int ofs, ushort val)
         {
             try
@@ -197,7 +257,7 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="AccessViolationException">
         /// ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.
         /// </exception>
-        [System.Security.SecurityCritical]
+        [SecurityCritical]
         public static ulong ReadUInt64(IntPtr ptr)
         {
             return ReadUInt64(ptr, 0);
@@ -212,7 +272,7 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="AccessViolationException">
         /// Base address (ptr) plus offset byte (ofs) produces a null or invalid address.
         /// </exception>
-        [System.Security.SecurityCritical]
+        [SecurityCritical]
         public static unsafe ulong ReadUInt64(IntPtr ptr, int ofs)
         {
             try
@@ -254,7 +314,7 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="AccessViolationException">
         /// ptr is not a recognized format. -or- ptr is null. -or- ptr is invalid.
         /// </exception>
-        [System.Security.SecurityCritical]
+        [SecurityCritical]
         public static void WriteUInt64(IntPtr ptr, ulong val)
         {
             WriteUInt64(ptr, 0, val);
@@ -269,7 +329,7 @@ namespace BlackSharp.Core.Extensions
         /// <exception cref="AccessViolationException">
         /// Base address (ptr) plus offset byte (ofs) produces a null or invalid address.
         /// </exception>
-        [System.Security.SecurityCritical]
+        [SecurityCritical]
         public static unsafe void WriteUInt64(IntPtr ptr, int ofs, ulong val)
         {
             try
@@ -302,6 +362,25 @@ namespace BlackSharp.Core.Extensions
         }
 
         #endregion
+
+        #endregion
+
+        #region Private
+
+        static void ValidateBufferRange(byte[] buffer, int offset, int size)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException(nameof(buffer));
+            }
+
+            if (offset < 0
+             || size > buffer.Length
+             || offset > buffer.Length - size)
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            }
+        }
 
         #endregion
     }

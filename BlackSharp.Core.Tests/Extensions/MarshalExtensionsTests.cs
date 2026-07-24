@@ -32,6 +32,48 @@ namespace BlackSharp.Core.Tests.Extensions
         }
 
         [TestMethod]
+        public void CopyToBytes_FromBytes_WithOffset()
+        {
+            var expected = new TestStructure
+            {
+                First = 0x1234,
+                Second = 0x89ABCDEF
+            };
+            int offset = 3;
+            var buffer = new byte[offset + Marshal.SizeOf<TestStructure>() + 2];
+
+            MarshalExtensions.CopyToBytes(expected, buffer, offset);
+            TestStructure actual =
+                MarshalExtensions.FromBytes<TestStructure>(buffer, offset);
+
+            Assert.AreEqual(expected.First, actual.First);
+            Assert.AreEqual(expected.Second, actual.Second);
+            Assert.AreEqual(0, buffer[0]);
+            Assert.AreEqual(0, buffer[buffer.Length - 1]);
+        }
+
+        [TestMethod]
+        public void CopyToBytes_FromBytes_InvalidBufferRange()
+        {
+            int size = Marshal.SizeOf<TestStructure>();
+            var shortBuffer = new byte[size - 1];
+            var exactBuffer = new byte[size];
+
+            Assert.ThrowsExactly<ArgumentNullException>(
+                () => MarshalExtensions.CopyToBytes(default(TestStructure), null, 0));
+            Assert.ThrowsExactly<ArgumentNullException>(
+                () => MarshalExtensions.FromBytes<TestStructure>(null, 0));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+                () => MarshalExtensions.CopyToBytes(default(TestStructure), exactBuffer, -1));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+                () => MarshalExtensions.FromBytes<TestStructure>(exactBuffer, 1));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+                () => MarshalExtensions.CopyToBytes(default(TestStructure), shortBuffer, 0));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+                () => MarshalExtensions.FromBytes<TestStructure>(shortBuffer, 0));
+        }
+
+        [TestMethod]
         public void Copy()
         {
             var size = 512;
