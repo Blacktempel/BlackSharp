@@ -146,6 +146,7 @@ namespace BlackSharp.UI.Avalonia.Controls
                 {
                     number = 0.0;
                     isNegative = false;
+
                     return false;
                 }
             }
@@ -156,6 +157,7 @@ namespace BlackSharp.UI.Avalonia.Controls
                 {
                     number = 0.0;
                     isNegative = true;
+
                     return false;
                 }
                 s += '0';
@@ -165,6 +167,7 @@ namespace BlackSharp.UI.Avalonia.Controls
             {
                 number = 0.0;
                 isNegative = false;
+
                 return false;
             }
 
@@ -188,6 +191,7 @@ namespace BlackSharp.UI.Avalonia.Controls
                 {
                     number = 0.0;
                     isNegative = false;
+
                     return false;
                 }
             }

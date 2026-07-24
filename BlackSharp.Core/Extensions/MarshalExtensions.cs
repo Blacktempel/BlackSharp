@@ -106,6 +106,7 @@ namespace BlackSharp.Core.Extensions
             try
             {
                 Marshal.Copy(buffer, offset, pointer, size);
+
                 return Marshal.PtrToStructure<T>(pointer);
             }
             finally
@@ -186,6 +187,7 @@ namespace BlackSharp.Core.Extensions
                     byte* valPtr = (byte*)&val;
                     valPtr[0] = addr[0];
                     valPtr[1] = addr[1];
+
                     return val;
                 }
             }
@@ -296,6 +298,7 @@ namespace BlackSharp.Core.Extensions
                     valPtr[5] = addr[5];
                     valPtr[6] = addr[6];
                     valPtr[7] = addr[7];
+
                     return val;
                 }
             }

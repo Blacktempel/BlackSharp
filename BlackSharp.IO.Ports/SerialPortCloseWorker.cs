@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -50,6 +50,7 @@ internal static class SerialPortCloseWorker
             RotateWorker(worker);
 
             exception = null;
+
             return false;
         }
 
@@ -105,7 +106,7 @@ internal static class SerialPortCloseWorker
 
             CloseWorker currentWorker = EnsureCurrentWorkerLocked();
 
-            foreach (CloseRequest pendingRequest in pendingRequests)
+            foreach (var pendingRequest in pendingRequests)
             {
                 currentWorker.Enqueue(pendingRequest);
             }
@@ -192,6 +193,7 @@ internal static class SerialPortCloseWorker
                 }
 
                 Monitor.PulseAll(_sync);
+
                 return pendingRequests;
             }
         }

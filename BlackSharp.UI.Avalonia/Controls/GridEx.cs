@@ -86,6 +86,7 @@ namespace BlackSharp.UI.Avalonia.Controls
         protected override Size MeasureOverride(Size constraint)
         {
             UpdateChildMargins();
+
             return base.MeasureOverride(constraint);
         }
 
@@ -98,7 +99,7 @@ namespace BlackSharp.UI.Avalonia.Controls
             int maxCol = 0,
                 maxRow = 0;
 
-            foreach (Control child in Children)
+            foreach (var child in Children)
             {
                 if (!child.IsVisible)
                     continue;
@@ -106,7 +107,7 @@ namespace BlackSharp.UI.Avalonia.Controls
                 maxRow = Math.Max(maxRow, GetRow(child));
             }
 
-            foreach (Control child in Children)
+            foreach (var child in Children)
             {
                 int col     = GetColumn     (child),
                     colSpan = GetColumnSpan (child),

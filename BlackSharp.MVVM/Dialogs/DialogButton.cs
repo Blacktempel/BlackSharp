@@ -103,6 +103,7 @@ namespace BlackSharp.MVVM.Dialogs
             {
                 //All default buttons are closing the dialog
                 var btn = CreateButton(dbi, TryGet(_ContentMapping, dbi), true);
+
                 return btn;
             });
 

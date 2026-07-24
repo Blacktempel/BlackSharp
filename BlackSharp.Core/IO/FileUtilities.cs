@@ -25,8 +25,8 @@ namespace BlackSharp.Core.IO
             try
             {
                 return File.Exists(path)
-                    ? File.ReadAllText(path).Trim()
-                    : string.Empty;
+                     ? File.ReadAllText(path).Trim()
+                     : string.Empty;
             }
             catch
             {

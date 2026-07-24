@@ -135,6 +135,7 @@ namespace BlackSharp.Core.Extensions
             string temp0 = str.Substring(0, startIndex);
             int index = startIndex + length;
             string temp2 = str.Substring(index, str.Length - index);
+
             return temp0 + instead + temp2;
         }
 

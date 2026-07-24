@@ -120,9 +120,11 @@ namespace BlackSharp.Core.Collections
         {
             if (match == null)
                 throw new ArgumentNullException(nameof(match));
+
             foreach (var item in this)
                 if (match(item))
                     return true;
+
             return false;
         }
 
@@ -135,6 +137,7 @@ namespace BlackSharp.Core.Collections
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
+
             foreach (var item in this)
                 action.Invoke(item);
         }
@@ -151,9 +154,11 @@ namespace BlackSharp.Core.Collections
         {
             if (match == null)
                 throw new ArgumentNullException(nameof(match));
+
             foreach (var item in this)
                 if (!match(item))
                     return false;
+
             return true;
         }
 
@@ -185,6 +190,7 @@ namespace BlackSharp.Core.Collections
         public void AddRange(IEnumerable<T> items)
         {
             CheckReentrancy();
+
             if (items == null)
                 throw new ArgumentNullException(nameof(items));
 
@@ -210,8 +216,10 @@ namespace BlackSharp.Core.Collections
         public void AddRange(IEnumerable<T> items, Predicate<T> condition)
         {
             CheckReentrancy();
+
             if (items == null)
                 throw new ArgumentNullException(nameof(items));
+
             if (condition == null)
                 throw new ArgumentNullException(nameof(condition));
 
@@ -238,10 +246,13 @@ namespace BlackSharp.Core.Collections
         public void RemoveRange(int index, int count)
         {
             CheckReentrancy();
+
             if (index < 0 || index >= Count)
                 throw new ArgumentOutOfRangeException(nameof(index));
+
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
+
             if (Count - index < count)
                 throw new ArgumentException("Invalid offset");
 
@@ -279,6 +290,7 @@ namespace BlackSharp.Core.Collections
                     --i;
                 }
             }
+
             OnCollectionReset();
         }
 
@@ -295,6 +307,7 @@ namespace BlackSharp.Core.Collections
             foreach (var item in this)
                 if (match(item))
                     return item;
+
             return default(T);
         }
 
@@ -311,6 +324,7 @@ namespace BlackSharp.Core.Collections
             for (int i = Count - 1; i >= 0; --i)
                 if (match(this[i]))
                     return this[i];
+
             return default(T);
         }
 
@@ -328,6 +342,7 @@ namespace BlackSharp.Core.Collections
             foreach (var item in this)
                 if (match(item))
                     matches.Add(item);
+
             return matches;
         }
 
@@ -344,6 +359,7 @@ namespace BlackSharp.Core.Collections
             for (int i = 0; i < count; ++i)
                 if (match(this[i]))
                     return i;
+
             return InvalidIndex;
         }
 
@@ -360,6 +376,7 @@ namespace BlackSharp.Core.Collections
             for (int i = count - 1; i >= 0; --i)
                 if (match(this[i]))
                     return i;
+
             return InvalidIndex;
         }
 
@@ -423,12 +440,16 @@ namespace BlackSharp.Core.Collections
         public void Sort(int index, int count, IComparer<T> comparer)
         {
             CheckReentrancy();
+
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index));
+
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
+
             if (Count - index < count)
                 throw new ArgumentException("Invalid offset");
+
             ArrayList.Adapter((IList)Items).Sort(index, count, (IComparer)comparer);
             OnCollectionReset();
         }
@@ -473,6 +494,7 @@ namespace BlackSharp.Core.Collections
         protected IDisposable BlockReentrancy()
         {
             Monitor.Enter();
+
             return Monitor;
         }
 

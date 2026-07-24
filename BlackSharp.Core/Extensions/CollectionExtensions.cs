@@ -64,11 +64,12 @@ namespace BlackSharp.Core.Extensions
                 throw new ArgumentNullException(nameof(predicate));
             }
 
-            foreach (T candidate in values)
+            foreach (var candidate in values)
             {
                 if (predicate(candidate))
                 {
                     value = candidate;
+
                     return true;
                 }
             }

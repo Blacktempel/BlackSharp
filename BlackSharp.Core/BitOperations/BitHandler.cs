@@ -92,7 +92,7 @@ namespace BlackSharp.Core.BitOperations
             }
 
             int length = toBit - fromBit + 1;
-            T mask = (T.One << length) - T.One;
+            var mask = (T.One << length) - T.One;
 
             return (value >> fromBit) & mask;
         }
@@ -163,9 +163,9 @@ namespace BlackSharp.Core.BitOperations
 
             int length = toBit - fromBit + 1;
 
-            T mask = ((T.One << length) - T.One) << fromBit;
+            var mask = ((T.One << length) - T.One) << fromBit;
 
-            T bitsMasked = (bits & ((T.One << length) - T.One)) << fromBit;
+            var bitsMasked = (bits & ((T.One << length) - T.One)) << fromBit;
 
             return (value & ~mask) | bitsMasked;
         }
@@ -242,7 +242,7 @@ namespace BlackSharp.Core.BitOperations
             }
 
             int length = toBit - fromBit + 1;
-            T mask = ((T.One << length) - T.One) << fromBit;
+            var mask = ((T.One << length) - T.One) << fromBit;
 
             return set ? (value | mask) : (value & ~mask);
     }

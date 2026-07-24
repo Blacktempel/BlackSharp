@@ -51,6 +51,7 @@ namespace BlackSharp.Core.Extensions
             var type = typeof(Default<>).MakeGenericType(t);
             var prop = type.GetProperty(nameof(Default<int>.Value), BindingFlags.Static | BindingFlags.Public);
             var get = prop.GetGetMethod();
+
             return get.Invoke(null, null);
         }
 

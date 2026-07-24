@@ -148,9 +148,9 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
                              0,                                  //Sub authority 7
                              out var sid                         //Returned SID
                          )
-               &&
+             &&
                 AdvApi32.InitializeAcl(acl, (uint)aclSize, ACL_REVISION) //ACL setup OK and
-               &&
+             &&
                 AdvApi32.AddAccessAllowedAce(acl, ACL_REVISION, MUTANT_ALL_ACCESS, sid) //ACE setup OK ?
                )
             {

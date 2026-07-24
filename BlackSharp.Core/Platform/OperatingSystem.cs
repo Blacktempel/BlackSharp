@@ -114,6 +114,7 @@ namespace BlackSharp.Core.Platform
                 if (NTDLL.RtlGetVersion(ref versionInfo) != 0)
                 {
                     major = minor = 0;
+
                     return false;
                 }
 

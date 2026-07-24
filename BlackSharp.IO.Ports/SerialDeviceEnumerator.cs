@@ -102,6 +102,7 @@ public static class SerialDeviceEnumerator
         if (value is string text)
         {
             int separator = text.LastIndexOf(';');
+
             return separator >= 0 ? text.Substring(separator + 1) : text;
         }
 

@@ -67,8 +67,8 @@ namespace BlackSharp.Core.Numerics
             }
 
             return d > 1.0e154
-                ? System.Math.Log(d) + System.Math.Log(2.0)
-                : System.Math.Log(d + System.Math.Sqrt((d - 1.0) * (d + 1.0)));
+                 ? System.Math.Log(d) + System.Math.Log(2.0)
+                 : System.Math.Log(d + System.Math.Sqrt((d - 1.0) * (d + 1.0)));
 #endif
         }
 
@@ -186,6 +186,7 @@ namespace BlackSharp.Core.Numerics
             var lower = (ulong)(product & UInt64Mask);
 
             low = unchecked((long)lower);
+
             return (long)(product >> 64);
 #endif
         }
@@ -205,6 +206,7 @@ namespace BlackSharp.Core.Numerics
             var product = (BigInteger)a * b;
 
             low = (ulong)(product & UInt64Mask);
+
             return (ulong)(product >> 64);
 #endif
         }
@@ -279,6 +281,7 @@ namespace BlackSharp.Core.Numerics
             }
 
             var result = System.Math.Pow(System.Math.Abs(d), 1.0 / 3.0);
+
             return CopySign(result, d);
 #endif
         }
@@ -641,6 +644,7 @@ namespace BlackSharp.Core.Numerics
         public static (IntPtr Quotient, IntPtr Remainder) DivRem(IntPtr left, IntPtr right)
         {
             var quotient = System.Math.DivRem(left.ToInt64(), right.ToInt64(), out var remainder);
+
             return (new IntPtr(quotient), new IntPtr(remainder));
         }
 
@@ -804,8 +808,8 @@ namespace BlackSharp.Core.Numerics
             }
 
             return val1.HasValue
-                ? Math.Max(val1.Value, val2.Value)
-                : val2;
+                 ? Math.Max(val1.Value, val2.Value)
+                 : val2;
         }
 
         /// <summary>

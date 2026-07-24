@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -140,6 +140,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 
         int bytesRead = checked((int)bytesTransferred);
         Marshal.Copy(operation.Buffer, buffer, offset, bytesRead);
+
         return bytesRead;
     }
 
@@ -410,6 +411,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
                 if (cancelError != WindowsNativeMethods.ErrorNotFound && cancelError != WindowsNativeMethods.ErrorOperationAborted)
                 {
                     operation.AbandonResources();
+
                     return;
                 }
             }
@@ -466,7 +468,20 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
         flags = SetFlag(flags, 9, settings.Handshake == Handshake.XOnXOff || settings.Handshake == Handshake.RequestToSendXOnXOff); // fInX
         flags = SetFlag(flags, 10, false); // fErrorChar
         flags = SetFlag(flags, 11, false); // fNull
-        flags = SetBits(flags, 12, 2, settings.Handshake == Handshake.RequestToSend || settings.Handshake == Handshake.RequestToSendXOnXOff ? 2u : (settings.RtsEnable ? 1u : 0u)); // fRtsControl
+
+        uint rtsControl;
+
+        if (settings.Handshake == Handshake.RequestToSend
+         || settings.Handshake == Handshake.RequestToSendXOnXOff)
+        {
+            rtsControl = 2;
+        }
+        else
+        {
+            rtsControl = settings.RtsEnable ? 1u : 0u;
+        }
+
+        flags = SetBits(flags, 12, 2, rtsControl); // fRtsControl
         flags = SetFlag(flags, 14, false); // fAbortOnError
         dcb.Flags = flags;
 
@@ -600,24 +615,28 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
     private static uint SetFlag(uint flags, int bit, bool value)
     {
         uint mask = 1u << bit;
+
         return value ? flags | mask : flags & ~mask;
     }
 
     private static uint SetBits(uint flags, int offset, int width, uint value)
     {
         uint mask = ((1u << width) - 1u) << offset;
+
         return (flags & ~mask) | ((value << offset) & mask);
     }
 
     private static IOException CreateIOException(string message)
     {
         var inner = WindowsNativeMethods.LastWin32Exception();
+
         return new IOException(message + " " + inner.Message, inner);
     }
 
     private static IOException CreateIOException(string message, int error)
     {
         var inner = new Win32Exception(error);
+
         return new IOException(message + " " + inner.Message, inner);
     }
 

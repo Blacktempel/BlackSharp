@@ -24,6 +24,7 @@ namespace BlackSharp.UI.Avalonia.Converter
             var param = (double)Convert.ChangeType(parameter, typeof(double));
 
             ThrowIfDoubleValueIsInvalid(val);
+
             return val * (param == 0.0 ? 1.0 : param);
         }
 
@@ -33,6 +34,7 @@ namespace BlackSharp.UI.Avalonia.Converter
             var param = (double)Convert.ChangeType(parameter, typeof(double));
 
             ThrowIfDoubleValueIsInvalid(val);
+
             return val == 0.0 ? val : val / param;
         }
 

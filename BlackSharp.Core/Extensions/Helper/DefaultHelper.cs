@@ -32,6 +32,7 @@ namespace BlackSharp.Core.Extensions.Helper
                     _Value = (T)(object)Array.CreateInstance(typeof(T).GetElementType(), new int[typeof(T).GetArrayRank()]);
                 else
                     _Value = (T)(object)Array.CreateInstance(typeof(T).GetElementType(), 0);
+
                 return;
             }
 
@@ -39,6 +40,7 @@ namespace BlackSharp.Core.Extensions.Helper
             {
                 //String is IEnumerable<char>, but don't want to treat it like a collection
                 _Value = default(T);
+
                 return;
             }
 
@@ -48,6 +50,7 @@ namespace BlackSharp.Core.Extensions.Helper
                 if (typeof(T).IsAssignableFrom(typeof(object[])))
                 {
                     _Value = (T)(object)new object[0];
+
                     return;
                 }
 
@@ -57,6 +60,7 @@ namespace BlackSharp.Core.Extensions.Helper
                     if (typeof(T).IsAssignableFrom(elementType.MakeArrayType()))
                     {
                         _Value = (T)(object)Array.CreateInstance(elementType, 0);
+
                         return;
                     }
                 }

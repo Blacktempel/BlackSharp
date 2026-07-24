@@ -58,6 +58,7 @@ namespace BlackSharp.UI.Avalonia.Windows.Media
                     return geometry;
                 }
             }
+
             return null;
         }
 

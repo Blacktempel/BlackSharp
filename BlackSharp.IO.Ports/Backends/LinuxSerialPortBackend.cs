@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -453,8 +453,19 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
             return timeout;
         }
 
-        long remaining = timeout - stopwatch.ElapsedMilliseconds;
-        return remaining <= 0 ? 0 : remaining > int.MaxValue ? int.MaxValue : (int)remaining;
+        var remaining = timeout - stopwatch.ElapsedMilliseconds;
+
+        if (remaining <= 0)
+        {
+            return 0;
+        }
+
+        if (remaining > int.MaxValue)
+        {
+            return int.MaxValue;
+        }
+
+        return (int)remaining;
     }
 
     private static string NormalizePortName(string portName)
@@ -550,6 +561,7 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
     private static IOException CreateIOException(string message)
     {
         var inner = LinuxNativeMethods.LastErrnoException();
+
         return new IOException(message + " " + inner.Message, inner);
     }
 

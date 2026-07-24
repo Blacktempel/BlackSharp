@@ -22,12 +22,14 @@ namespace BlackSharp.Core.Extensions
         {
             if (e == null)
                 return string.Empty;
+
             string exceptionString = FullExceptionString(e.InnerException);
 
             if (e.Message != null)
             {
                 if (!string.IsNullOrEmpty(exceptionString))
                     exceptionString += Environment.NewLine + Environment.NewLine;
+
                 exceptionString += "Info:" + Environment.NewLine;
                 exceptionString += (e.HResult >= 0 ? $"({e.HResult}) " : $"(0x{e.HResult.ToString("X")}) ") + e.Message;
             }
@@ -36,9 +38,11 @@ namespace BlackSharp.Core.Extensions
             {
                 if (!string.IsNullOrEmpty(exceptionString))
                     exceptionString += Environment.NewLine + Environment.NewLine;
+
                 exceptionString += "Details:" + Environment.NewLine;
                 exceptionString += e.StackTrace;
             }
+
             return exceptionString;
         }
     }

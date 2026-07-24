@@ -39,9 +39,11 @@ namespace BlackSharp.Core.Extensions
         {
             if (Any(obj, value1, value2))
                 return true;
+
             foreach (var o in values)
                 if (obj.Equals(o))
                     return true;
+
             return false;
         }
 
@@ -56,6 +58,7 @@ namespace BlackSharp.Core.Extensions
             foreach (var o in collection)
                 if (obj.Equals(o))
                     return true;
+
             return false;
         }
 
@@ -75,7 +78,7 @@ namespace BlackSharp.Core.Extensions
                 throw new ArgumentNullException(nameof(comparer));
             }
 
-            foreach (T value in collection)
+            foreach (var value in collection)
             {
                 if (comparer.Equals(obj, value))
                 {
@@ -110,9 +113,11 @@ namespace BlackSharp.Core.Extensions
         {
             if (AnyOf(obj, value1, value2))
                 return true;
+
             foreach (var o in values)
                 if (obj.Equals(o))
                     return true;
+
             return false;
         }
 
@@ -127,6 +132,7 @@ namespace BlackSharp.Core.Extensions
             foreach (var o in collection)
                 if (obj.Equals(o))
                     return true;
+
             return false;
         }
 
@@ -137,17 +143,17 @@ namespace BlackSharp.Core.Extensions
         /// <returns>If the object is of a number type.</returns>
         public static bool IsNumber(this object obj)
         {
-            return obj is byte ||
-                    obj is short ||
-                    obj is int ||
-                    obj is long ||
-                    obj is float ||
-                    obj is double ||
-                    obj is decimal ||
-                    obj is sbyte ||
-                    obj is ushort ||
-                    obj is uint ||
-                    obj is ulong;
+            return obj is byte
+                || obj is short
+                || obj is int
+                || obj is long
+                || obj is float
+                || obj is double
+                || obj is decimal
+                || obj is sbyte
+                || obj is ushort
+                || obj is uint
+                || obj is ulong;
         }
     }
 }

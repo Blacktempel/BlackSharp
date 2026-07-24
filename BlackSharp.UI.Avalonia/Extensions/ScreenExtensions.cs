@@ -238,6 +238,7 @@ namespace BlackSharp.UI.Avalonia.Extensions
         static byte[] GetEdid(string registryPath)
         {
             using var key = Registry.LocalMachine.OpenSubKey(registryPath + @"\Device Parameters");
+
             return key?.GetValue("EDID") as byte[];
         }
 

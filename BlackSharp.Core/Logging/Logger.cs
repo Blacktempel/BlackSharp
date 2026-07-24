@@ -103,6 +103,7 @@ namespace BlackSharp.Core.Logging
         public override string ToString()
         {
             var time = Time?.ToString("[dd/MM/yyyy HH:mm:ss.fff] ");
+
             return $"{time}{Logger.GetStringForLogLevel(Level)} {Message}";
         }
         #endregion
@@ -138,6 +139,7 @@ namespace BlackSharp.Core.Logging
             {
                 if (_Instance == null)
                     _Instance = new Logger();
+
                 return _Instance;
             }
         }
@@ -250,6 +252,7 @@ namespace BlackSharp.Core.Logging
                     File.AppendAllText(path, ToString(), Encoding.UTF8);
                 else
                     File.WriteAllText(path, ToString(), Encoding.UTF8);
+
                 return true;
             }
             catch
