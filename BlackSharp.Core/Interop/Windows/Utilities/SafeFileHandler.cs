@@ -8,6 +8,8 @@
 
 using BlackSharp.Core.Interop.Windows.Enums;
 using BlackSharp.Core.Interop.Windows.Native;
+using BlackSharp.Core.Interop.Windows.Structures;
+using Microsoft.Win32.SafeHandles;
 
 namespace BlackSharp.Core.Interop.Windows.Utilities
 {
@@ -49,6 +51,66 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
                 FileCreationDisposition.OpenExisting,
                 fileFlagsAndAttributes,
                 IntPtr.Zero);
+        }
+
+        /// <summary>
+        /// Opens a safe file handle with given parameters.
+        /// </summary>
+        /// <param name="lpFileName">The name of the file or device to be created or opened.</param>
+        /// <param name="dwDesiredAccess">The requested access to the file or device.</param>
+        /// <param name="dwShareMode">The requested sharing mode of the file or device.</param>
+        /// <param name="lpSecurityAttributes">A pointer to a <see cref="SECURITY_ATTRIBUTES"/> structure.</param>
+        /// <param name="dwCreationDisposition">An action to take on a file or device that exists or does not exist.</param>
+        /// <param name="dwFlagsAndAttributes">The file or device attributes and flags.</param>
+        /// <param name="hTemplateFile">A handle to a template file with the GENERIC_READ access right.</param>
+        /// <returns>A safe file handle to the opened file or device.</returns>
+        public static SafeFileHandle OpenSafeFileHandle(
+            string lpFileName,
+            DesiredAccess dwDesiredAccess,
+            FileShareMode dwShareMode,
+            IntPtr lpSecurityAttributes,
+            FileCreationDisposition dwCreationDisposition,
+            FileFlagsAndAttributes dwFlagsAndAttributes,
+            IntPtr hTemplateFile)
+        {
+            return Kernel32.CreateFileS(
+                lpFileName,
+                dwDesiredAccess,
+                dwShareMode,
+                lpSecurityAttributes,
+                dwCreationDisposition,
+                dwFlagsAndAttributes,
+                hTemplateFile);
+        }
+
+        /// <summary>
+        /// Opens a safe file handle with given parameters.
+        /// </summary>
+        /// <param name="lpFileName">The name of the file or device to be created or opened.</param>
+        /// <param name="dwDesiredAccess">The requested access to the file or device.</param>
+        /// <param name="dwShareMode">The requested sharing mode of the file or device.</param>
+        /// <param name="lpSecurityAttributes">A pointer to a <see cref="SECURITY_ATTRIBUTES"/> structure.</param>
+        /// <param name="dwCreationDisposition">An action to take on a file or device that exists or does not exist.</param>
+        /// <param name="dwFlagsAndAttributes">The file or device attributes and flags.</param>
+        /// <param name="hTemplateFile">A handle to a template file with the GENERIC_READ access right.</param>
+        /// <returns>A safe file handle to the opened file or device.</returns>
+        public static SafeFileHandle OpenSafeFileHandle(
+            string lpFileName,
+            DesiredAccess dwDesiredAccess,
+            FileShareMode dwShareMode,
+            ref SECURITY_ATTRIBUTES lpSecurityAttributes,
+            FileCreationDisposition dwCreationDisposition,
+            FileFlagsAndAttributes dwFlagsAndAttributes,
+            IntPtr hTemplateFile)
+        {
+            return Kernel32.CreateFileS(
+                lpFileName,
+                dwDesiredAccess,
+                dwShareMode,
+                ref lpSecurityAttributes,
+                dwCreationDisposition,
+                dwFlagsAndAttributes,
+                hTemplateFile);
         }
 
         /// <summary>

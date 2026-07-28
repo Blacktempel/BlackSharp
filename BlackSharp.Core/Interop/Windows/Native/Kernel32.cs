@@ -10,6 +10,7 @@
 
 using BlackSharp.Core.Interop.Windows.Enums;
 using BlackSharp.Core.Interop.Windows.Structures;
+using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
 using System.Security;
 
@@ -42,6 +43,38 @@ namespace BlackSharp.Core.Interop.Windows.Native
             FileCreationDisposition dwCreationDisposition,
             FileFlagsAndAttributes dwFlagsAndAttributes,
             IntPtr hTemplateFile);
+
+        [DllImport(DLL_NAME, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "CreateFileW")]
+        public static extern SafeFileHandle CreateFileS(
+            string lpFileName,
+            DesiredAccess dwDesiredAccess,
+            FileShareMode dwShareMode,
+            IntPtr lpSecurityAttributes,
+            FileCreationDisposition dwCreationDisposition,
+            FileFlagsAndAttributes dwFlagsAndAttributes,
+            IntPtr hTemplateFile);
+
+        [DllImport(DLL_NAME, SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "CreateFileW")]
+        public static extern SafeFileHandle CreateFileS(
+            string lpFileName,
+            DesiredAccess dwDesiredAccess,
+            FileShareMode dwShareMode,
+            ref SECURITY_ATTRIBUTES lpSecurityAttributes,
+            FileCreationDisposition dwCreationDisposition,
+            FileFlagsAndAttributes dwFlagsAndAttributes,
+            IntPtr hTemplateFile);
+
+        [DllImport(DLL_NAME, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool DeviceIoControl(
+            SafeFileHandle hDevice,
+            uint dwIoControlCode,
+            IntPtr lpInBuffer,
+            uint nInBufferSize,
+            IntPtr lpOutBuffer,
+            uint nOutBufferSize,
+            out uint lpBytesReturned,
+            IntPtr lpOverlapped);
 
         [DllImport(DLL_NAME)]
         [SuppressUnmanagedCodeSecurity]
