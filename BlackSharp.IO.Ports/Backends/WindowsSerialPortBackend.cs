@@ -13,6 +13,7 @@ using BlackSharp.IO.Ports.Interop.Windows;
 using BlackSharp.IO.Ports.Models;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Win32ErrorCodes      = BlackSharp.Core.Interop.Windows.Win32ErrorCodes;
 using WindowsNativeMethods = BlackSharp.Core.Interop.Windows.Native.Kernel32;
 
 namespace BlackSharp.IO.Ports.Backends;
@@ -339,7 +340,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
                 return completedBytes;
             }
         }
-        else if (initialError != WindowsNativeMethods.ErrorIoPending)
+        else if (initialError != Win32ErrorCodes.IoPending)
         {
             throw CreateIOException($"{operationName} operation failed.", initialError);
         }
@@ -373,12 +374,12 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
         }
 
         int error = Marshal.GetLastWin32Error();
-        if (error == WindowsNativeMethods.ErrorIoIncomplete)
+        if (error == Win32ErrorCodes.IoIncomplete)
         {
             return false;
         }
 
-        if (error == WindowsNativeMethods.ErrorOperationAborted)
+        if (error == Win32ErrorCodes.OperationAborted)
         {
             throw new IOException($"The serial port {operationName} operation was aborted.");
         }
@@ -394,7 +395,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
         }
 
         int error = Marshal.GetLastWin32Error();
-        if (error == WindowsNativeMethods.ErrorOperationAborted)
+        if (error == Win32ErrorCodes.OperationAborted)
         {
             throw new IOException($"The serial port {operationName} operation was aborted.");
         }
@@ -409,7 +410,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
             if (!WindowsNativeMethods.CancelIoEx(handle, operation.Overlapped))
             {
                 int cancelError = Marshal.GetLastWin32Error();
-                if (cancelError != WindowsNativeMethods.ErrorNotFound && cancelError != WindowsNativeMethods.ErrorOperationAborted)
+                if (cancelError != Win32ErrorCodes.NotFound && cancelError != Win32ErrorCodes.OperationAborted)
                 {
                     operation.AbandonResources();
 

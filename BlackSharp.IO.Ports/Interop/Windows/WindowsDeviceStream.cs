@@ -12,6 +12,7 @@ using BlackSharp.Core.Interop.Windows.Structures;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
 
+using Win32ErrorCodes      = BlackSharp.Core.Interop.Windows.Win32ErrorCodes;
 using WindowsNativeMethods = BlackSharp.Core.Interop.Windows.Native.Kernel32;
 
 namespace BlackSharp.IO.Ports.Interop.Windows;
@@ -353,7 +354,7 @@ public sealed class WindowsDeviceStream : IDisposable
         }
 
         int error = Marshal.GetLastWin32Error();
-        if (error != WindowsNativeMethods.ErrorIoPending)
+        if (error != Win32ErrorCodes.IoPending)
         {
             return false;
         }

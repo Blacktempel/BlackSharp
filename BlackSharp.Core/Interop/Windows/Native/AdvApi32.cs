@@ -22,6 +22,42 @@ namespace BlackSharp.Core.Interop.Windows.Native
         const string DLL_NAME = "advapi32.dll";
 
         /// <summary>
+        /// Grants read access to a registry key.
+        /// </summary>
+        public const uint KeyRead    = 0x00020019;
+
+        /// <summary>
+        /// Identifies a null-terminated registry string.
+        /// </summary>
+        public const uint RegSz      = 1;
+
+        /// <summary>
+        /// Identifies arbitrary binary registry data.
+        /// </summary>
+        public const uint RegBinary  = 3;
+
+        /// <summary>
+        /// Identifies a 32-bit registry value.
+        /// </summary>
+        public const uint RegDword   = 4;
+
+        /// <summary>
+        /// Identifies a sequence of null-terminated registry strings.
+        /// </summary>
+        public const uint RegMultiSz = 7;
+
+        /// <summary>
+        /// Identifies a 64-bit registry value.
+        /// </summary>
+        public const uint RegQword   = 11;
+
+        /// <summary>
+        /// Represents the predefined local-machine registry key.
+        /// </summary>
+        public static readonly IntPtr HkeyLocalMachine =
+            new(unchecked((int)0x80000002));
+
+        /// <summary>
         /// Grants access to connect to the service control manager.
         /// </summary>
         public const uint SC_MANAGER_CONNECT        = 0x0001;
@@ -85,21 +121,6 @@ namespace BlackSharp.Core.Interop.Windows.Native
         /// Requests that a service stop.
         /// </summary>
         public const uint SERVICE_CONTROL_STOP  = 0x00000001;
-
-        /// <summary>
-        /// Indicates that a service is already running.
-        /// </summary>
-        public const int ERROR_SERVICE_ALREADY_RUNNING = 1056;
-
-        /// <summary>
-        /// Indicates that the requested service is not installed.
-        /// </summary>
-        public const int ERROR_SERVICE_DOES_NOT_EXIST  = 1060;
-
-        /// <summary>
-        /// Indicates that the requested service is not active.
-        /// </summary>
-        public const int ERROR_SERVICE_NOT_ACTIVE      = 1062;
 
         #endregion
 

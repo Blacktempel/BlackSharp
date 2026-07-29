@@ -22,6 +22,12 @@ namespace BlackSharp.Core.Interop.Windows.Enums
         /// <summary>Allows subsequent write access.</summary>
         Write  = 0x00000002,
         /// <summary>Allows subsequent delete access.</summary>
-        Delete = 0x00000004
+        Delete = 0x00000004,
+
+        /// <summary>Allows subsequent read and write access.</summary>
+        ReadWrite = Read | Write,
+
+        /// <summary>Allows subsequent read, write, and delete access.</summary>
+        All = Read | Write | Delete
     }
 }

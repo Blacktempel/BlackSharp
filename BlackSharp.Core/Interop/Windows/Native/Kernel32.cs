@@ -90,26 +90,6 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public const uint Setrts = 3;
 
         /// <summary>
-        /// Indicates that an I/O operation was canceled.
-        /// </summary>
-        public const int ErrorOperationAborted =  995;
-
-        /// <summary>
-        /// Indicates that an overlapped I/O operation has not completed.
-        /// </summary>
-        public const int ErrorIoIncomplete     =  996;
-
-        /// <summary>
-        /// Indicates that an overlapped I/O operation is pending.
-        /// </summary>
-        public const int ErrorIoPending        =  997;
-
-        /// <summary>
-        /// Indicates that the requested item was not found.
-        /// </summary>
-        public const int ErrorNotFound         = 1168;
-
-        /// <summary>
         /// Indicates that a wait object was signaled.
         /// </summary>
         public const uint WaitObject0 = 0x00000000;
@@ -519,6 +499,22 @@ namespace BlackSharp.Core.Interop.Windows.Native
         #endregion
 
         #region Public
+
+        /// <summary>
+        /// Creates a Windows device-control code from its component fields.
+        /// </summary>
+        /// <param name="deviceType">The device type encoded in the control code.</param>
+        /// <param name="function">The device-specific function number.</param>
+        /// <param name="method">The buffer transfer method.</param>
+        /// <param name="access">The required device access rights.</param>
+        /// <returns>The encoded device-control code.</returns>
+        public static uint CtlCode(uint deviceType, uint function, IoControlMethod method, IoControlAccess access)
+        {
+            return (deviceType << 16)
+                 | ((uint)access << 14)
+                 | (function << 2)
+                 | (uint)method;
+        }
 
         /// <summary>
         /// Sends a strongly typed control request to a device.

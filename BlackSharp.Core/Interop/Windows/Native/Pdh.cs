@@ -20,11 +20,6 @@ namespace BlackSharp.Core.Interop.Windows.Native
         const string DLL_NAME = "pdh.dll";
 
         /// <summary>
-        /// Indicates that a PDH operation completed successfully.
-        /// </summary>
-        public const uint ErrorSuccess = 0;
-
-        /// <summary>
         /// Indicates that the supplied PDH buffer is too small.
         /// </summary>
         public const uint PdhMoreData = 0x800007D2u;
