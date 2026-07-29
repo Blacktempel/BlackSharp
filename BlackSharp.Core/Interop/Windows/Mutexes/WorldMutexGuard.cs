@@ -21,9 +21,8 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         /// <param name="worldMutex">Mutex to automatically lock and unlock.</param>
         public WorldMutexGuard(WorldMutex worldMutex)
         {
-            _WorldMutex = worldMutex;
-
-            _WorldMutex.Lock();
+            _WorldMutex   = worldMutex ?? throw new ArgumentNullException(nameof(worldMutex));
+            _LockAcquired = _WorldMutex.Lock();
         }
 
         #endregion
@@ -31,6 +30,7 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         #region Fields
 
         WorldMutex _WorldMutex;
+        bool       _LockAcquired;
 
         #endregion
 
@@ -41,6 +41,13 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         /// </summary>
         public void Dispose()
         {
+            if (!_LockAcquired)
+            {
+                return;
+            }
+
+            _LockAcquired = false;
+
             _WorldMutex.Unlock();
         }
 

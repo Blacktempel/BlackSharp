@@ -18,7 +18,7 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
     /// <summary>
     /// Create / Open a mutex with appropiate protection.
     /// </summary>
-    public sealed class WorldMutex
+    public sealed class WorldMutex : IDisposable
     {
         #region Constructor
 
@@ -26,16 +26,22 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         /// Constructs a new global mutex with specified name.
         /// </summary>
         /// <param name="mutexName">Name of mutex.</param>
-        /// <exception cref="PlatformNotSupportedException">Throws if not on Windows.</exception>
         public WorldMutex(string mutexName)
         {
-            if (!OS.IsWindows())
+            if (string.IsNullOrWhiteSpace(mutexName))
             {
-                throw new PlatformNotSupportedException();
+                throw new ArgumentException("A mutex name is required.", nameof(mutexName));
             }
 
-            //Create mutex
-            _WorldMutex = CreateWorldMutex(mutexName);
+            if (OS.IsWindows())
+            {
+                _WorldMutex = CreateWorldMutex(mutexName);
+            }
+            else
+            {
+                MutexName     = $"Global\\{mutexName}";
+                _ManagedMutex = new Mutex(false, MutexName);
+            }
         }
 
         /// <summary>
@@ -43,8 +49,7 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         /// </summary>
         ~WorldMutex()
         {
-            //Cleanup for Handle
-            Kernel32.CloseHandle(_WorldMutex);
+            Dispose(false);
         }
 
         #endregion
@@ -74,6 +79,8 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         /// Mutex Handle.
         /// </summary>
         IntPtr _WorldMutex;
+        Mutex  _ManagedMutex;
+        bool   _Disposed;
 
         #endregion
 
@@ -95,6 +102,28 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         /// <returns>Returns true if the mutex was successfully locked within the specified timeout, false otherwise.</returns>
         public bool Lock(uint millisecondsTimeout = TWO_SECONDS)
         {
+            if (_Disposed)
+            {
+                return false;
+            }
+
+            if (_ManagedMutex != null)
+            {
+                try
+                {
+                    return _ManagedMutex.WaitOne(
+                        TimeSpan.FromMilliseconds(millisecondsTimeout));
+                }
+                catch (AbandonedMutexException)
+                {
+                    return true;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return false;
+                }
+            }
+
             if (_WorldMutex != IntPtr.Zero)
             {
                 return Kernel32.WaitForSingleObject(_WorldMutex, millisecondsTimeout) == 0;
@@ -108,15 +137,80 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
         /// </summary>
         public void Unlock()
         {
+            if (_Disposed)
+            {
+                return;
+            }
+
+            if (_ManagedMutex != null)
+            {
+                try
+                {
+                    _ManagedMutex.ReleaseMutex();
+                }
+                catch (ApplicationException)
+                {
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+
+                return;
+            }
+
             if (_WorldMutex != IntPtr.Zero)
             {
                 Kernel32.ReleaseMutex(_WorldMutex);
             }
         }
 
+        /// <summary>
+        /// Releases the operating-system mutex resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+        }
+
         #endregion
 
         #region Private
+
+        void Dispose(bool disposing)
+        {
+            if (_Disposed)
+            {
+                return;
+            }
+
+            _Disposed = true;
+
+            if (disposing)
+            {
+                _ManagedMutex?.Dispose();
+            }
+
+            _ManagedMutex = null;
+
+            var handle = _WorldMutex;
+
+            _WorldMutex = IntPtr.Zero;
+
+            if (!OS.IsWindows() || handle == IntPtr.Zero)
+            {
+                return;
+            }
+
+            try
+            {
+                Kernel32.CloseHandle(handle);
+            }
+            catch
+            {
+            }
+        }
 
         /// <summary>
         /// Create / Open a mutex with appropiate protection.
