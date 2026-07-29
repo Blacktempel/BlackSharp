@@ -8,11 +8,12 @@
 
 using BlackSharp.Core.Interop.Windows.Enums;
 using BlackSharp.Core.Interop.Windows.Native;
+using BlackSharp.Core.Interop.Windows.Structures;
 using BlackSharp.IO.Ports.Interop.Windows;
-using BlackSharp.IO.Ports.Interop.Windows.Structures;
 using BlackSharp.IO.Ports.Models;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using WindowsNativeMethods = BlackSharp.Core.Interop.Windows.Native.Kernel32;
 
 namespace BlackSharp.IO.Ports.Backends;
 
@@ -23,7 +24,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
     private const int CancelCompletionWaitMilliseconds = 250;
 
     private readonly object _stateLock = new object();
-    private IntPtr _handle = WindowsNativeMethods.InvalidHandleValue;
+    private IntPtr _handle = WindowsNativeMethods.InvalidHandle;
     private SerialPortSettings _settings;
     private bool _closing;
 
@@ -36,7 +37,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
         get
         {
             lock (_stateLock)
-                return _handle != WindowsNativeMethods.InvalidHandleValue && !_closing;
+                return _handle != WindowsNativeMethods.InvalidHandle && !_closing;
         }
     }
 
@@ -51,7 +52,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
                 throw CreateIOException($"{nameof(WindowsNativeMethods.ClearCommError)} failed.");
             }
 
-            return stat.cbInQue > int.MaxValue ? int.MaxValue : (int)stat.cbInQue;
+            return stat.BytesInQueue > int.MaxValue ? int.MaxValue : (int)stat.BytesInQueue;
         }
     }
 
@@ -77,7 +78,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
             FileFlagsAndAttributes.Normal | FileFlagsAndAttributes.Overlapped,
             IntPtr.Zero);
 
-        if (handle == WindowsNativeMethods.InvalidHandleValue)
+        if (handle == WindowsNativeMethods.InvalidHandle)
         {
             throw CreateIOException($"Could not open serial port '{settings.PortName}'.");
         }
@@ -241,7 +242,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 
         lock (_stateLock)
         {
-            if (_handle == WindowsNativeMethods.InvalidHandleValue)
+            if (_handle == WindowsNativeMethods.InvalidHandle)
             {
                 return;
             }
@@ -267,11 +268,11 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
         lock (_stateLock)
         {
             handle = _handle;
-            _handle = WindowsNativeMethods.InvalidHandleValue;
+            _handle = WindowsNativeMethods.InvalidHandle;
             _closing = true;
         }
 
-        if (handle == WindowsNativeMethods.InvalidHandleValue)
+        if (handle == WindowsNativeMethods.InvalidHandle)
         {
             return;
         }
@@ -285,7 +286,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
     public static List<string> GetPortNames()
     {
         var buffer = new char[64 * 1024];
-        uint length = WindowsNativeMethods.QueryDosDeviceW(null, buffer, (uint)buffer.Length);
+        uint length = WindowsNativeMethods.QueryDosDevice(null, buffer, buffer.Length);
 
         if (length == 0)
         {
@@ -442,7 +443,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
     {
         var dcb = new Dcb
         {
-            DCBlength = (uint)Marshal.SizeOf(typeof(Dcb))
+            DcbLength = (uint)Marshal.SizeOf(typeof(Dcb))
         };
 
         if (!WindowsNativeMethods.GetCommState(handle, ref dcb))
@@ -450,7 +451,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
             throw CreateIOException($"{nameof(WindowsNativeMethods.GetCommState)} failed.");
         }
 
-        dcb.DCBlength = (uint)Marshal.SizeOf(typeof(Dcb));
+        dcb.DcbLength = (uint)Marshal.SizeOf(typeof(Dcb));
         dcb.BaudRate = checked((uint)settings.BaudRate);
         dcb.ByteSize = checked((byte)settings.DataBits);
         dcb.Parity = ToWindowsParity(settings.Parity);
@@ -533,7 +534,7 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
     {
         lock (_stateLock)
         {
-            if (_handle == WindowsNativeMethods.InvalidHandleValue || _closing || _settings == null)
+            if (_handle == WindowsNativeMethods.InvalidHandle || _closing || _settings == null)
             {
                 return null;
             }
@@ -668,15 +669,15 @@ internal sealed class WindowsSerialPortBackend : ISerialPortBackend
 
             try
             {
-                EventHandle = WindowsNativeMethods.CreateEventW(IntPtr.Zero, true, false, null);
+                EventHandle = WindowsNativeMethods.CreateEvent(IntPtr.Zero, true, false, null);
                 if (EventHandle == IntPtr.Zero)
                 {
-                    throw CreateIOException($"{nameof(WindowsNativeMethods.CreateEventW)} failed.");
+                    throw CreateIOException($"{nameof(WindowsNativeMethods.CreateEvent)} failed.");
                 }
 
                 Overlapped = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(NativeOverlappedData)));
 
-                var overlapped = new NativeOverlappedData { hEvent = EventHandle };
+                var overlapped = new NativeOverlappedData { EventHandle = EventHandle };
 
                 Marshal.StructureToPtr(overlapped, Overlapped, false);
             }

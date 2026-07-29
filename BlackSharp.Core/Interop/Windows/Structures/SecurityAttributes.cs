@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2026 Florian K.
+ * Copyright (c) 2025 Florian K.
  */
 
 using System.Runtime.InteropServices;
@@ -11,29 +11,24 @@ using System.Runtime.InteropServices;
 namespace BlackSharp.Core.Interop.Windows.Structures
 {
     /// <summary>
-    /// Describes a device interface returned by the Windows Setup API.
+    /// Supplies a security descriptor and handle-inheritance setting when creating a Windows object.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct DeviceInterfaceData
+    public struct SecurityAttributes
     {
         /// <summary>
         /// The size of this structure in bytes.
         /// </summary>
-        public int Size;
+        public uint Length;
 
         /// <summary>
-        /// The device interface class identifier.
+        /// A pointer to the security descriptor to apply.
         /// </summary>
-        public Guid InterfaceClassGuid;
+        public IntPtr SecurityDescriptor;
 
         /// <summary>
-        /// Flags describing the state of the device interface.
+        /// Indicates whether child processes inherit the returned handle.
         /// </summary>
-        public int Flags;
-
-        /// <summary>
-        /// A value reserved for the operating system.
-        /// </summary>
-        public IntPtr Reserved;
+        public bool InheritHandle;
     }
 }

@@ -6,17 +6,31 @@
  * Copyright (c) 2025 Florian K.
  */
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 namespace BlackSharp.UI.Avalonia.Windows.Media.Enums
 {
+    /// <summary>
+    /// Identifies a standard status icon geometry.
+    /// </summary>
     public enum GeometryIcon
     {
+        /// <summary>
+        /// An error icon.
+        /// </summary>
         Error,
+
+        /// <summary>
+        /// A warning or exclamation icon.
+        /// </summary>
         Exclamation,
+
+        /// <summary>
+        /// An informational icon.
+        /// </summary>
         Information,
+
+        /// <summary>
+        /// A question icon.
+        /// </summary>
         Question,
     }
 }
-
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

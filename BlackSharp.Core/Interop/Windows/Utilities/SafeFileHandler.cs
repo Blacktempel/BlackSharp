@@ -59,7 +59,7 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
         /// <param name="lpFileName">The name of the file or device to be created or opened.</param>
         /// <param name="dwDesiredAccess">The requested access to the file or device.</param>
         /// <param name="dwShareMode">The requested sharing mode of the file or device.</param>
-        /// <param name="lpSecurityAttributes">A pointer to a <see cref="SECURITY_ATTRIBUTES"/> structure.</param>
+        /// <param name="lpSecurityAttributes">A pointer to a <see cref="SecurityAttributes"/> structure.</param>
         /// <param name="dwCreationDisposition">An action to take on a file or device that exists or does not exist.</param>
         /// <param name="dwFlagsAndAttributes">The file or device attributes and flags.</param>
         /// <param name="hTemplateFile">A handle to a template file with the GENERIC_READ access right.</param>
@@ -89,7 +89,7 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
         /// <param name="lpFileName">The name of the file or device to be created or opened.</param>
         /// <param name="dwDesiredAccess">The requested access to the file or device.</param>
         /// <param name="dwShareMode">The requested sharing mode of the file or device.</param>
-        /// <param name="lpSecurityAttributes">A pointer to a <see cref="SECURITY_ATTRIBUTES"/> structure.</param>
+        /// <param name="lpSecurityAttributes">A pointer to a <see cref="SecurityAttributes"/> structure.</param>
         /// <param name="dwCreationDisposition">An action to take on a file or device that exists or does not exist.</param>
         /// <param name="dwFlagsAndAttributes">The file or device attributes and flags.</param>
         /// <param name="hTemplateFile">A handle to a template file with the GENERIC_READ access right.</param>
@@ -98,7 +98,7 @@ namespace BlackSharp.Core.Interop.Windows.Utilities
             string lpFileName,
             DesiredAccess dwDesiredAccess,
             FileShareMode dwShareMode,
-            ref SECURITY_ATTRIBUTES lpSecurityAttributes,
+            ref SecurityAttributes lpSecurityAttributes,
             FileCreationDisposition dwCreationDisposition,
             FileFlagsAndAttributes dwFlagsAndAttributes,
             IntPtr hTemplateFile)

@@ -13,8 +13,6 @@ namespace BlackSharp.UI.Avalonia.Controls
 {
     #region TextBoxNumberType
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
     /// <summary>
     /// Specifies the numeric type that a text box is intended to accept or display.
     /// </summary>
@@ -23,22 +21,31 @@ namespace BlackSharp.UI.Avalonia.Controls
     /// The values correspond to common signed and unsigned integer types, as well as floating-point and decimal types.</remarks>
     public enum TextBoxNumberType
     {
+        /// <summary>A signed 8-bit integer.</summary>
         SByte,
+        /// <summary>A signed 16-bit integer.</summary>
         Short,
+        /// <summary>A signed 32-bit integer.</summary>
         Int,
+        /// <summary>A signed 64-bit integer.</summary>
         Long,
 
+        /// <summary>An unsigned 8-bit integer.</summary>
         Byte,
+        /// <summary>An unsigned 16-bit integer.</summary>
         UShort,
+        /// <summary>An unsigned 32-bit integer.</summary>
         UInt,
+        /// <summary>An unsigned 64-bit integer.</summary>
         ULong,
 
+        /// <summary>A single-precision floating-point number.</summary>
         Float,
+        /// <summary>A double-precision floating-point number.</summary>
         Double,
+        /// <summary>A decimal number.</summary>
         Decimal
     }
-
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
     #endregion
 

@@ -11,10 +11,10 @@ using System.Runtime.InteropServices;
 namespace BlackSharp.Core.Interop.Windows.Structures
 {
     /// <summary>
-    /// Describes a device interface returned by the Windows Setup API.
+    /// Identifies a device information element managed by the Windows Setup API.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct DeviceInterfaceData
+    public struct DeviceInfoData
     {
         /// <summary>
         /// The size of this structure in bytes.
@@ -22,14 +22,14 @@ namespace BlackSharp.Core.Interop.Windows.Structures
         public int Size;
 
         /// <summary>
-        /// The device interface class identifier.
+        /// The setup class identifier of the device.
         /// </summary>
-        public Guid InterfaceClassGuid;
+        public Guid ClassGuid;
 
         /// <summary>
-        /// Flags describing the state of the device interface.
+        /// The configuration-manager device instance handle.
         /// </summary>
-        public int Flags;
+        public uint DeviceInstance;
 
         /// <summary>
         /// A value reserved for the operating system.

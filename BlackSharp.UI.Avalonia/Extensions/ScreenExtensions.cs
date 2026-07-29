@@ -9,7 +9,6 @@
 #pragma warning disable CA1416 // Platform compatibility warning
 
 using Avalonia.Platform;
-using BlackSharp.UI.Avalonia.Platform.Windows.Interop;
 using BlackSharp.UI.Avalonia.Platform.Windows.Interop.Enums;
 using BlackSharp.UI.Avalonia.Platform.Windows.Interop.Structures;
 using Microsoft.Win32;
@@ -17,6 +16,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 using OS = BlackSharp.Core.Platform.OperatingSystem;
+using WindowsUser32 = BlackSharp.Core.Interop.Windows.Native.User32;
 
 namespace BlackSharp.UI.Avalonia.Extensions
 {
@@ -134,7 +134,7 @@ namespace BlackSharp.UI.Avalonia.Extensions
             };
 
             //Get the monitor handle from the screens bounds
-            var monitor = User32.MonitorFromRect(ref rect, User32.MONITOR_DEFAULTTONEAREST);
+            var monitor = MonitorFromRectangle(ref rect, WindowsUser32.MonitorDefaultToNearest);
 
             if (monitor == IntPtr.Zero)
             {
@@ -145,12 +145,12 @@ namespace BlackSharp.UI.Avalonia.Extensions
             mi.cbSize = (uint)Marshal.SizeOf<MONITORINFOEX>();
 
             //Get the monitor info to obtain the device name
-            if (!User32.GetMonitorInfo(monitor, ref mi))
+            if (!GetMonitorInformation(monitor, ref mi))
             {
                 return null;
             }
 
-            if (User32.GetDisplayConfigBufferSizes(User32.QDC_ONLY_ACTIVE_PATHS, out uint pathCount, out uint modeCount) != 0)
+            if (WindowsUser32.GetDisplayConfigBufferSizes(WindowsUser32.QueryDisplayConfigOnlyActivePaths, out uint pathCount, out uint modeCount) != 0)
             {
                 return null;
             }
@@ -158,7 +158,7 @@ namespace BlackSharp.UI.Avalonia.Extensions
             var paths = new DISPLAYCONFIG_PATH_INFO[pathCount];
             var modes = new DISPLAYCONFIG_MODE_INFO[modeCount];
 
-            if (User32.QueryDisplayConfig(User32.QDC_ONLY_ACTIVE_PATHS, ref pathCount, paths, ref modeCount, modes, IntPtr.Zero) != 0)
+            if (QueryDisplayConfiguration(WindowsUser32.QueryDisplayConfigOnlyActivePaths, ref pathCount, paths, ref modeCount, modes, IntPtr.Zero) != 0)
             {
                 return null;
             }
@@ -173,7 +173,7 @@ namespace BlackSharp.UI.Avalonia.Extensions
                 sourceName.header.adapterId = source.adapterId;
                 sourceName.header.id = source.id;
 
-                if (User32.DisplayConfigGetDeviceInfo(ref sourceName) != 0)
+                if (GetDisplayConfigurationDeviceInfo(ref sourceName) != 0)
                 {
                     continue;
                 }
@@ -192,7 +192,7 @@ namespace BlackSharp.UI.Avalonia.Extensions
                 name.header.adapterId = target.adapterId;
                 name.header.id = target.id;
 
-                if (User32.DisplayConfigGetDeviceInfo(ref name) != 0)
+                if (GetDisplayConfigurationDeviceInfo(ref name) != 0)
                 {
                     continue;
                 }
@@ -209,6 +209,58 @@ namespace BlackSharp.UI.Avalonia.Extensions
         static string NormalizeDisplayName(string displayName)
         {
             return string.IsNullOrWhiteSpace(displayName) ? null : displayName.Trim();
+        }
+
+        static int GetDisplayConfigurationDeviceInfo(ref DISPLAYCONFIG_SOURCE_DEVICE_NAME deviceName)
+        {
+            return InvokeNative(ref deviceName, WindowsUser32.DisplayConfigGetDeviceInfo);
+        }
+
+        static int GetDisplayConfigurationDeviceInfo(ref DISPLAYCONFIG_TARGET_DEVICE_NAME deviceName)
+        {
+            return InvokeNative(ref deviceName, WindowsUser32.DisplayConfigGetDeviceInfo);
+        }
+
+        static bool GetMonitorInformation(IntPtr monitor, ref MONITORINFOEX monitorInfo)
+        {
+            return InvokeNative(
+                ref monitorInfo,
+                pointer => WindowsUser32.GetMonitorInfo(monitor, pointer));
+        }
+
+        static IntPtr MonitorFromRectangle(ref RECT rectangle, uint flags)
+        {
+            return InvokeNative(
+                ref rectangle,
+                pointer => WindowsUser32.MonitorFromRect(pointer, flags));
+        }
+
+        static int QueryDisplayConfiguration(
+            uint flags,
+            ref uint pathCount,
+            DISPLAYCONFIG_PATH_INFO[] paths,
+            ref uint modeCount,
+            DISPLAYCONFIG_MODE_INFO[] modes,
+            IntPtr currentTopologyId)
+        {
+            var pathHandle = GCHandle.Alloc(paths, GCHandleType.Pinned);
+            var modeHandle = GCHandle.Alloc(modes, GCHandleType.Pinned);
+
+            try
+            {
+                return WindowsUser32.QueryDisplayConfig(
+                    flags,
+                    ref pathCount,
+                    pathHandle.AddrOfPinnedObject(),
+                    ref modeCount,
+                    modeHandle.AddrOfPinnedObject(),
+                    currentTopologyId);
+            }
+            finally
+            {
+                modeHandle.Free();
+                pathHandle.Free();
+            }
         }
 
         static string GetRegistryPathFromDevicePath(string devicePath)
@@ -266,6 +318,34 @@ namespace BlackSharp.UI.Avalonia.Extensions
               | (edid[15] << 24));
 
             return serial != 0 ? serial.ToString() : null;
+        }
+
+        static TResult InvokeNative<T, TResult>(ref T value, Func<IntPtr, TResult> action)
+            where T : struct
+        {
+            var pointer = Marshal.AllocHGlobal(Marshal.SizeOf<T>());
+            var initialized = false;
+
+            try
+            {
+                Marshal.StructureToPtr(value, pointer, false);
+                initialized = true;
+
+                var result = action(pointer);
+
+                value = Marshal.PtrToStructure<T>(pointer);
+
+                return result;
+            }
+            finally
+            {
+                if (initialized)
+                {
+                    Marshal.DestroyStructure<T>(pointer);
+                }
+
+                Marshal.FreeHGlobal(pointer);
+            }
         }
 
         #endregion

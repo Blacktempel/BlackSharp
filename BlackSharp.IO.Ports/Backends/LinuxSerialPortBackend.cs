@@ -6,10 +6,10 @@
  * Copyright (c) 2026 Florian K.
  */
 
-using BlackSharp.IO.Ports.Interop.Linux;
-using BlackSharp.IO.Ports.Interop.Linux.Structures;
+using BlackSharp.Core.Interop.Linux.Structures;
 using BlackSharp.IO.Ports.Models;
 using System.Diagnostics;
+using LinuxNativeMethods = BlackSharp.Core.Interop.Linux.Native.LibC;
 
 namespace BlackSharp.IO.Ports.Backends;
 
@@ -320,7 +320,7 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
 
     private void Configure(SerialPortSettings settings)
     {
-        var termios = new Termios { c_cc = new byte[LinuxNativeMethods.NCCS] };
+        var termios = new Termios { ControlCharacters = new byte[LinuxNativeMethods.NCCS] };
 
         if (LinuxNativeMethods.tcgetattr(_fd, ref termios) != 0)
         {
@@ -329,36 +329,36 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
 
         LinuxNativeMethods.cfmakeraw(ref termios);
 
-        termios.c_cflag |= LinuxNativeMethods.CLOCAL | LinuxNativeMethods.CREAD;
-        termios.c_cflag &= ~LinuxNativeMethods.CSIZE;
-        termios.c_cflag |= ToLinuxDataBits(settings.DataBits);
+        termios.ControlFlags |= LinuxNativeMethods.CLOCAL | LinuxNativeMethods.CREAD;
+        termios.ControlFlags &= ~LinuxNativeMethods.CSIZE;
+        termios.ControlFlags |= ToLinuxDataBits(settings.DataBits);
 
         if (settings.StopBits == StopBits.Two)
         {
-            termios.c_cflag |= LinuxNativeMethods.CSTOPB;
+            termios.ControlFlags |= LinuxNativeMethods.CSTOPB;
         }
         else
         {
-            termios.c_cflag &= ~LinuxNativeMethods.CSTOPB;
+            termios.ControlFlags &= ~LinuxNativeMethods.CSTOPB;
         }
 
-        termios.c_cflag &= ~(LinuxNativeMethods.PARENB | LinuxNativeMethods.PARODD | LinuxNativeMethods.CMSPAR);
+        termios.ControlFlags &= ~(LinuxNativeMethods.PARENB | LinuxNativeMethods.PARODD | LinuxNativeMethods.CMSPAR);
 
         switch (settings.Parity)
         {
             case Parity.None:
                 break;
             case Parity.Even:
-                termios.c_cflag |= LinuxNativeMethods.PARENB;
+                termios.ControlFlags |= LinuxNativeMethods.PARENB;
                 break;
             case Parity.Odd:
-                termios.c_cflag |= LinuxNativeMethods.PARENB | LinuxNativeMethods.PARODD;
+                termios.ControlFlags |= LinuxNativeMethods.PARENB | LinuxNativeMethods.PARODD;
                 break;
             case Parity.Mark:
-                termios.c_cflag |= LinuxNativeMethods.PARENB | LinuxNativeMethods.CMSPAR | LinuxNativeMethods.PARODD;
+                termios.ControlFlags |= LinuxNativeMethods.PARENB | LinuxNativeMethods.CMSPAR | LinuxNativeMethods.PARODD;
                 break;
             case Parity.Space:
-                termios.c_cflag |= LinuxNativeMethods.PARENB | LinuxNativeMethods.CMSPAR;
+                termios.ControlFlags |= LinuxNativeMethods.PARENB | LinuxNativeMethods.CMSPAR;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(settings.Parity));
@@ -366,24 +366,24 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
 
         if (settings.Handshake == Handshake.RequestToSend || settings.Handshake == Handshake.RequestToSendXOnXOff)
         {
-            termios.c_cflag |= LinuxNativeMethods.CRTSCTS;
+            termios.ControlFlags |= LinuxNativeMethods.CRTSCTS;
         }
         else
         {
-            termios.c_cflag &= ~LinuxNativeMethods.CRTSCTS;
+            termios.ControlFlags &= ~LinuxNativeMethods.CRTSCTS;
         }
 
         if (settings.Handshake == Handshake.XOnXOff || settings.Handshake == Handshake.RequestToSendXOnXOff)
         {
-            termios.c_iflag |= LinuxNativeMethods.IXON | LinuxNativeMethods.IXOFF;
+            termios.InputFlags |= LinuxNativeMethods.IXON | LinuxNativeMethods.IXOFF;
         }
         else
         {
-            termios.c_iflag &= ~(LinuxNativeMethods.IXON | LinuxNativeMethods.IXOFF);
+            termios.InputFlags &= ~(LinuxNativeMethods.IXON | LinuxNativeMethods.IXOFF);
         }
 
-        termios.c_cc[LinuxNativeMethods.VMIN] = 0;
-        termios.c_cc[LinuxNativeMethods.VTIME] = 0;
+        termios.ControlCharacters[LinuxNativeMethods.VMIN] = 0;
+        termios.ControlCharacters[LinuxNativeMethods.VTIME] = 0;
 
         uint speed = ToLinuxBaudRate(settings.BaudRate);
         if (LinuxNativeMethods.cfsetispeed(ref termios, speed) != 0)
@@ -410,15 +410,15 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
         {
             var pollFd = new PollFd
             {
-                fd = _fd,
-                events = events,
-                revents = 0
+                FileDescriptor = _fd,
+                Events = events,
+                ReturnedEvents = 0
             };
 
             int result = LinuxNativeMethods.poll(ref pollFd, (UIntPtr)1, timeoutMs);
             if (result > 0)
             {
-                return pollFd.revents;
+                return pollFd.ReturnedEvents;
             }
 
             if (result == 0)

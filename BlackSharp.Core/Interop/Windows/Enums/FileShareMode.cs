@@ -8,13 +8,20 @@
 
 namespace BlackSharp.Core.Interop.Windows.Enums
 {
+    /// <summary>
+    /// Defines how subsequent handles may access an open file or device.
+    /// </summary>
     [Flags]
     public enum FileShareMode : uint
     {
+        /// <summary>Prevents sharing the file or device.</summary>
         None = 0,
 
+        /// <summary>Allows subsequent read access.</summary>
         Read   = 0x00000001,
+        /// <summary>Allows subsequent write access.</summary>
         Write  = 0x00000002,
+        /// <summary>Allows subsequent delete access.</summary>
         Delete = 0x00000004
     }
 }

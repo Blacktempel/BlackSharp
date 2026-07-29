@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 namespace BlackSharp.Core.Interop.Windows.Structures
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ACL
+    internal struct Acl
     {
         byte AclRevision;
         byte Sbz1;

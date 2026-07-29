@@ -131,7 +131,7 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
             var swa = new SidIdentifierAuthority();
             swa.Value = SECURITY_WORLD_SID_AUTHORITY; //World access
 
-            int aclSize = Marshal.SizeOf<ACL>() * 32;
+            int aclSize = Marshal.SizeOf<Acl>() * 32;
             IntPtr acl = Marshal.AllocHGlobal(aclSize);
 
             if (AdvApi32.AllocateAndInitializeSid
@@ -164,10 +164,10 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
             IntPtr sdbPtr = Marshal.AllocHGlobal(Marshal.SizeOf(sdb));
             Marshal.StructureToPtr(sdb, sdbPtr, false);
 
-            var sab = new SECURITY_ATTRIBUTES(); //Setup security attributes block
-            sab.nLength = (uint)Marshal.SizeOf(sdb);
-            sab.bInheritHandle = false;
-            sab.lpSecurityDescriptor = sdbPtr;
+            var sab = new SecurityAttributes(); //Setup security attributes block
+            sab.Length = (uint)Marshal.SizeOf(sdb);
+            sab.InheritHandle = false;
+            sab.SecurityDescriptor = sdbPtr;
 
             var mutexName = $"Global\\{name}";
 

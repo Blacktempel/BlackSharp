@@ -11,8 +11,15 @@ using System.Security.Cryptography;
 
 namespace BlackSharp.Core.Security.Cryptography
 {
+    /// <summary>
+    /// Creates a new SHA-3 hash implementation.
+    /// </summary>
+    /// <returns>The created hash implementation.</returns>
     public delegate object SHA3NewDelegate();
 
+    /// <summary>
+    /// Provides the common implementation for the SHA-3 family of hash algorithms.
+    /// </summary>
     public abstract class SHA3 : HashAlgorithm
     {
         #region Constructor
@@ -30,6 +37,10 @@ namespace BlackSharp.Core.Security.Cryptography
             RegisteredClasses = dict;
         }
 
+        /// <summary>
+        /// Initializes a SHA-3 implementation with the specified digest size.
+        /// </summary>
+        /// <param name="hashBitSize">The digest size in bits.</param>
         protected SHA3(int hashBitSize)
         {
             Initialize();
@@ -41,10 +52,24 @@ namespace BlackSharp.Core.Security.Cryptography
 
         #region Constants
 
+        /// <summary>
+        /// The width of the Keccak-f permutation in bits.
+        /// </summary>
         public const int KeccakB              = 1600 ;
+
+        /// <summary>
+        /// The number of rounds in the Keccak-f permutation.
+        /// </summary>
         public const int KeccakNumberOfRounds = 24   ;
+
+        /// <summary>
+        /// The size of a Keccak state lane in bits.
+        /// </summary>
         public const int KeccakLaneSizeInBits = 8 * 8;
 
+        /// <summary>
+        /// The round constants used by the Keccak-f permutation.
+        /// </summary>
         protected static readonly ulong[] RoundConstants = new ulong[]
         {
             0x0000000000000001UL,
@@ -79,31 +104,55 @@ namespace BlackSharp.Core.Security.Cryptography
 
         static readonly IReadOnlyDictionary<string, SHA3NewDelegate> RegisteredClasses;
 
-        protected ulong[] _State     ;
-        protected byte[]  _Buffer    ;
-        protected int     _BuffLength;
+        /// <summary>
+        /// The current Keccak state lanes.
+        /// </summary>
+        protected ulong[] _State;
+
+        /// <summary>
+        /// The pending input block.
+        /// </summary>
+        protected byte[] _Buffer;
+
+        /// <summary>
+        /// The number of input bytes currently stored in <see cref="_Buffer"/>.
+        /// </summary>
+        protected int _BuffLength;
 
         #endregion
 
         #region Properties
 
+        /// <inheritdoc/>
         public override bool CanReuseTransform { get { return true; } }
 
         /// <summary>
         /// AKA Size in bytes.
         /// </summary>
         protected int KeccakR { get; private set; }
+        /// <summary>
+        /// Gets the digest size in bytes.
+        /// </summary>
         protected int HashByteLength { get { return HashSizeValue / 8; } }
 
         #endregion
 
         #region Public
 
+        /// <summary>
+        /// Creates the default SHA3-512 implementation.
+        /// </summary>
+        /// <returns>A SHA3-512 hash implementation.</returns>
         public static new SHA3 Create()
         {
             return Create(nameof(SHA3_512));
         }
 
+        /// <summary>
+        /// Creates the registered SHA-3 implementation with the specified name.
+        /// </summary>
+        /// <param name="hashName">The registered implementation name.</param>
+        /// <returns>The matching implementation, or <see langword="null"/> when no implementation is registered.</returns>
         public static new SHA3 Create(string hashName)
         {
             SHA3NewDelegate item;
@@ -117,6 +166,7 @@ namespace BlackSharp.Core.Security.Cryptography
             }
         }
 
+        /// <inheritdoc/>
         public override void Initialize()
         {
             _BuffLength = 0;
@@ -127,6 +177,7 @@ namespace BlackSharp.Core.Security.Cryptography
 
         #region Protected
 
+        /// <inheritdoc/>
         protected override void HashCore(byte[] array, int ibStart, int cbSize)
         {
             if (array == null)
@@ -180,6 +231,7 @@ namespace BlackSharp.Core.Security.Cryptography
             }
         }
 
+        /// <inheritdoc/>
         protected override byte[] HashFinal()
         {
             int sizeInBytes = KeccakR;
@@ -210,11 +262,23 @@ namespace BlackSharp.Core.Security.Cryptography
             return outb;
         }
 
+        /// <summary>
+        /// Rotates a Keccak lane left by the specified bit count.
+        /// </summary>
+        /// <param name="a">The lane value.</param>
+        /// <param name="offset">The rotation count.</param>
+        /// <returns>The rotated lane value.</returns>
         protected ulong ROL(ulong a, int offset)
         {
             return (((a) << ((offset) % KeccakLaneSizeInBits)) ^ ((a) >> (KeccakLaneSizeInBits - ((offset) % KeccakLaneSizeInBits))));
         }
 
+        /// <summary>
+        /// Copies as much input as possible into the pending block.
+        /// </summary>
+        /// <param name="array">The source bytes.</param>
+        /// <param name="offset">The source offset, advanced by the copied length.</param>
+        /// <param name="count">The remaining source length, reduced by the copied length.</param>
         protected void AddToBuffer(byte[] array, ref int offset, ref int count)
         {
             int amount = Math.Min(count, _Buffer.Length - _BuffLength);

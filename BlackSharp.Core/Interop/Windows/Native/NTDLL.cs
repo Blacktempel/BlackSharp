@@ -12,12 +12,32 @@ using System.Security;
 
 namespace BlackSharp.Core.Interop.Windows.Native
 {
-    internal static class NTDLL
+    /// <summary>
+    /// Provides selected native Windows system functions.
+    /// </summary>
+    public static class NTDLL
     {
-        const string DLLNAME = "ntdll.dll";
+        #region Fields
 
+        const string DLL_NAME = "ntdll.dll";
+
+        #endregion
+
+        #region Imports
+
+        /// <summary>
+        /// Retrieves the requested class of system information.
+        /// </summary>
+        [DllImport(DLL_NAME)]
+        public static extern int NtQuerySystemInformation(int systemInformationClass, IntPtr systemInformation, uint systemInformationLength, out uint returnLength);
+
+        /// <summary>
+        /// Retrieves the operating-system version from the native runtime library.
+        /// </summary>
         [SecurityCritical]
-        [DllImport(DLLNAME, CharSet = CharSet.Unicode)]
-        public static extern uint RtlGetVersion(ref OSVERSIONINFOEX versionInfo);
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode)]
+        public static extern uint RtlGetVersion(ref OsVersionInfoEx versionInfo);
+
+        #endregion
     }
 }

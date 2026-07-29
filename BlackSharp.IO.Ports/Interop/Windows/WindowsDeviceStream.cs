@@ -8,9 +8,11 @@
 
 using BlackSharp.Core.Interop.Windows.Enums;
 using BlackSharp.Core.Interop.Windows.Native;
-using BlackSharp.IO.Ports.Interop.Windows.Structures;
+using BlackSharp.Core.Interop.Windows.Structures;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
+
+using WindowsNativeMethods = BlackSharp.Core.Interop.Windows.Native.Kernel32;
 
 namespace BlackSharp.IO.Ports.Interop.Windows;
 
@@ -61,7 +63,7 @@ public sealed class WindowsDeviceStream : IDisposable
             FileFlagsAndAttributes.Overlapped,
             IntPtr.Zero);
 
-        if (handle == IntPtr.Zero || handle == WindowsNativeMethods.InvalidHandleValue)
+        if (handle == IntPtr.Zero || handle == WindowsNativeMethods.InvalidHandle)
         {
             return null;
         }
@@ -129,15 +131,15 @@ public sealed class WindowsDeviceStream : IDisposable
             return false;
         }
 
-        var eventHandle = WindowsNativeMethods.CreateEventW(IntPtr.Zero, true, false, null);
-        if (eventHandle == IntPtr.Zero || eventHandle == WindowsNativeMethods.InvalidHandleValue)
+        var eventHandle = WindowsNativeMethods.CreateEvent(IntPtr.Zero, true, false, null);
+        if (eventHandle == IntPtr.Zero || eventHandle == WindowsNativeMethods.InvalidHandle)
         {
             return false;
         }
 
         var overlapped = new NativeOverlappedData
         {
-            hEvent = eventHandle,
+            EventHandle = eventHandle,
         };
 
         GCHandle inputHandle = default;
@@ -222,7 +224,7 @@ public sealed class WindowsDeviceStream : IDisposable
     {
         var dcb = new Dcb
         {
-            DCBlength = (uint)Marshal.SizeOf(typeof(Dcb)),
+            DcbLength = (uint)Marshal.SizeOf(typeof(Dcb)),
         };
 
         if (!WindowsNativeMethods.GetCommState(_Handle, ref dcb))
@@ -291,15 +293,15 @@ public sealed class WindowsDeviceStream : IDisposable
             return false;
         }
 
-        var eventHandle = WindowsNativeMethods.CreateEventW(IntPtr.Zero, true, false, null);
-        if (eventHandle == IntPtr.Zero || eventHandle == WindowsNativeMethods.InvalidHandleValue)
+        var eventHandle = WindowsNativeMethods.CreateEvent(IntPtr.Zero, true, false, null);
+        if (eventHandle == IntPtr.Zero || eventHandle == WindowsNativeMethods.InvalidHandle)
         {
             return false;
         }
 
         var overlapped = new NativeOverlappedData
         {
-            hEvent = eventHandle,
+            EventHandle = eventHandle,
         };
 
         var pinnedBuffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);

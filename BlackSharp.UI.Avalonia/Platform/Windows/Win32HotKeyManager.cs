@@ -14,6 +14,8 @@ using BlackSharp.UI.Avalonia.Platform.Interfaces;
 using BlackSharp.UI.Avalonia.Platform.Windows.Interop;
 using System.Windows.Input;
 
+using WindowsUser32 = BlackSharp.Core.Interop.Windows.Native.User32;
+
 namespace BlackSharp.UI.Avalonia.Platform.Windows
 {
     /// <summary>
@@ -82,13 +84,13 @@ namespace BlackSharp.UI.Avalonia.Platform.Windows
                 {
                     //HotKey has changed
                     //We must unregister the old HotKey first, according to MSDN docs
-                    User32.UnregisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.ID));
+                    WindowsUser32.UnregisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.ID));
 
                     //Create Win32 translation
                     var win32HotKey = new Win32HotKey(hotKey, command);
 
                     //Register HotKey again, with the changes
-                    if (User32.RegisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.ID), win32HotKey.Modifiers, win32HotKey.Key))
+                    if (WindowsUser32.RegisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.ID), win32HotKey.Modifiers, win32HotKey.Key))
                     {
                         _HotKeys[hotKey.ID] = win32HotKey;
                     }
@@ -100,7 +102,7 @@ namespace BlackSharp.UI.Avalonia.Platform.Windows
                 var win32HotKey = new Win32HotKey(hotKey, command);
 
                 //Register HotKey
-                if (User32.RegisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.ID), win32HotKey.Modifiers, win32HotKey.Key))
+                if (WindowsUser32.RegisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.ID), win32HotKey.Modifiers, win32HotKey.Key))
                 {
                     _HotKeys.Add(hotKey.ID, win32HotKey);
                 }
@@ -117,7 +119,7 @@ namespace BlackSharp.UI.Avalonia.Platform.Windows
             if (_HotKeys.TryGetValue(hotKey.ID, out var val))
             {
                 //HotKey exists, remove it
-                User32.UnregisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.ID));
+                WindowsUser32.UnregisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.ID));
 
                 //Also remove from internal list
                 _HotKeys.Remove(hotKey.ID);
@@ -132,7 +134,7 @@ namespace BlackSharp.UI.Avalonia.Platform.Windows
             //Unregister all HotKeys
             foreach (var hotKey in _HotKeys.Values)
             {
-                User32.UnregisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.HotKeyID));
+                WindowsUser32.UnregisterHotKey(_Hwnd, TIdentifierToInt32(hotKey.HotKeyID));
             }
         }
 

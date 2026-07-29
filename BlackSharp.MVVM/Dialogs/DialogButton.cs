@@ -6,8 +6,6 @@
  * Copyright (c) 2025 Florian K.
  */
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 using BlackSharp.MVVM.ComponentModel;
 using BlackSharp.MVVM.Dialogs.Enums;
 using CommunityToolkit.Mvvm.Input;
@@ -37,6 +35,10 @@ namespace BlackSharp.MVVM.Dialogs
         #region Properties
 
         string _Content;
+
+        /// <summary>
+        /// Gets or sets the text displayed by the button.
+        /// </summary>
         public string Content
         {
             get { return _Content; }
@@ -44,6 +46,10 @@ namespace BlackSharp.MVVM.Dialogs
         }
 
         bool _IsDefault;
+
+        /// <summary>
+        /// Gets or sets whether this is the dialog's default button.
+        /// </summary>
         public bool IsDefault
         {
             get { return _IsDefault; }
@@ -51,6 +57,10 @@ namespace BlackSharp.MVVM.Dialogs
         }
 
         bool _IsCancel;
+
+        /// <summary>
+        /// Gets or sets whether this button closes or cancels the dialog.
+        /// </summary>
         public bool IsCancel
         {
             get { return _IsCancel; }
@@ -58,6 +68,10 @@ namespace BlackSharp.MVVM.Dialogs
         }
 
         DialogButtonType _ButtonType;
+
+        /// <summary>
+        /// Gets or sets the semantic button type.
+        /// </summary>
         public DialogButtonType ButtonType
         {
             get { return _ButtonType; }
@@ -65,6 +79,10 @@ namespace BlackSharp.MVVM.Dialogs
         }
 
         RelayCommand _Command;
+
+        /// <summary>
+        /// Gets or sets the command executed by the button.
+        /// </summary>
         public RelayCommand Command
         {
             get { return _Command; }
@@ -72,6 +90,10 @@ namespace BlackSharp.MVVM.Dialogs
         }
 
         object _CommandParameter;
+
+        /// <summary>
+        /// Gets or sets the parameter passed to <see cref="Command"/>.
+        /// </summary>
         public object CommandParameter
         {
             get { return _CommandParameter; }
@@ -79,6 +101,10 @@ namespace BlackSharp.MVVM.Dialogs
         }
 
         object _UserData;
+
+        /// <summary>
+        /// Gets or sets application-defined data associated with the button.
+        /// </summary>
         public object UserData
         {
             get { return _UserData; }
@@ -173,5 +199,3 @@ namespace BlackSharp.MVVM.Dialogs
         #endregion
     }
 }
-
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

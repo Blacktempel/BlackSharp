@@ -13,7 +13,20 @@ namespace BlackSharp.Core.Reflection.Emit
 {
 #if !NETSTANDARD2_0_OR_GREATER
 
+    /// <summary>
+    /// Invokes a dynamically generated method that returns a value.
+    /// </summary>
+    /// <typeparam name="TRet">The return type.</typeparam>
+    /// <param name="target">The target instance, or <see langword="null"/> for a static method.</param>
+    /// <param name="args">The method arguments.</param>
+    /// <returns>The method result.</returns>
     public delegate TRet DynamicMethodDelegate<TRet>(object target, params object[] args);
+
+    /// <summary>
+    /// Invokes a dynamically generated method without a return value.
+    /// </summary>
+    /// <param name="target">The target instance, or <see langword="null"/> for a static method.</param>
+    /// <param name="args">The method arguments.</param>
     public delegate void DynamicMethodDelegate(object target, params object[] args);
 
     /// <summary>
@@ -24,6 +37,15 @@ namespace BlackSharp.Core.Reflection.Emit
     {
         #region Public
 
+        /// <summary>
+        /// Creates a delegate that calls the supplied method through generated intermediate language.
+        /// </summary>
+        /// <typeparam name="TDelegate">The delegate type to create.</typeparam>
+        /// <param name="method">The method to call.</param>
+        /// <param name="returnType">An optional delegate return type override.</param>
+        /// <param name="instanceType">An optional type for the target instance parameter.</param>
+        /// <param name="parameterTypes">Optional delegate parameter types.</param>
+        /// <returns>A delegate that invokes <paramref name="method"/>.</returns>
         public static TDelegate CreateMethodCaller<TDelegate>(MethodInfo method, Type returnType = null, Type instanceType = null, params Type[] parameterTypes)
             where TDelegate : class
         {
@@ -156,6 +178,13 @@ namespace BlackSharp.Core.Reflection.Emit
             return dyn.CreateDelegate(typeof(TDelegate)) as TDelegate;
         }
 
+        /// <summary>
+        /// Creates a delegate that allocates an instance by invoking a matching constructor.
+        /// </summary>
+        /// <typeparam name="TDelegate">The delegate type to create.</typeparam>
+        /// <param name="typeToCreate">The type to instantiate.</param>
+        /// <param name="argumentTypes">The constructor argument types.</param>
+        /// <returns>A delegate that invokes the matching constructor.</returns>
         public static TDelegate CreateMethodAllocator<TDelegate>(Type typeToCreate, params Type[] argumentTypes)
             where TDelegate : class
         {

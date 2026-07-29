@@ -11,29 +11,24 @@ using System.Runtime.InteropServices;
 namespace BlackSharp.Core.Interop.Windows.Structures
 {
     /// <summary>
-    /// Describes a device interface returned by the Windows Setup API.
+    /// Reports the status and queue sizes of a Windows communications device.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct DeviceInterfaceData
+    public struct ComStat
     {
         /// <summary>
-        /// The size of this structure in bytes.
+        /// The packed communications-status flags.
         /// </summary>
-        public int Size;
+        public uint Flags;
 
         /// <summary>
-        /// The device interface class identifier.
+        /// The number of bytes waiting in the receive queue.
         /// </summary>
-        public Guid InterfaceClassGuid;
+        public uint BytesInQueue;
 
         /// <summary>
-        /// Flags describing the state of the device interface.
+        /// The number of bytes waiting in the transmit queue.
         /// </summary>
-        public int Flags;
-
-        /// <summary>
-        /// A value reserved for the operating system.
-        /// </summary>
-        public IntPtr Reserved;
+        public uint BytesOutQueue;
     }
 }

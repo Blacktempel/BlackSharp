@@ -32,6 +32,7 @@
 
 using BlackSharp.Core.Interop.Windows.Native;
 using BlackSharp.Core.Interop.Windows.Structures;
+using System.Runtime.InteropServices;
 
 namespace BlackSharp.Core.Platform
 {
@@ -109,7 +110,10 @@ namespace BlackSharp.Core.Platform
         {
             if (IsWindows())
             {
-                var versionInfo = new OSVERSIONINFOEX();
+                var versionInfo = new OsVersionInfoEx
+                {
+                    OsVersionInfoSize = Marshal.SizeOf<OsVersionInfoEx>()
+                };
 
                 if (NTDLL.RtlGetVersion(ref versionInfo) != 0)
                 {
