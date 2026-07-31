@@ -26,6 +26,16 @@ namespace BlackSharp.Core.Interop.Windows
         public const int FileNotFound          = 2;
 
         /// <summary>
+        /// Indicates that access to a file or device was denied.
+        /// </summary>
+        public const int AccessDenied          = 5;
+
+        /// <summary>
+        /// Indicates that a file or device cannot be opened because of incompatible sharing settings.
+        /// </summary>
+        public const int SharingViolation      = 32;
+
+        /// <summary>
         /// Indicates that the supplied buffer is too small.
         /// </summary>
         public const int InsufficientBuffer    = 122;

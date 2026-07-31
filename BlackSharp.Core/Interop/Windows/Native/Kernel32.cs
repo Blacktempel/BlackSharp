@@ -463,11 +463,24 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public static extern bool SetFilePointerEx(SafeFileHandle device, long distanceToMove, IntPtr newFilePointer, uint moveMethod);
 
         /// <summary>
+        /// Signals an event object.
+        /// </summary>
+        [DllImport(DLL_NAME, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetEvent(IntPtr hEvent);
+
+        /// <summary>
         /// Configures the input and output buffer sizes of a communications device.
         /// </summary>
         [DllImport(DLL_NAME, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetupComm(IntPtr hFile, uint dwInQueue, uint dwOutQueue);
+
+        /// <summary>
+        /// Waits until one or all supplied objects are signaled or the timeout elapses.
+        /// </summary>
+        [DllImport(DLL_NAME, SetLastError = true)]
+        public static extern uint WaitForMultipleObjects(uint nCount, IntPtr[] lpHandles, [MarshalAs(UnmanagedType.Bool)] bool bWaitAll, uint dwMilliseconds);
 
         /// <summary>
         /// Waits until an object is signaled or the timeout elapses.

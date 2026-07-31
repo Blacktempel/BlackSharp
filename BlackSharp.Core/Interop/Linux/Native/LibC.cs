@@ -39,6 +39,8 @@ public static class LibC
     public const int EINTR = 4;
     /// <summary>Indicates that a nonblocking operation should be retried later.</summary>
     public const int EAGAIN = 11;
+    /// <summary>Indicates that access to a file or device was denied.</summary>
+    public const int EACCES = 13;
 
     /// <summary>Requests notification when data can be read.</summary>
     public const short POLLIN = 0x0001;
@@ -216,10 +218,40 @@ public static class LibC
     public static extern int close(int fd);
 
     /// <summary>
+    /// Creates an event file descriptor.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int eventfd(uint initialValue, int flags);
+
+    /// <summary>
+    /// Releases memory allocated by the C runtime.
+    /// </summary>
+    [DllImport(LIBRARY_NAME)]
+    public static extern void free(IntPtr pointer);
+
+    /// <summary>
     /// Performs a device-control request with an integer argument.
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
     public static extern int ioctl(int fd, int request, ref int argp);
+
+    /// <summary>
+    /// Performs a device-control request that returns an integer.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int ioctl(int fd, UIntPtr request, out int value);
+
+    /// <summary>
+    /// Performs a device-control request using a managed byte buffer.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int ioctl(int fd, UIntPtr request, byte[] buffer);
+
+    /// <summary>
+    /// Performs a device-control request with an unmanaged argument.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int ioctl(int fd, UIntPtr request, IntPtr argument);
 
     /// <summary>
     /// Performs a device-control request with an unmanaged argument.
@@ -246,6 +278,12 @@ public static class LibC
     public static extern int poll(ref PollFd fds, UIntPtr nfds, int timeout);
 
     /// <summary>
+    /// Waits for events on multiple file descriptors.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int poll([In, Out] PollFd[] fds, UIntPtr nfds, int timeout);
+
+    /// <summary>
     /// Reads bytes from a file descriptor.
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
@@ -256,6 +294,12 @@ public static class LibC
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
     public static extern IntPtr readlink(string path, byte[] buffer, UIntPtr bufferSize);
+
+    /// <summary>
+    /// Resolves a path to its canonical absolute form.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern IntPtr realpath(string path, IntPtr resolvedPath);
 
     /// <summary>
     /// Discards queued terminal input, output, or both.
@@ -280,6 +324,12 @@ public static class LibC
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
     public static extern IntPtr write(int fd, byte[] buffer, UIntPtr count);
+
+    /// <summary>
+    /// Writes an unsigned 64-bit value to a file descriptor.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern IntPtr write(int fd, ref ulong value, UIntPtr count);
 
     #endregion
 
