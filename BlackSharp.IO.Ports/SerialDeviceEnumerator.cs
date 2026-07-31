@@ -7,9 +7,11 @@
  */
 
 using BlackSharp.Core.Extensions;
+using BlackSharp.Core.Interop.Linux.Native;
 using BlackSharp.IO.Ports.Models;
 using Microsoft.Win32;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using OS = BlackSharp.Core.Platform.OperatingSystem;
 
 namespace BlackSharp.IO.Ports;
@@ -237,7 +239,32 @@ public static class SerialDeviceEnumerator
 
     private static bool TryFindLinuxUSBParent(string devicePath, out string usbParent)
     {
-        var candidate = devicePath;
+        var resolvedPath = LibC.realpath(devicePath, IntPtr.Zero);
+
+        if (resolvedPath == IntPtr.Zero)
+        {
+            usbParent = string.Empty;
+
+            return false;
+        }
+
+        string candidate;
+
+        try
+        {
+            candidate = Marshal.PtrToStringAnsi(resolvedPath);
+        }
+        finally
+        {
+            LibC.free(resolvedPath);
+        }
+
+        if (string.IsNullOrWhiteSpace(candidate))
+        {
+            usbParent = string.Empty;
+
+            return false;
+        }
 
         for (int depth = 0; depth < MaximumLinuxParentDepth; ++depth)
         {
@@ -249,7 +276,15 @@ public static class SerialDeviceEnumerator
                 return true;
             }
 
-            candidate = Path.Combine(candidate, "..");
+            var parent = Path.GetDirectoryName(candidate);
+
+            if (string.IsNullOrWhiteSpace(parent)
+             || string.Equals(parent, candidate, StringComparison.Ordinal))
+            {
+                break;
+            }
+
+            candidate = parent;
         }
 
         usbParent = string.Empty;
