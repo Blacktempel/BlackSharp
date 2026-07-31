@@ -1,4 +1,4 @@
-# SerialPort
+﻿# SerialPort
 
 Small cross-platform C# serial-port implementation for Windows and Linux.
 
@@ -9,6 +9,7 @@ The goal is to avoid the problematic managed cleanup path and to provide a `TryC
 
 - Windows COM ports through Win32 `CreateFile(FILE_FLAG_OVERLAPPED)`, `SetCommState`, overlapped `ReadFile`/`WriteFile`, `CancelIoEx`, `CloseHandle`
 - Linux serial devices through libc/POSIX `open`, `termios`, `poll`, `read`, `write`, `tcflush`, `close`
+- USB serial device discovery through the Windows registry and Linux sysfs
 - Baud rate, data bits, parity, stop bits
 - None / XOnXOff / RTS-CTS / RTS-CTS + XOnXOff handshake
 - DTR/RTS control
