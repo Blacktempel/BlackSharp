@@ -22,7 +22,7 @@ namespace BlackSharp.UI.Avalonia.Controls
         static BusyPanel()
         {
             AffectsRender<BusyPanel>(IsBusyProperty,
-                                     ShowProgressRingProperty,
+                                     ShowProgressIndicatorProperty,
                                      BusyMessageProperty);
         }
 
@@ -39,15 +39,14 @@ namespace BlackSharp.UI.Avalonia.Controls
         /// <summary>
         /// Shows a progress control to inform user that control is busy.
         /// </summary>
-        /// <remarks>This is currently not implemented.</remarks>
-        public static readonly AvaloniaProperty<bool> ShowProgressRingProperty =
-            AvaloniaProperty.Register<BusyPanel, bool>(nameof(ShowProgressRing), true);
+        public static readonly AvaloniaProperty<bool> ShowProgressIndicatorProperty =
+            AvaloniaProperty.Register<BusyPanel, bool>(nameof(ShowProgressIndicator), true);
 
         /// <summary>
         /// Message to show as "busy" message.
         /// </summary>
         public static readonly AvaloniaProperty<string> BusyMessageProperty =
-            AvaloniaProperty.Register<BusyPanel, string>(nameof(ShowProgressRing), defaultBindingMode: BindingMode.TwoWay);
+            AvaloniaProperty.Register<BusyPanel, string>(nameof(BusyMessage), defaultBindingMode: BindingMode.TwoWay);
 
         #endregion
 
@@ -63,12 +62,12 @@ namespace BlackSharp.UI.Avalonia.Controls
         }
 
         /// <summary>
-        /// <inheritdoc cref="ShowProgressRingProperty"/>
+        /// <inheritdoc cref="ShowProgressIndicatorProperty"/>
         /// </summary>
-        public bool ShowProgressRing
+        public bool ShowProgressIndicator
         {
-            get { return (bool)GetValue(ShowProgressRingProperty); }
-            set { SetValue(ShowProgressRingProperty, value); }
+            get { return (bool)GetValue(ShowProgressIndicatorProperty); }
+            set { SetValue(ShowProgressIndicatorProperty, value); }
         }
 
         /// <summary>

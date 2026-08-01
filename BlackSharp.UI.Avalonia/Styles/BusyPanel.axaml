@@ -1,9 +1,9 @@
-<Styles xmlns="https://github.com/avaloniaui"
+﻿<Styles xmlns="https://github.com/avaloniaui"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:ctrl="using:BlackSharp.UI.Avalonia.Controls">
 	<Design.PreviewWith>
-		<Border Padding="20">
-			<ctrl:BusyPanel IsBusy="True" BusyMessage="Please wait">
+		<Border Width="720" Height="360">
+			<ctrl:BusyPanel IsBusy="True" BusyMessage="Exporting hardware report...">
 				<StackPanel>
 					<TextBlock Text="Test"/>
 					<TextBlock Text="Test"/>
@@ -16,23 +16,52 @@
 	</Design.PreviewWith>
 
 	<Style Selector="ctrl|BusyPanel">
+		<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+		<Setter Property="VerticalContentAlignment" Value="Stretch"/>
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="ctrl:BusyPanel">
 					<Grid>
-						<ContentPresenter Content="{TemplateBinding Content}"/>
-						<Grid IsVisible="{TemplateBinding IsBusy}">
-							<Grid Background="LightBlue" Opacity="0.3"/>
-							<Border Background="#C8FFC8" Opacity="0.8"
+						<ContentPresenter Content="{TemplateBinding Content}"
+									  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+									  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+						<Grid Background="#8C0B0F17"
+							  IsVisible="{TemplateBinding IsBusy}">
+							<Border MinWidth="340"
+									MaxWidth="520"
+									Margin="24"
+									Padding="24"
+									HorizontalAlignment="Center"
+									VerticalAlignment="Center"
+									Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+									BorderBrush="{DynamicResource ThemeBorderLowBrush}"
 									BorderThickness="1"
-									HorizontalAlignment="Center" VerticalAlignment="Center"
-									IsVisible="{TemplateBinding ShowProgressRing}">
-								<StackPanel>
-									<Label Content="{TemplateBinding BusyMessage}"
-										   MinHeight="50"
-										   FontWeight="SemiBold"
-										   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-								</StackPanel>
+									BoxShadow="0 16 40 0 #59000000"
+									CornerRadius="14">
+								<Grid ColumnDefinitions="4,*">
+									<Border Width="4"
+											Height="52"
+											VerticalAlignment="Center"
+											Background="{DynamicResource SystemControlHighlightAccentBrush}"
+											CornerRadius="2"/>
+
+									<StackPanel Grid.Column="1"
+												Margin="18,0,0,0"
+												Spacing="16">
+										<TextBlock MaxWidth="410"
+												   FontSize="15"
+												   FontWeight="SemiBold"
+												   Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+												   Text="{TemplateBinding BusyMessage}"
+												   TextAlignment="Left"
+												   TextWrapping="Wrap"/>
+										<ProgressBar Height="4"
+													 MinWidth="260"
+													 HorizontalAlignment="Stretch"
+													 IsIndeterminate="True"
+													 IsVisible="{TemplateBinding ShowProgressIndicator}"/>
+									</StackPanel>
+								</Grid>
 							</Border>
 						</Grid>
 					</Grid>
