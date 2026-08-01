@@ -90,6 +90,11 @@ namespace BlackSharp.Core.Interop.Windows
         /// </summary>
         public const int NotFound              = 1168;
 
+        /// <summary>
+        /// Indicates that an operation timed out.
+        /// </summary>
+        public const int Timeout               = 1460;
+
         #endregion
     }
 }

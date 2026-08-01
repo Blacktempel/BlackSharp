@@ -34,6 +34,15 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Gets whether the mutex was acquired successfully.
+        /// </summary>
+        public bool IsLockAcquired => _LockAcquired;
+
+        #endregion
+
         #region Public
 
         /// <summary>
