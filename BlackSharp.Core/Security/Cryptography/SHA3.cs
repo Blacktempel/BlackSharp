@@ -6,7 +6,6 @@
  * Copyright (c) 2026 Florian K.
  */
 
-using BlackSharp.Core.Reflection.Emit;
 using System.Security.Cryptography;
 
 namespace BlackSharp.Core.Security.Cryptography

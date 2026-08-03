@@ -57,6 +57,117 @@ namespace BlackSharp.Core.Tests.Security.Cryptography
             Assert.AreSame(typeof(SHA3_512), SHA3.Create(nameof(SHA3_512))?.GetType());
         }
 
+        [TestMethod]
+        public void SHA3_HashData_ByteArray()
+        {
+            var source = Encoding.UTF8.GetBytes(Text);
+
+            AssertHash(SHA3_224.HashData(source), SHA3_224_Hash);
+            AssertHash(SHA3_256.HashData(source), SHA3_256_Hash);
+            AssertHash(SHA3_384.HashData(source), SHA3_384_Hash);
+            AssertHash(SHA3_512.HashData(source), SHA3_512_Hash);
+        }
+
+        [TestMethod]
+        public void SHA3_HashData_ReadOnlySpan()
+        {
+            var source = Encoding.UTF8.GetBytes(Text).AsSpan();
+
+            AssertHash(SHA3_224.HashData(source), SHA3_224_Hash);
+            AssertHash(SHA3_256.HashData(source), SHA3_256_Hash);
+            AssertHash(SHA3_384.HashData(source), SHA3_384_Hash);
+            AssertHash(SHA3_512.HashData(source), SHA3_512_Hash);
+        }
+
+        [TestMethod]
+        public void SHA3_HashData_ReadOnlySpan_Destination()
+        {
+            var source = Encoding.UTF8.GetBytes(Text);
+            var destination = new byte[64];
+
+            Assert.AreEqual(28, SHA3_224.HashData(source, destination));
+            AssertHash(destination[..28], SHA3_224_Hash);
+
+            Assert.AreEqual(32, SHA3_256.HashData(source, destination));
+            AssertHash(destination[..32], SHA3_256_Hash);
+
+            Assert.AreEqual(48, SHA3_384.HashData(source, destination));
+            AssertHash(destination[..48], SHA3_384_Hash);
+
+            Assert.AreEqual(64, SHA3_512.HashData(source, destination));
+            AssertHash(destination, SHA3_512_Hash);
+        }
+
+        [TestMethod]
+        public void SHA3_HashData_Stream()
+        {
+            var source = Encoding.UTF8.GetBytes(Text);
+
+            using (var stream = new MemoryStream(source))
+            {
+                AssertHash(SHA3_224.HashData(stream), SHA3_224_Hash);
+            }
+
+            using (var stream = new MemoryStream(source))
+            {
+                AssertHash(SHA3_256.HashData(stream), SHA3_256_Hash);
+            }
+
+            using (var stream = new MemoryStream(source))
+            {
+                AssertHash(SHA3_384.HashData(stream), SHA3_384_Hash);
+            }
+
+            using (var stream = new MemoryStream(source))
+            {
+                AssertHash(SHA3_512.HashData(stream), SHA3_512_Hash);
+            }
+        }
+
+        [TestMethod]
+        public void SHA3_HashData_Stream_Destination()
+        {
+            var source = Encoding.UTF8.GetBytes(Text);
+            var destination = new byte[64];
+
+            using (var stream = new MemoryStream(source))
+            {
+                Assert.AreEqual(28, SHA3_224.HashData(stream, destination));
+                AssertHash(destination[..28], SHA3_224_Hash);
+            }
+
+            using (var stream = new MemoryStream(source))
+            {
+                Assert.AreEqual(32, SHA3_256.HashData(stream, destination));
+                AssertHash(destination[..32], SHA3_256_Hash);
+            }
+
+            using (var stream = new MemoryStream(source))
+            {
+                Assert.AreEqual(48, SHA3_384.HashData(stream, destination));
+                AssertHash(destination[..48], SHA3_384_Hash);
+            }
+
+            using (var stream = new MemoryStream(source))
+            {
+                Assert.AreEqual(64, SHA3_512.HashData(stream, destination));
+                AssertHash(destination, SHA3_512_Hash);
+            }
+        }
+
+        [TestMethod]
+        public void SHA3_HashData_DestinationTooSmall()
+        {
+            var source = Encoding.UTF8.GetBytes(Text);
+
+            Assert.ThrowsExactly<ArgumentException>(() => SHA3_512.HashData(source, new byte[63]));
+
+            using (var stream = new MemoryStream(source))
+            {
+                Assert.ThrowsExactly<ArgumentException>(() => SHA3_512.HashData(stream, new byte[63]));
+            }
+        }
+
         #endregion
 
         #region Private
@@ -70,6 +181,11 @@ namespace BlackSharp.Core.Tests.Security.Cryptography
             sha.ComputeHash(raw);
 
             return StringUtilities.ToHexString(sha.Hash);
+        }
+
+        void AssertHash(byte[] hash, string expected)
+        {
+            Assert.AreEqual(expected, StringUtilities.ToHexString(hash), StringComparer.OrdinalIgnoreCase);
         }
 
         #endregion
