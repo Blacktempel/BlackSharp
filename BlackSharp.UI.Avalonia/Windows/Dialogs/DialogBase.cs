@@ -11,12 +11,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
-using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using BlackSharp.MVVM.Dialogs;
 using BlackSharp.MVVM.Dialogs.Enums;
-using BlackSharp.UI.Avalonia.Media;
 using BlackSharp.UI.Avalonia.Windows.Dialogs.Enums;
 using BlackSharp.UI.Avalonia.Windows.Media;
 using BlackSharp.UI.Avalonia.Windows.Media.Enums;
@@ -119,16 +117,6 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
 
             KeyBindings.Add(new() { Command = new RelayCommand(Close), Gesture = new KeyGesture(Key.Escape) });
             KeyBindings.Add(new() { Command = CopyMessageCommand     , Gesture = new KeyGesture(Key.C, KeyModifiers.Control) });
-
-            if (!Design.IsDesignMode)
-            {
-                Loaded += OnWindowLoaded;
-            }
-
-            Application.Current?.PlatformSettings?.ColorValuesChanged += (s, e) =>
-            {
-                SetBackgroundColor();
-            };
         }
 
         #endregion
@@ -358,20 +346,6 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
             }
 
             return Result;
-        }
-
-        void OnWindowLoaded(object sender, RoutedEventArgs e)
-        {
-            SetBackgroundColor();
-        }
-
-        void SetBackgroundColor()
-        {
-            var b = SystemColors.GetSystemBackground();
-            if (b != null)
-            {
-                Background = b;
-            }
         }
 
         #endregion
