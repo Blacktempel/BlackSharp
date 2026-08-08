@@ -9,13 +9,13 @@
 #pragma warning disable CA1416 // Platform compatibility warning
 
 using Avalonia.Platform;
-using BlackSharp.UI.Avalonia.Platform.Windows.Interop.Enums;
-using BlackSharp.UI.Avalonia.Platform.Windows.Interop.Structures;
+using BlackSharp.Core.Interop;
+using BlackSharp.Core.Interop.Windows;
+using BlackSharp.Core.Interop.Windows.Structures;
 using Microsoft.Win32;
+using OS = BlackSharp.Core.Platform.OperatingSystem;
 using System.Runtime.InteropServices;
 using System.Text;
-
-using OS = BlackSharp.Core.Platform.OperatingSystem;
 using WindowsUser32 = BlackSharp.Core.Interop.Windows.Native.User32;
 
 namespace BlackSharp.UI.Avalonia.Extensions
@@ -125,27 +125,33 @@ namespace BlackSharp.UI.Avalonia.Extensions
 
         static WindowsScreenDeviceInfo GetWindowsScreenDeviceInfo(Screen screen)
         {
-            var rect = new RECT
+            var rect = new Win32Rectangle
             {
-                left = screen.Bounds.X,
-                top = screen.Bounds.Y,
-                right = screen.Bounds.Right,
-                bottom = screen.Bounds.Bottom
+                Left   = screen.Bounds.X,
+                Top    = screen.Bounds.Y,
+                Right  = screen.Bounds.Right,
+                Bottom = screen.Bounds.Bottom,
             };
 
             //Get the monitor handle from the screens bounds
-            var monitor = MonitorFromRectangle(ref rect, WindowsUser32.MonitorDefaultToNearest);
+            var monitor = MarshalUtilities.Invoke(
+                ref rect,
+                pointer => WindowsUser32.MonitorFromRect(pointer, WindowsUser32.MonitorDefaultToNearest));
 
             if (monitor == IntPtr.Zero)
             {
                 return null;
             }
 
-            var mi = new MONITORINFOEX();
-            mi.cbSize = (uint)Marshal.SizeOf<MONITORINFOEX>();
+            var monitorInfo = new MonitorInfoEx
+            {
+                Size = Marshal.SizeOf<MonitorInfoEx>(),
+            };
 
             //Get the monitor info to obtain the device name
-            if (!GetMonitorInformation(monitor, ref mi))
+            if (!MarshalUtilities.Invoke(
+                ref monitorInfo,
+                pointer => WindowsUser32.GetMonitorInfo(monitor, pointer)))
             {
                 return null;
             }
@@ -155,52 +161,58 @@ namespace BlackSharp.UI.Avalonia.Extensions
                 return null;
             }
 
-            var paths = new DISPLAYCONFIG_PATH_INFO[pathCount];
-            var modes = new DISPLAYCONFIG_MODE_INFO[modeCount];
+            var paths = new DisplayConfigPathInfo[pathCount];
+            var modes = new DisplayConfigModeInfo[modeCount];
 
-            if (QueryDisplayConfiguration(WindowsUser32.QueryDisplayConfigOnlyActivePaths, ref pathCount, paths, ref modeCount, modes, IntPtr.Zero) != 0)
+            if (DisplayConfigurationUtilities.QueryDisplayConfig(
+                WindowsUser32.QueryDisplayConfigOnlyActivePaths,
+                ref pathCount,
+                paths,
+                ref modeCount,
+                modes,
+                IntPtr.Zero) != 0)
             {
                 return null;
             }
 
             foreach (var path in paths)
             {
-                var source = path.sourceInfo;
+                var source = path.SourceInfo;
 
-                var sourceName = new DISPLAYCONFIG_SOURCE_DEVICE_NAME();
-                sourceName.header.type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
-                sourceName.header.size = (uint)Marshal.SizeOf<DISPLAYCONFIG_SOURCE_DEVICE_NAME>();
-                sourceName.header.adapterId = source.adapterId;
-                sourceName.header.id = source.id;
+                var sourceName = new DisplayConfigSourceDeviceName();
+                sourceName.Header.Type      = DisplayConfigDeviceInfoType.GetSourceName;
+                sourceName.Header.Size      = (uint)Marshal.SizeOf<DisplayConfigSourceDeviceName>();
+                sourceName.Header.AdapterID = source.AdapterID;
+                sourceName.Header.ID        = source.ID;
 
-                if (GetDisplayConfigurationDeviceInfo(ref sourceName) != 0)
+                if (DisplayConfigurationUtilities.GetDeviceInfo(ref sourceName) != 0)
                 {
                     continue;
                 }
 
                 //Check if this is the monitor we are looking for
-                if (mi.szDevice.CompareTo(sourceName.viewGdiDeviceName, StringComparison.OrdinalIgnoreCase) != 0)
+                if (monitorInfo.DeviceName.CompareTo(sourceName.ViewGdiDeviceName, StringComparison.OrdinalIgnoreCase) != 0)
                 {
                     continue;
                 }
 
-                var target = path.targetInfo;
+                var target = path.TargetInfo;
 
-                var name = new DISPLAYCONFIG_TARGET_DEVICE_NAME();
-                name.header.type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME;
-                name.header.size = (uint)Marshal.SizeOf<DISPLAYCONFIG_TARGET_DEVICE_NAME>();
-                name.header.adapterId = target.adapterId;
-                name.header.id = target.id;
+                var name = new DisplayConfigTargetDeviceName();
+                name.Header.Type      = DisplayConfigDeviceInfoType.GetTargetName;
+                name.Header.Size      = (uint)Marshal.SizeOf<DisplayConfigTargetDeviceName>();
+                name.Header.AdapterID = target.AdapterID;
+                name.Header.ID        = target.ID;
 
-                if (GetDisplayConfigurationDeviceInfo(ref name) != 0)
+                if (DisplayConfigurationUtilities.GetDeviceInfo(ref name) != 0)
                 {
                     continue;
                 }
 
                 return new WindowsScreenDeviceInfo(
-                    name.monitorDevicePath,
-                    name.monitorFriendlyDeviceName,
-                    sourceName.viewGdiDeviceName);
+                    name.MonitorDevicePath,
+                    name.MonitorFriendlyDeviceName,
+                    sourceName.ViewGdiDeviceName);
             }
 
             return null;
@@ -209,58 +221,6 @@ namespace BlackSharp.UI.Avalonia.Extensions
         static string NormalizeDisplayName(string displayName)
         {
             return string.IsNullOrWhiteSpace(displayName) ? null : displayName.Trim();
-        }
-
-        static int GetDisplayConfigurationDeviceInfo(ref DISPLAYCONFIG_SOURCE_DEVICE_NAME deviceName)
-        {
-            return InvokeNative(ref deviceName, WindowsUser32.DisplayConfigGetDeviceInfo);
-        }
-
-        static int GetDisplayConfigurationDeviceInfo(ref DISPLAYCONFIG_TARGET_DEVICE_NAME deviceName)
-        {
-            return InvokeNative(ref deviceName, WindowsUser32.DisplayConfigGetDeviceInfo);
-        }
-
-        static bool GetMonitorInformation(IntPtr monitor, ref MONITORINFOEX monitorInfo)
-        {
-            return InvokeNative(
-                ref monitorInfo,
-                pointer => WindowsUser32.GetMonitorInfo(monitor, pointer));
-        }
-
-        static IntPtr MonitorFromRectangle(ref RECT rectangle, uint flags)
-        {
-            return InvokeNative(
-                ref rectangle,
-                pointer => WindowsUser32.MonitorFromRect(pointer, flags));
-        }
-
-        static int QueryDisplayConfiguration(
-            uint flags,
-            ref uint pathCount,
-            DISPLAYCONFIG_PATH_INFO[] paths,
-            ref uint modeCount,
-            DISPLAYCONFIG_MODE_INFO[] modes,
-            IntPtr currentTopologyId)
-        {
-            var pathHandle = GCHandle.Alloc(paths, GCHandleType.Pinned);
-            var modeHandle = GCHandle.Alloc(modes, GCHandleType.Pinned);
-
-            try
-            {
-                return WindowsUser32.QueryDisplayConfig(
-                    flags,
-                    ref pathCount,
-                    pathHandle.AddrOfPinnedObject(),
-                    ref modeCount,
-                    modeHandle.AddrOfPinnedObject(),
-                    currentTopologyId);
-            }
-            finally
-            {
-                modeHandle.Free();
-                pathHandle.Free();
-            }
         }
 
         static string GetRegistryPathFromDevicePath(string devicePath)
@@ -318,34 +278,6 @@ namespace BlackSharp.UI.Avalonia.Extensions
               | (edid[15] << 24));
 
             return serial != 0 ? serial.ToString() : null;
-        }
-
-        static TResult InvokeNative<T, TResult>(ref T value, Func<IntPtr, TResult> action)
-            where T : struct
-        {
-            var pointer = Marshal.AllocHGlobal(Marshal.SizeOf<T>());
-            var initialized = false;
-
-            try
-            {
-                Marshal.StructureToPtr(value, pointer, false);
-                initialized = true;
-
-                var result = action(pointer);
-
-                value = Marshal.PtrToStructure<T>(pointer);
-
-                return result;
-            }
-            finally
-            {
-                if (initialized)
-                {
-                    Marshal.DestroyStructure<T>(pointer);
-                }
-
-                Marshal.FreeHGlobal(pointer);
-            }
         }
 
         #endregion

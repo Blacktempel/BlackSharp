@@ -8,11 +8,12 @@
 
 using BlackSharp.Core.Extensions;
 using BlackSharp.Core.Interop.Linux.Native;
+using BlackSharp.Core.IO;
 using BlackSharp.IO.Ports.Models;
 using Microsoft.Win32;
+using OS = BlackSharp.Core.Platform.OperatingSystem;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using OS = BlackSharp.Core.Platform.OperatingSystem;
 
 namespace BlackSharp.IO.Ports;
 
@@ -189,9 +190,9 @@ public static class SerialDeviceEnumerator
                     HardwareID   = hardwareID,
                     PortName     = portName,
                     FriendlyName = StringExtensions.FirstNotNullOrWhiteSpace(
-                        ReadTextFile(Path.Combine(usbParent, "product")),
+                        FileUtilities.ReadAllTextOrEmpty(Path.Combine(usbParent, "product")),
                         ttyName),
-                    Manufacturer = ReadTextFile(Path.Combine(usbParent, "manufacturer")),
+                    Manufacturer = FileUtilities.ReadAllTextOrEmpty(Path.Combine(usbParent, "manufacturer")),
                 });
             }
             catch (IOException)
@@ -219,22 +220,6 @@ public static class SerialDeviceEnumerator
         }
 
         return string.Empty;
-    }
-
-    private static string ReadTextFile(string path)
-    {
-        try
-        {
-            return File.Exists(path) ? File.ReadAllText(path).Trim() : string.Empty;
-        }
-        catch (IOException)
-        {
-            return string.Empty;
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return string.Empty;
-        }
     }
 
     private static bool TryFindLinuxUSBParent(string devicePath, out string usbParent)
@@ -295,7 +280,7 @@ public static class SerialDeviceEnumerator
     private static bool TryReadHexFile(string path, out int value)
     {
         if (uint.TryParse(
-            ReadTextFile(path),
+            FileUtilities.ReadAllTextOrEmpty(path),
             NumberStyles.AllowHexSpecifier,
             CultureInfo.InvariantCulture,
             out var parsed))

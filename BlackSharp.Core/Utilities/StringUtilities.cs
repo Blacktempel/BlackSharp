@@ -6,6 +6,7 @@
  * Copyright (c) 2026 Florian K.
  */
 
+using BlackSharp.Core.Extensions;
 using System.Globalization;
 
 namespace BlackSharp.Core.Utilities
@@ -13,7 +14,7 @@ namespace BlackSharp.Core.Utilities
     /// <summary>
     /// Utility class for string operations.
     /// </summary>
-    public class StringUtilities
+    public static class StringUtilities
     {
         #region Public
 
@@ -24,16 +25,98 @@ namespace BlackSharp.Core.Utilities
         /// <returns>Hex string.</returns>
         public static string ToHexString(byte[] bytes)
         {
-            var chars = new char[bytes.Length * 2];
-
-            for (var i = 0; i < bytes.Length; i++)
+            if (bytes == null)
             {
-                var value = bytes[i];
-                chars[i * 2] = GetHexChar(value >> 4);
-                chars[i * 2 + 1] = GetHexChar(value & 0x0F);
+                throw new ArgumentNullException(nameof(bytes));
+            }
+
+            return ToHexString(bytes, 0, bytes.Length, string.Empty);
+        }
+
+        /// <summary>
+        /// Converts a bounded byte-array range to a hexadecimal string.
+        /// </summary>
+        /// <param name="bytes">Byte array to convert.</param>
+        /// <param name="offset">Start offset of the range.</param>
+        /// <param name="length">Number of bytes to convert.</param>
+        /// <param name="separator">Text inserted between encoded bytes.</param>
+        /// <returns>The hexadecimal string, or an empty string when the range is unavailable.</returns>
+        public static string ToHexString(byte[] bytes, int offset, int length, string separator = " ")
+        {
+            if (!ByteArrayExtensions.HasRange(bytes, offset, length))
+            {
+                return string.Empty;
+            }
+
+            separator ??= string.Empty;
+
+            var chars = new char[length * 2 + Math.Max(0, length - 1) * separator.Length];
+            var position = 0;
+
+            for (var index = 0; index < length; ++index)
+            {
+                if (index > 0)
+                {
+                    separator.CopyTo(0, chars, position, separator.Length);
+                    position += separator.Length;
+                }
+
+                var value = bytes[offset + index];
+
+                chars[position++] = GetHexChar(value >> 4);
+                chars[position++] = GetHexChar(value & 0x0F);
             }
 
             return new string(chars);
+        }
+
+        /// <summary>
+        /// Decodes and normalizes an ASCII byte array.
+        /// </summary>
+        /// <param name="value">The encoded byte array.</param>
+        /// <returns>The decoded and normalized string.</returns>
+        public static string DecodeASCII(byte[] value)
+        {
+            return value == null ? string.Empty : DecodeASCII(value, 0, value.Length);
+        }
+
+        /// <summary>
+        /// Decodes and normalizes a bounded ASCII byte-array range.
+        /// </summary>
+        /// <param name="value">The encoded byte array.</param>
+        /// <param name="offset">The first byte to decode.</param>
+        /// <param name="length">The number of bytes to decode.</param>
+        /// <returns>The decoded and normalized string, or an empty string when the range is unavailable.</returns>
+        public static string DecodeASCII(byte[] value, int offset, int length)
+        {
+            return ByteArrayExtensions.HasRange(value, offset, length)
+                 ? TrimNullPadding(System.Text.Encoding.ASCII.GetString(value, offset, length))
+                 : string.Empty;
+        }
+
+        /// <summary>
+        /// Returns the first normalized string that is not empty or whitespace.
+        /// </summary>
+        /// <param name="values">The candidate strings in priority order.</param>
+        /// <returns>The first normalized value or an empty string.</returns>
+        public static string FirstNonEmpty(params string[] values)
+        {
+            if (values == null)
+            {
+                return string.Empty;
+            }
+
+            foreach (var value in values)
+            {
+                var candidate = TrimNullPadding(value);
+
+                if (!string.IsNullOrWhiteSpace(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            return string.Empty;
         }
 
         /// <summary>

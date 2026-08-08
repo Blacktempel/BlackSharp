@@ -48,6 +48,15 @@ namespace BlackSharp.Core.Tests.Extensions
         }
 
         [TestMethod]
+        public void EqualsAny()
+        {
+            Assert.IsTrue(StringExtensions.EqualsAny("enabled", StringComparison.OrdinalIgnoreCase, "disabled", "ENABLED"));
+
+            Assert.IsFalse(StringExtensions.EqualsAny("enabled", StringComparison.Ordinal, "ENABLED"));
+            Assert.IsFalse(StringExtensions.EqualsAny(null, StringComparison.Ordinal, "enabled"));
+        }
+
+        [TestMethod]
         public void Join()
         {
             const int Elem0 =   123;

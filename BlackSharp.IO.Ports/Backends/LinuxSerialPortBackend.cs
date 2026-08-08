@@ -7,9 +7,10 @@
  */
 
 using BlackSharp.Core.Interop.Linux.Structures;
+using BlackSharp.Core.Threading;
 using BlackSharp.IO.Ports.Models;
-using System.Diagnostics;
 using LinuxNativeMethods = BlackSharp.Core.Interop.Linux.Native.LibC;
+using System.Diagnostics;
 
 namespace BlackSharp.IO.Ports.Backends;
 
@@ -92,7 +93,9 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
 
         while (total < count)
         {
-            int pollTimeout = total > 0 ? 0 : GetRemainingTimeout(timeout, stopwatch);
+            int pollTimeout = total > 0
+                ? 0
+                : TimeoutUtilities.GetRemainingMilliseconds(timeout, stopwatch);
 
             short events = Poll(LinuxNativeMethods.POLLIN, pollTimeout);
 
@@ -173,7 +176,7 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
 
         while (total < count)
         {
-            int pollTimeout = GetRemainingTimeout(timeout, stopwatch);
+            int pollTimeout = TimeoutUtilities.GetRemainingMilliseconds(timeout, stopwatch);
             short events = Poll(LinuxNativeMethods.POLLOUT, pollTimeout);
 
             if ((events & (LinuxNativeMethods.POLLERR | LinuxNativeMethods.POLLHUP | LinuxNativeMethods.POLLNVAL)) != 0 && (events & LinuxNativeMethods.POLLOUT) == 0)
@@ -434,38 +437,6 @@ internal sealed class LinuxSerialPortBackend : ISerialPortBackend
 
             throw CreateIOException("poll() failed.");
         }
-    }
-
-    private static int GetRemainingTimeout(int timeout, Stopwatch stopwatch)
-    {
-        if (timeout == SerialPort.InfiniteTimeout)
-        {
-            return -1;
-        }
-
-        if (timeout == 0)
-        {
-            return 0;
-        }
-
-        if (stopwatch == null)
-        {
-            return timeout;
-        }
-
-        var remaining = timeout - stopwatch.ElapsedMilliseconds;
-
-        if (remaining <= 0)
-        {
-            return 0;
-        }
-
-        if (remaining > int.MaxValue)
-        {
-            return int.MaxValue;
-        }
-
-        return (int)remaining;
     }
 
     private static string NormalizePortName(string portName)

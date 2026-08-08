@@ -276,20 +276,7 @@ namespace BlackSharp.UI.Avalonia.Controls
         /// <param name="e">Requested reorder operation.</param>
         protected virtual void OnReorderRequested(ItemReorderRequestedEventArgs e)
         {
-            // Keep a CLR event for non-MVVM consumers, then prefer the bound command.
-            // If neither handles the request, the control provides a useful automatic collection fallback.
-            ReorderRequested?.Invoke(this, e);
-
-            if (!e.Handled && ReorderCommand?.CanExecute(e) == true)
-            {
-                ReorderCommand.Execute(e);
-                e.Handled = true;
-            }
-
-            if (!e.Handled)
-            {
-                e.Handled = TryMoveItem(e.OldIndex, e.NewIndex);
-            }
+            ReorderRequestDispatcher.Dispatch(this, e, ReorderRequested, ReorderCommand, TryMoveItem);
         }
 
         #endregion

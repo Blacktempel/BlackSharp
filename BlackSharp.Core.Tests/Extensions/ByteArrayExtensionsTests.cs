@@ -40,6 +40,19 @@ namespace BlackSharp.Core.Tests.Extensions
         }
 
         [TestMethod]
+        public void HasRange()
+        {
+            byte[] data = { 0x10, 0x20, 0x30 };
+
+            Assert.IsTrue(data.HasRange(0, data.Length));
+            Assert.IsTrue(data.HasRange(data.Length, 0));
+
+            Assert.IsFalse(data.HasRange(-1, 1));
+            Assert.IsFalse(data.HasRange(2, 2));
+            Assert.IsFalse(ByteArrayExtensions.HasRange(null, 0, 0));
+        }
+
+        [TestMethod]
         public void ReadNullTerminatedASCIIString()
         {
             byte[] data = { 0x20, 0x41, 0x42, 0x20, 0x00, 0x43 };

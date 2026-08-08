@@ -89,6 +89,31 @@ namespace BlackSharp.Core.Extensions
         }
 
         /// <summary>
+        /// Returns whether this string equals any specified value using the specified comparison rules.
+        /// </summary>
+        /// <param name="str">This string.</param>
+        /// <param name="comparison">One of the values that specifies the rules to use in this comparison.</param>
+        /// <param name="values">The strings to compare.</param>
+        /// <returns><see langword="true"/> if this string equals any specified value.</returns>
+        public static bool EqualsAny(this string str, StringComparison comparison, params string[] values)
+        {
+            if (values == null)
+            {
+                return false;
+            }
+
+            foreach (var value in values)
+            {
+                if (string.Equals(str, value, comparison))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Returns the first specified string that is not <see langword="null"/>, empty, or whitespace.
         /// </summary>
         /// <param name="values">The strings to inspect in order.</param>

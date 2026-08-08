@@ -21,6 +21,23 @@ namespace BlackSharp.Core.Tests.Utilities
             Assert.AreEqual("FF",         StringUtilities.ToHexString([0xFF]));
             Assert.AreEqual("0A",         StringUtilities.ToHexString([0x0A]));
             Assert.AreEqual("000F10FFAB", StringUtilities.ToHexString([0x00, 0x0F, 0x10, 0xFF, 0xAB]));
+            Assert.AreEqual("0F-10-FF"  , StringUtilities.ToHexString([0x00, 0x0F, 0x10, 0xFF, 0xAB], 1, 3, "-"));
+        }
+
+        [TestMethod]
+        public void DecodeASCII()
+        {
+            byte[] data = { 0x00, 0x20, 0x41, 0x42, 0x00, 0x20, 0x43 };
+
+            Assert.AreEqual("AB", StringUtilities.DecodeASCII(data, 1, 5));
+            Assert.AreEqual(string.Empty, StringUtilities.DecodeASCII(null));
+        }
+
+        [TestMethod]
+        public void FirstNonEmpty()
+        {
+            Assert.AreEqual("value", StringUtilities.FirstNonEmpty(null, string.Empty, "value"));
+            Assert.AreEqual(string.Empty, StringUtilities.FirstNonEmpty(null, string.Empty));
         }
 
         [TestMethod]

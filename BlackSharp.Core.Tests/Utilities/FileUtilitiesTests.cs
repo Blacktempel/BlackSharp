@@ -36,6 +36,34 @@ namespace BlackSharp.Core.Tests.Utilities
             }
         }
 
+        [TestMethod]
+        public void WriteAllTextAtomic()
+        {
+            string path = Path.GetTempFileName();
+
+            try
+            {
+                FileUtilities.WriteAllTextAtomic(path, "first");
+                FileUtilities.WriteAllTextAtomic(path, "second");
+
+                Assert.AreEqual("second", File.ReadAllText(path));
+                Assert.AreEqual(0, Directory.GetFiles(Path.GetDirectoryName(path), Path.GetFileName(path) + ".*.tmp").Length);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [TestMethod]
+        public void EnumerateOrEmpty()
+        {
+            string directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+
+            Assert.AreEqual(0, FileUtilities.GetFilesOrEmpty(directory).Length);
+            Assert.AreEqual(0, FileUtilities.GetDirectoriesOrEmpty(directory).Length);
+        }
+
         #endregion
     }
 }

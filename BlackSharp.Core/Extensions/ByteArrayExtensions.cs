@@ -36,6 +36,21 @@ namespace BlackSharp.Core.Extensions
         }
 
         /// <summary>
+        /// Returns whether the byte array contains the complete requested range.
+        /// </summary>
+        /// <param name="data">The source byte array.</param>
+        /// <param name="offset">Start offset of the range.</param>
+        /// <param name="length">Number of bytes in the range.</param>
+        /// <returns><see langword="true"/> when the complete range is available.</returns>
+        public static bool HasRange(this byte[] data, int offset, int length)
+        {
+            return data != null
+                && offset >= 0
+                && length >= 0
+                && offset <= data.Length - length;
+        }
+
+        /// <summary>
         /// Reads a trimmed, null-terminated ASCII string from a bounded region of a byte array.
         /// </summary>
         /// <param name="data">Byte array containing the encoded string.</param>
@@ -466,13 +481,6 @@ namespace BlackSharp.Core.Extensions
         #endregion
 
         #region Private
-
-        private static bool HasRange(byte[] data, int offset, int length)
-        {
-            return data != null &&
-                   offset >= 0 &&
-                   offset <= data.Length - length;
-        }
 
         private static void ValidateRange(byte[] data, int offset, int length)
         {

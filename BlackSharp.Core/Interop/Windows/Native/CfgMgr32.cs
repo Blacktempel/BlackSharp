@@ -19,6 +19,21 @@ namespace BlackSharp.Core.Interop.Windows.Native
 
         const string DLL_NAME = "cfgmgr32.dll";
 
+        /// <summary>
+        /// Selects the hardware-identifiers registry property.
+        /// </summary>
+        public const uint CrpHardwareId = 0x00000002;
+
+        /// <summary>
+        /// Selects the service-name registry property.
+        /// </summary>
+        public const uint CrpService = 0x00000005;
+
+        /// <summary>
+        /// Selects the setup-class registry property.
+        /// </summary>
+        public const uint CrpClass = 0x00000008;
+
         #endregion
 
         #region Imports
