@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlackSharp.Core\BlackSharp.Core.csproj" />
+    <ProjectReference Include="..\..\BlackSharp.Core\BlackSharp.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
