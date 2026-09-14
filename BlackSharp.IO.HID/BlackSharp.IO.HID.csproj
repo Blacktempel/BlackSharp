@@ -13,9 +13,7 @@
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
     <PackageTags>usb;hid;hidraw;io;device;windows;linux;cross-platform</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-    <AssemblyVersion>1.2.0</AssemblyVersion>
-    <FileVersion>1.2.0</FileVersion>
-    <Version>$(AssemblyVersion)</Version>
+    <Version>1.2.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

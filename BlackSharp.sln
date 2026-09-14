@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackSharp.IO.HID", "BlackS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackSharp.IO.HID.Tests", "Unit Tests\BlackSharp.IO.HID.Tests\BlackSharp.IO.HID.Tests.csproj", "{5F79F876-93DB-49C8-78BD-EC2478D108D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackSharp.IO.Ports.Tests", "Unit Tests\BlackSharp.IO.Ports.Tests\BlackSharp.IO.Ports.Tests.csproj", "{95192E35-93A6-4A7E-888B-0FAD6848FB70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{5F79F876-93DB-49C8-78BD-EC2478D108D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F79F876-93DB-49C8-78BD-EC2478D108D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F79F876-93DB-49C8-78BD-EC2478D108D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95192E35-93A6-4A7E-888B-0FAD6848FB70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95192E35-93A6-4A7E-888B-0FAD6848FB70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95192E35-93A6-4A7E-888B-0FAD6848FB70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95192E35-93A6-4A7E-888B-0FAD6848FB70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{BC2F72B3-24AF-40FD-A92D-90E2134DD5B4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{5F79F876-93DB-49C8-78BD-EC2478D108D2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{95192E35-93A6-4A7E-888B-0FAD6848FB70} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E354AE4D-9DD4-4F78-979F-3F347A61AFA4}

@@ -1,9 +1,8 @@
-﻿# SerialPort
+﻿# BlackSharp.IO.Ports
 
-Small cross-platform C# serial-port implementation for Windows and Linux.
+Cross-platform serial-port and raw USB-device access for Windows and Linux.
 
-It intentionally does **not** wrap `System.IO.Ports.SerialPort`.<br/>
-The goal is to avoid the problematic managed cleanup path and to provide a `TryClose(TimeSpan timeout)` method that cannot freeze the caller forever.
+The serial-port API intentionally does **not** wrap `System.IO.Ports.SerialPort`.
 
 ## Supported
 
@@ -15,13 +14,20 @@ The goal is to avoid the problematic managed cleanup path and to provide a `TryC
 - DTR/RTS control
 - Read/write timeouts
 - Close with caller-side timeout
+- Raw USB access through Win32 device handles and libusb
+- Filtered Linux USB-device discovery by vendor and product ID
+- Configurable libusb interface, bulk endpoints and kernel-driver detachment
+- Cross-platform `USBDeviceStream` read/write API
+- libusb control transfers and endpoint halt recovery
+- Optional Windows read IOCTL mapping for driver-backed USB devices
 
 ## Not implemented
 
 - `DataReceived` event
 - `BaseStream`
 - modem/pin change events
-- macOS backend
+- macOS serial backend
+- macOS raw USB backend
 - arbitrary Linux custom baud through `termios2`/`BOTHER`
 
 ## Important close semantics
@@ -35,9 +41,9 @@ The close worker is then abandoned and a fresh worker is created for future clos
 
 For a hard guarantee that the OS handle is gone even if a USB driver blocks forever, please use process isolation around the serial access.
 
-## Example
+## Serial example
 
-```
+```csharp
 using BlackSharp.IO.Ports;
 
 using var port = new SerialPort("COM12")
@@ -51,7 +57,7 @@ using var port = new SerialPort("COM12")
     WriteTimeout = 500,
     CloseTimeout = TimeSpan.FromMilliseconds(500),
     DtrEnable = false,
-    RtsEnable = false
+    RtsEnable = false,
 };
 
 port.Open();
@@ -68,3 +74,29 @@ if (!closed)
 ```
 
 Linux port names can be full paths (`/dev/ttyUSB0`) or short names (`ttyUSB0`).
+
+## Linux raw USB example
+
+```csharp
+var devices = USBDeviceStream.GetDevices((vendorID, productID) => vendorID == 0x1234 && productID == 0x5678);
+
+var options = new USBDeviceStreamOptions
+{
+    InterfaceNumber = 0,
+    ReadEndpoint = 0x81,
+    WriteEndpoint = 0x01,
+};
+
+using var stream = USBDeviceStream.Open(devices.FirstOrDefault(), options);
+
+if (stream != null)
+{
+    stream.Write(new byte[] { 0x01 }, 500, out _);
+
+    var response = new byte[64];
+    stream.Read(response, 500, out var bytesRead);
+}
+```
+
+Linux raw USB access requires the `libusb-1.0.so.0` shared library and operating-system permissions for the target device.
+On Windows, construct `USBDeviceInfo` with the native device path supplied by the device-specific enumerator. The same `USBDeviceStream` read/write API is then used; driver-backed devices can map reads to an IOCTL through `WindowsReadControlCode`.

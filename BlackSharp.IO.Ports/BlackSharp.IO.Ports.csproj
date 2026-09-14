@@ -7,15 +7,13 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Description>A System.IO.Ports-like API for serial communication and timeout-safe close handling.</Description>
+    <Description>Cross-platform serial communication and raw USB device access.</Description>
     <Copyright>Florian K.</Copyright>
     <PackageProjectUrl>https://github.com/Blacktempel/BlackSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
-    <PackageTags>serial;serialport;com;uart;rs232;io;ports;communication;windows;linux;cross-platform</PackageTags>
+    <PackageTags>serial;serialport;com;uart;rs232;usb;libusb;device;io;ports;communication;windows;linux;cross-platform</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-    <AssemblyVersion>1.2.0</AssemblyVersion>
-    <FileVersion>1.2.0</FileVersion>
-    <Version>$(AssemblyVersion)</Version>
+	<Version>1.2.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
@@ -69,6 +67,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BlackSharp.Core\BlackSharp.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="BlackSharp.IO.Ports.Tests" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
