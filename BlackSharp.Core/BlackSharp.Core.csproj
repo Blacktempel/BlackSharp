@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
     <PackageTags>framework; code; shared</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

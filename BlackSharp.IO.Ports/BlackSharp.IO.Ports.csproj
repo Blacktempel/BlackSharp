@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
     <PackageTags>serial;serialport;com;uart;rs232;usb;libusb;device;io;ports;communication;windows;linux;cross-platform</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-	<Version>1.2.1</Version>
+	<Version>1.2.2</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
