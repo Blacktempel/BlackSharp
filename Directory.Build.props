@@ -1,0 +1,16 @@
+﻿<Project>
+  <PropertyGroup>
+    <BlackSharpVersionsDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)Versions/'))</BlackSharpVersionsDirectory>
+    <BlackSharpVersionFile>$(BlackSharpVersionsDirectory)BLACKSHARP.VERSION</BlackSharpVersionFile>
+    <BlackSharpVersion Condition="Exists('$(BlackSharpVersionFile)')">$([System.IO.File]::ReadAllText('$(BlackSharpVersionFile)').Trim())</BlackSharpVersion>
+  </PropertyGroup>
+
+  <Target Name="ValidateBlackSharpVersion"
+          BeforeTargets="PrepareForBuild;Pack"
+          Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(IsPackable)' == 'true'">
+    <Error Condition="!Exists('$(BlackSharpVersionFile)')"
+           Text="The BlackSharp version file '$(BlackSharpVersionFile)' does not exist." />
+    <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(BlackSharpVersion)', '^\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$'))"
+           Text="The BlackSharp version '$(BlackSharpVersion)' in '$(BlackSharpVersionFile)' is not a valid semantic version." />
+  </Target>
+</Project>

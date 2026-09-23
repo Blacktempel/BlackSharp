@@ -5,6 +5,22 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:
+    inputs:
+      upload_build_artifacts:
+        description: Upload NuGet packages and compiled libraries
+        required: false
+        default: true
+        type: boolean
+  workflow_call:
+    inputs:
+      upload_build_artifacts:
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
 
 jobs:
 
@@ -21,30 +37,33 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
 
     - name: Setup MSBuild on Windows
       if: runner.os == 'Windows'
-      uses: microsoft/setup-msbuild@v3
+      uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
       with:
         msbuild-architecture: x64
 
-    - name: Install .NET Core 8
-      uses: actions/setup-dotnet@v5
+    - name: Install .NET SDKs
+      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: |
+          8.0.x
+          9.0.x
+          10.0.x
 
-    - name: Install .NET Core 9
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: 9.0.x
+    - name: Validate shared version
+      id: version
+      shell: pwsh
+      run: |
+        dotnet msbuild BlackSharp.Core/BlackSharp.Core.csproj -nologo -t:ValidateBlackSharpVersion
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-    - name: Install .NET Core 10
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: 10.0.x
+        $version = (Get-Content -LiteralPath Versions/BLACKSHARP.VERSION -Raw).Trim()
+        "version=$version" >> $env:GITHUB_OUTPUT
 
     - name: NuGet restore Windows
       if: runner.os == 'Windows'
@@ -54,7 +73,6 @@ jobs:
       if: runner.os == 'Linux'
       run: dotnet restore
 
-    # Create the app package by building and packaging the Windows Application Packaging project
     - name: Build Windows Release
       if: runner.os == 'Windows'
       run: msbuild $env:Solution_Name /p:Configuration=Release /p:Platform="Any CPU" -m
@@ -64,36 +82,85 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Run Unit Tests
-      run: dotnet test
+      run: dotnet test --configuration Release --no-build --no-restore
 
-    - name: Publish net472 for Windows
+    - name: Pack NuGet packages
       if: runner.os == 'Windows'
-      uses: actions/upload-artifact@v6
-      with:
-        name: BlackSharp-net472
-        path: bin/Release/net472
+      shell: pwsh
+      run: dotnet pack $env:Solution_Name --configuration Release --no-build --no-restore --output "$env:RUNNER_TEMP/BlackSharp-NuGet"
 
-    - name: Publish net481 for Windows
+    - name: Verify NuGet package versions
       if: runner.os == 'Windows'
-      uses: actions/upload-artifact@v6
-      with:
-        name: BlackSharp-net481
-        path: bin/Release/net481
+      shell: pwsh
+      env:
+        BLACKSHARP_VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        $ErrorActionPreference = 'Stop'
 
-    - name: Publish net8
-      uses: actions/upload-artifact@v6
-      with:
-        name: BlackSharp-net8
-        path: bin/Release/net8
+        $expectedPackages = @(
+          'BlackSharp.Core'
+          'BlackSharp.IO.HID'
+          'BlackSharp.IO.Ports'
+          'BlackSharp.MVVM'
+          'BlackSharp.UI.Avalonia'
+        )
+        $packages = @(Get-ChildItem -LiteralPath "$env:RUNNER_TEMP/BlackSharp-NuGet" -Filter '*.nupkg' -File | Sort-Object Name)
+        if ($packages.Count -ne $expectedPackages.Count) {
+          throw "Expected $($expectedPackages.Count) NuGet packages, found $($packages.Count)."
+        }
 
-    - name: Publish net9
-      uses: actions/upload-artifact@v6
-      with:
-        name: BlackSharp-net9
-        path: bin/Release/net9
+        foreach ($package in $packages) {
+          $archive = [System.IO.Compression.ZipFile]::OpenRead($package.FullName)
+          try {
+            $specifications = @($archive.Entries | Where-Object { $_.FullName.EndsWith('.nuspec') })
+            if ($specifications.Count -ne 1) {
+              throw "Expected one NuGet specification in $($package.Name)."
+            }
 
-    - name: Publish net10
-      uses: actions/upload-artifact@v6
+            $reader = [System.IO.StreamReader]::new($specifications[0].Open())
+            try {
+              [xml]$specification = $reader.ReadToEnd()
+            }
+            finally {
+              $reader.Dispose()
+            }
+
+            $packageID = [string]$specification.package.metadata.id
+            $packageVersion = [string]$specification.package.metadata.version
+            if ($packageID -cnotin $expectedPackages) {
+              throw "Unexpected or duplicate NuGet package: $packageID."
+            }
+            if ($packageVersion -cne $env:BLACKSHARP_VERSION) {
+              throw "Package $packageID has version $packageVersion instead of $env:BLACKSHARP_VERSION."
+            }
+
+            $expectedPackages = @($expectedPackages | Where-Object { $_ -cne $packageID })
+          }
+          finally {
+            $archive.Dispose()
+          }
+        }
+
+        Write-Host "Verified $($packages.Count) BlackSharp NuGet packages at version $env:BLACKSHARP_VERSION."
+
+    - name: Upload NuGet packages
+      if: ${{ runner.os == 'Windows' && github.event_name != 'push' && github.event_name != 'pull_request' && inputs.upload_build_artifacts }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
-        name: BlackSharp-net10
-        path: bin/Release/net10
+        name: BlackSharp-NuGet-${{ steps.version.outputs.version }}
+        path: ${{ runner.temp }}/BlackSharp-NuGet/*.nupkg
+        if-no-files-found: error
+
+    - name: Upload compiled libraries
+      if: ${{ github.event_name != 'push' && github.event_name != 'pull_request' && inputs.upload_build_artifacts }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: BlackSharp-${{ runner.os }}-${{ steps.version.outputs.version }}
+        path: |
+          BlackSharp.*/bin/Release/net472/
+          BlackSharp.*/bin/Release/net481/
+          BlackSharp.*/bin/Release/netstandard2.0/
+          BlackSharp.*/bin/Release/net8.0/
+          BlackSharp.*/bin/Release/net9.0/
+          BlackSharp.*/bin/Release/net10.0/
+        if-no-files-found: error

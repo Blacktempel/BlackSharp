@@ -21,6 +21,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackSharp.IO.HID.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackSharp.IO.Ports.Tests", "Unit Tests\BlackSharp.IO.Ports.Tests\BlackSharp.IO.Ports.Tests.csproj", "{95192E35-93A6-4A7E-888B-0FAD6848FB70}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EA9A7186-E188-4CA1-A921-3AC42364689D}"
+	ProjectSection(SolutionItems) = preProject
+		Versions\BLACKSHARP.VERSION = Versions\BLACKSHARP.VERSION
+		Directory.Build.props = Directory.Build.props
+		.github\workflows\master.yml = .github\workflows\master.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
