@@ -347,7 +347,7 @@ public sealed class HIDStream : Stream
     /// <inheritdoc />
     public override void Write(byte[] buffer, int offset, int count)
     {
-        // Frame the caller data as a complete HID output report and keep partial native writes from appearing successful.
+        // Preserve the protocol's report length. Any platform-specific padding belongs to the native transport.
         ValidateBuffer(buffer, offset, count);
 
         if (count == 0)
@@ -367,7 +367,7 @@ public sealed class HIDStream : Stream
             throw new ArgumentOutOfRangeException(nameof(count), "The output report is larger than the device maximum.");
         }
 
-        var data = new byte[Device.MaximumOutputReportLength];
+        var data = new byte[count];
 
         Buffer.BlockCopy(buffer, offset, data, 0, count);
 

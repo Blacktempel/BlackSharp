@@ -150,6 +150,12 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
         public DialogButtonType Result { get; protected set; }
 
         /// <summary>
+        /// Gets or sets whether this dialog may be shown without a desktop main window as its owner.
+        /// The default is <see langword="false"/>.
+        /// </summary>
+        public bool AllowOwnerlessDisplay { get; set; }
+
+        /// <summary>
         /// Gets the icon image displayed in the dialog.
         /// </summary>
         public Geometry IconData { get; protected set; }
@@ -316,7 +322,16 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
 
         #region Private
 
-        DialogButtonType ShowWindow(string title, string message, DialogButtons dialogButtons, IEnumerable<DialogButton> customButtons, bool dialog)
+        /// <summary>
+        /// Shows this dialog with the desktop main window as owner, or without an owner when explicitly allowed.
+        /// </summary>
+        /// <param name="title">The dialog title.</param>
+        /// <param name="message">The dialog message.</param>
+        /// <param name="dialogButtons">The standard buttons to display.</param>
+        /// <param name="customButtons">Additional buttons to display.</param>
+        /// <param name="dialog">Whether to wait for the dialog to close.</param>
+        /// <returns>The button selected by the user.</returns>
+        private DialogButtonType ShowWindow(string title, string message, DialogButtons dialogButtons, IEnumerable<DialogButton> customButtons, bool dialog)
         {
             //Add default buttons
             DialogButtons = DialogButton.CreateDefaultButtons(dialogButtons);
@@ -329,20 +344,57 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
 
             UpdateLayout();
 
-            var wnd = (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+            var wnd = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+
+            if (wnd == null && !AllowOwnerlessDisplay)
+            {
+                throw new InvalidOperationException("A main window is required unless ownerless dialog display is enabled.");
+            }
+
+            if (wnd == null)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
 
             if (dialog)
             {
                 //Block
                 using (var source = new CancellationTokenSource())
                 {
-                    ShowDialog(wnd).ContinueWith(t => source.Cancel(), TaskScheduler.FromCurrentSynchronizationContext());
-                    Dispatcher.UIThread.MainLoop(source.Token);
+                    if (wnd == null)
+                    {
+                        void OnClosed(object sender, EventArgs e) => source.Cancel();
+
+                        Closed += OnClosed;
+
+                        try
+                        {
+                            base.Show();
+
+                            Dispatcher.UIThread.MainLoop(source.Token);
+                        }
+                        finally
+                        {
+                            Closed -= OnClosed;
+                        }
+                    }
+                    else
+                    {
+                        ShowDialog(wnd).ContinueWith(t => source.Cancel(), TaskScheduler.FromCurrentSynchronizationContext());
+                        Dispatcher.UIThread.MainLoop(source.Token);
+                    }
                 }
             }
             else
             {
-                Show(wnd);
+                if (wnd == null)
+                {
+                    base.Show();
+                }
+                else
+                {
+                    Show(wnd);
+                }
             }
 
             return Result;

@@ -58,6 +58,19 @@ namespace BlackSharp.Core.Interop.Windows.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetTimingReport(IntPtr physicalMonitor, IntPtr timingReport);
 
+        /// <summary>
+        /// Retrieves the current and maximum values of a monitor's VCP feature.
+        /// </summary>
+        /// <param name="physicalMonitor">The physical monitor handle.</param>
+        /// <param name="vcpCode">The VCP feature code.</param>
+        /// <param name="codeType">Optional pointer receiving the VCP code type; may be zero.</param>
+        /// <param name="currentValue">Receives the current feature value.</param>
+        /// <param name="maximumValue">Receives the maximum value for a continuous feature; undefined for a noncontinuous feature.</param>
+        /// <returns><see langword="true"/> if the monitor returned the feature value.</returns>
+        [DllImport(DLL_NAME, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetVCPFeatureAndVCPFeatureReply(IntPtr physicalMonitor, byte vcpCode, IntPtr codeType, out uint currentValue, out uint maximumValue);
+
         #endregion
     }
 }

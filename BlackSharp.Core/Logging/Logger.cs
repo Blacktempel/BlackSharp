@@ -8,11 +8,14 @@
 
 using BlackSharp.Core.Extensions;
 using System.Collections;
+using System.Globalization;
 using System.Text;
+using PlatformOperatingSystem = BlackSharp.Core.Platform.OperatingSystem;
 
 namespace BlackSharp.Core.Logging
 {
     #region LogLevel Enum
+
     /// <summary>
     /// A level of logging.
     /// If <see cref="Logger.LogLevel"/> is set, for example,
@@ -58,9 +61,11 @@ namespace BlackSharp.Core.Logging
         /// </summary>
         Fatal
     }
+
     #endregion
 
     #region LogItem
+
     /// <summary>
     /// An item for <see cref="Logger"/>.
     /// </summary>
@@ -108,95 +113,221 @@ namespace BlackSharp.Core.Logging
         }
         #endregion
     }
+
     #endregion
 
     /// <summary>
-    /// A class to enable logging for different configurations.
+    /// Records diagnostics in memory or appends them directly to a bounded file, depending on the constructor.
     /// </summary>
-    public class Logger : IEnumerable<LogItem>
+    public class Logger : ILogger, IEnumerable<LogItem>
     {
         #region Constructor
+
         /// <summary>
-        /// Do not allow creating instance of class (only singleton).
+        /// Creates an independent in-memory logger.
         /// </summary>
-        Logger()
+        public Logger()
         {
         }
+
+        /// <summary>
+        /// Creates a logger that appends entries directly to a bounded file.
+        /// </summary>
+        /// <param name="filePath">The destination file path.</param>
+        /// <param name="minimumLevel">The lowest severity to record.</param>
+        /// <param name="maximumFileSizeBytes">The maximum size before rotation.</param>
+        /// <param name="retainedFileCount">The number of previous files to retain.</param>
+        public Logger(
+            string filePath,
+            LogLevel minimumLevel = LogLevel.Info,
+            long maximumFileSizeBytes = 5 * 1024 * 1024,
+            int retainedFileCount = 5)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("A log file path is required.", nameof(filePath));
+
+            if (maximumFileSizeBytes <= 0)
+                throw new ArgumentOutOfRangeException(nameof(maximumFileSizeBytes));
+
+            if (retainedFileCount < 1)
+                throw new ArgumentOutOfRangeException(nameof(retainedFileCount));
+
+            FilePath             = Path.GetFullPath(filePath);
+            LogLevel             = minimumLevel;
+            MaximumFileSizeBytes = maximumFileSizeBytes;
+            RetainedFileCount    = retainedFileCount;
+            IsEnabled            = true;
+        }
+
         #endregion
 
         #region Fields
-        List<LogItem> _Log = new List<LogItem>();
+
+        /// <summary>
+        /// Synchronizes access to retained log entries.
+        /// </summary>
+        private readonly object _syncRoot = new object();
+
+        /// <summary>
+        /// Retains entries written to this logger instance.
+        /// </summary>
+        private readonly List<LogItem> _log = new List<LogItem>();
+
+        /// <summary>
+        /// Tracks which in-memory entries were already appended to each destination file.
+        /// </summary>
+        private readonly Dictionary<string, int> _savedEntryCounts = new Dictionary<string, int>(
+            PlatformOperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+
         #endregion
 
         #region Properties
-        static Logger _Instance;
+
         /// <summary>
-        /// Gets singleton instance of this logger.
+        /// Gets the destination file, or <see langword="null"/> when entries are retained only in memory.
         /// </summary>
-        public static Logger Instance
-        {
-            get
-            {
-                if (_Instance == null)
-                    _Instance = new Logger();
-
-                return _Instance;
-            }
-        }
+        public string FilePath { get; }
 
         /// <summary>
-        /// Specifies if logging is enabled.
+        /// Gets the maximum size of a file-backed log before rotation.
+        /// </summary>
+        public long MaximumFileSizeBytes { get; }
+
+        /// <summary>
+        /// Gets the number of previous file generations retained during rotation.
+        /// </summary>
+        public int RetainedFileCount { get; }
+
+        /// <summary>
+        /// Gets or sets whether logging is enabled.
         /// </summary>
         public bool IsEnabled { get; set; }
 
         /// <summary>
-        /// Describes the current <see cref="Logging.LogLevel"/>. Default is <see cref="Logging.LogLevel.Error"/>.
+        /// Gets or sets the minimum severity. The memory-only default is <see cref="LogLevel.Error"/>.
         /// </summary>
         public LogLevel LogLevel { get; set; } = LogLevel.Error;
+
         #endregion
 
-        #region Public API
+        #region Public
 
         /// <summary>
         /// Adds an element to the log if specified level is higher
         /// or equal to current <see cref="LogLevel"/> and not
-        /// <see cref="Logging.LogLevel.Disabled"/>.
+        /// <see cref="LogLevel.Disabled"/>.
         /// </summary>
         /// <param name="level">Log level.</param>
         /// <param name="message">Log message.</param>
         /// <param name="time">Time of event.</param>
         public void Add(LogLevel level, string message, DateTime? time)
         {
-            if (!IsEnabled || level < LogLevel || LogLevel == LogLevel.Disabled)
-                return;
-            _Log.Add(new LogItem(level, message, time));
+            TryLogCore(level, null, message, null, time);
         }
 
         /// <summary>
         /// Adds an element to the log if specified level is higher
         /// or equal to current <see cref="LogLevel"/> and not
-        /// <see cref="Logging.LogLevel.Disabled"/>.
+        /// <see cref="LogLevel.Disabled"/>.
         /// </summary>
         /// <param name="level">Log level.</param>
         /// <param name="message">Log message.</param>
         public void Add(LogLevel level, string message)
         {
-            if (!IsEnabled || level < LogLevel || LogLevel == LogLevel.Disabled)
-                return;
-            _Log.Add(new LogItem(level, message, null));
+            Add(level, message, null);
         }
 
         /// <summary>
         /// Adds an element to the log if specified level is higher
         /// or equal to current <see cref="LogLevel"/> and not
-        /// <see cref="Logging.LogLevel.Disabled"/>.
+        /// <see cref="LogLevel.Disabled"/>.
         /// </summary>
         /// <param name="item">Item to add.</param>
         public void Add(LogItem item)
         {
-            if (!IsEnabled || item.Level < LogLevel || LogLevel == LogLevel.Disabled)
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
+            if (FilePath == null)
+            {
+                if (!IsEnabled || item.Level < LogLevel || LogLevel == LogLevel.Disabled)
+                {
+                    return;
+                }
+
+                lock (_syncRoot)
+                {
+                    _log.Add(item);
+                }
+
                 return;
-            _Log.Add(item);
+            }
+
+            TryLogCore(item.Level, null, item.Message, null, item.Time);
+        }
+
+        /// <inheritdoc/>
+        public void Log(LogLevel level, string source, string message, Exception exception = null)
+        {
+            TryLog(level, source, message, exception);
+        }
+
+        /// <summary>
+        /// Records an event and reports whether a file-backed write succeeded.
+        /// </summary>
+        /// <param name="level">The severity of the event.</param>
+        /// <param name="source">The component or operation that produced the event.</param>
+        /// <param name="message">A description of the event.</param>
+        /// <param name="exception">An optional associated exception.</param>
+        /// <returns>Whether the event was accepted or written successfully.</returns>
+        public bool TryLog(LogLevel level, string source, string message, Exception exception = null)
+        {
+            return TryLogCore(level, source, message, exception, DateTime.Now);
+        }
+
+        /// <summary>
+        /// Appends a preformatted entry to a file-backed logger using the same rotation rules.
+        /// Raw entries intentionally bypass severity filtering so crash and audit records are not discarded.
+        /// </summary>
+        /// <param name="entry">The complete entry text.</param>
+        /// <returns>Whether the entry was written successfully; memory-only loggers return <see langword="false"/>.</returns>
+        public bool TryWriteRaw(string entry)
+        {
+            if (FilePath == null)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(entry))
+            {
+                return true;
+            }
+
+            try
+            {
+                lock (_syncRoot)
+                {
+                    var directory = Path.GetDirectoryName(FilePath);
+
+                    if (!string.IsNullOrWhiteSpace(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
+                    RotateIfRequired(Encoding.UTF8.GetByteCount(entry));
+
+                    File.AppendAllText(FilePath, entry, new UTF8Encoding(true));
+                }
+
+                return true;
+            }
+            catch
+            {
+                // Diagnostics must not interrupt an application when the file is unavailable.
+                return false;
+            }
         }
 
         /// <summary>
@@ -205,7 +336,26 @@ namespace BlackSharp.Core.Logging
         /// <param name="level">Level to remove from <see cref="Logger"/>.</param>
         public void Remove(LogLevel level)
         {
-            _Log.RemoveIf(x => x.Level == level);
+            lock (_syncRoot)
+            {
+                foreach (var path in _savedEntryCounts.Keys.ToArray())
+                {
+                    var savedCount    = Math.Min(_savedEntryCounts[path], _log.Count);
+                    var removedCount = 0;
+
+                    for (var index = 0; index < savedCount; ++index)
+                    {
+                        if (_log[index].Level == level)
+                        {
+                            ++removedCount;
+                        }
+                    }
+
+                    _savedEntryCounts[path] = savedCount - removedCount;
+                }
+
+                _log.RemoveAll(item => item.Level == level);
+            }
         }
 
         /// <summary>
@@ -237,23 +387,69 @@ namespace BlackSharp.Core.Logging
         }
 
         /// <summary>
-        /// Saves content of current <see cref="Logger"/> to a file.<para/>
-        /// Note: To save current content to a string, use <see cref="ToString"/>.
+        /// Saves retained entries to a file. In append mode, only entries added since the last
+        /// successful save to the same path are written. For a file-backed logger, copies its current file.
         /// </summary>
         /// <param name="path">File path.</param>
-        /// <param name="append">Specifies if content should be
-        /// appended to the file if it already exists.</param>
+        /// <param name="append">Whether new content should be appended to an existing file.</param>
         /// <returns>If file could be written.</returns>
         public bool SaveToFile(string path, bool append = true)
         {
             try
             {
-                if (append)
-                    File.AppendAllText(path, ToString(), Encoding.UTF8);
-                else
-                    File.WriteAllText(path, ToString(), Encoding.UTF8);
+                var fullPath = Path.GetFullPath(path);
 
-                return true;
+                var pathComparison = PlatformOperatingSystem.IsWindows()
+                    ? StringComparison.OrdinalIgnoreCase
+                    : StringComparison.Ordinal;
+
+                if (FilePath != null && string.Equals(fullPath, FilePath, pathComparison))
+                {
+                    return true;
+                }
+
+                if (FilePath != null)
+                {
+                    var content = File.Exists(FilePath) ? File.ReadAllText(FilePath) : string.Empty;
+
+                    if (append)
+                    {
+                        File.AppendAllText(fullPath, content, Encoding.UTF8);
+                    }
+                    else
+                    {
+                        File.WriteAllText(fullPath, content, Encoding.UTF8);
+                    }
+
+                    return true;
+                }
+
+                lock (_syncRoot)
+                {
+                    var startIndex = append && File.Exists(fullPath) && _savedEntryCounts.TryGetValue(fullPath, out var savedCount)
+                        ? Math.Min(savedCount, _log.Count)
+                        : 0;
+
+                    var builder = new StringBuilder();
+
+                    for (var index = startIndex; index < _log.Count; ++index)
+                    {
+                        builder.AppendLine(_log[index].ToString());
+                    }
+
+                    if (append)
+                    {
+                        File.AppendAllText(fullPath, builder.ToString(), Encoding.UTF8);
+                    }
+                    else
+                    {
+                        File.WriteAllText(fullPath, builder.ToString(), Encoding.UTF8);
+                    }
+
+                    _savedEntryCounts[fullPath] = _log.Count;
+
+                    return true;
+                }
             }
             catch
             {
@@ -263,31 +459,141 @@ namespace BlackSharp.Core.Logging
 
         #endregion
 
+        #region Private
+
+        /// <summary>
+        /// Stores an event in memory or appends it to the configured file.
+        /// </summary>
+        /// <param name="level">The severity of the event.</param>
+        /// <param name="source">The event source.</param>
+        /// <param name="message">The event description.</param>
+        /// <param name="exception">An optional associated exception.</param>
+        /// <param name="time">An optional original event time.</param>
+        /// <returns>Whether the event was accepted or written successfully.</returns>
+        private bool TryLogCore(LogLevel level, string source, string message, Exception exception, DateTime? time)
+        {
+            if (!IsEnabled || LogLevel == LogLevel.Disabled || level == LogLevel.Disabled || level < LogLevel)
+            {
+                return true;
+            }
+
+            if (FilePath == null)
+            {
+                var description = string.IsNullOrWhiteSpace(source)
+                    ? message ?? string.Empty
+                    : $"[{source.Trim()}] {message}";
+
+                if (exception != null)
+                {
+                    description += Environment.NewLine + FormatException(exception);
+                }
+
+                lock (_syncRoot)
+                {
+                    _log.Add(new LogItem(level, description, time));
+                }
+
+                return true;
+            }
+
+            var timestamp = time.HasValue
+                ? new DateTimeOffset(time.Value).ToUniversalTime()
+                : DateTimeOffset.UtcNow;
+
+            var builder = new StringBuilder();
+
+            builder.Append(timestamp.ToString("O", CultureInfo.InvariantCulture));
+            builder.Append(' ').Append(GetStringForLogLevel(level));
+            builder.Append(" [").Append(string.IsNullOrWhiteSpace(source) ? "General" : source.Trim()).Append("] ");
+            builder.AppendLine(message ?? string.Empty);
+
+            if (exception != null)
+            {
+                builder.AppendLine(FormatException(exception));
+            }
+
+            return TryWriteRaw(builder.ToString());
+        }
+
+        /// <summary>
+        /// Formats an exception with its type and the detailed Core exception information.
+        /// </summary>
+        /// <param name="exception">The exception to format.</param>
+        /// <returns>The complete diagnostic text.</returns>
+        private static string FormatException(Exception exception)
+        {
+            return exception.GetType().FullName + Environment.NewLine + exception.FullExceptionString();
+        }
+
+        /// <summary>
+        /// Rotates older generations before an append would exceed the configured file size.
+        /// </summary>
+        /// <param name="appendedByteCount">The encoded size of the next entry.</param>
+        private void RotateIfRequired(int appendedByteCount)
+        {
+            var currentLength = File.Exists(FilePath) ? new FileInfo(FilePath).Length : 0;
+
+            if (currentLength + appendedByteCount <= MaximumFileSizeBytes)
+                return;
+
+            var oldestPath = FilePath + "." + RetainedFileCount;
+
+            if (File.Exists(oldestPath))
+            {
+                File.Delete(oldestPath);
+            }
+
+            for (var index = RetainedFileCount - 1; index >= 1; --index)
+            {
+                var sourcePath      = FilePath + "." + index;
+                var destinationPath = FilePath + "." + (index + 1);
+
+                if (File.Exists(sourcePath))
+                {
+                    File.Move(sourcePath, destinationPath);
+                }
+            }
+
+            if (File.Exists(FilePath))
+            {
+                File.Move(FilePath, FilePath + ".1");
+            }
+        }
+
+        #endregion
+
         #region ToString
+
         /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
-            //if (Debugger.IsAttached)
-            //    return $"Logger contains {_Log.Count} items.";
+            var builder = new StringBuilder();
 
-            StringBuilder sb = new StringBuilder();
-            foreach (var item in this)
+            lock (_syncRoot)
             {
-                sb.AppendLine(item.ToString());
+                foreach (var item in _log)
+                {
+                    builder.AppendLine(item.ToString());
+                }
             }
 
-            return sb.ToString();
+            return builder.ToString();
         }
+
         #endregion
 
         #region IEnumerable
+
         /// <summary>
         /// Enumerator implementation.
         /// </summary>
         /// <returns>An enumerator.</returns>
         public IEnumerator<LogItem> GetEnumerator()
         {
-            return _Log.GetEnumerator();
+            lock (_syncRoot)
+            {
+                return _log.ToList().GetEnumerator();
+            }
         }
 
         /// <summary>
@@ -296,8 +602,9 @@ namespace BlackSharp.Core.Logging
         /// <returns>An enumerator.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _Log.GetEnumerator();
+            return GetEnumerator();
         }
+
         #endregion
     }
 }

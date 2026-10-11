@@ -29,10 +29,12 @@ internal sealed class WindowsHIDTransport : IHIDTransport
     /// </summary>
     /// <param name="handle">The native handle used by the operation.</param>
     /// <param name="cancellationEvent">The cancellation event used by the operation.</param>
-    private WindowsHIDTransport(SafeFileHandle handle, IntPtr cancellationEvent)
+    /// <param name="outputReportLength">The output buffer length required by the Windows HID collection.</param>
+    private WindowsHIDTransport(SafeFileHandle handle, IntPtr cancellationEvent, int outputReportLength)
     {
-        _handle = handle;
-        _cancellationEvent = cancellationEvent;
+        _handle             = handle;
+        _cancellationEvent  = cancellationEvent;
+        _outputReportLength = outputReportLength;
     }
 
     #endregion
@@ -48,6 +50,11 @@ internal sealed class WindowsHIDTransport : IHIDTransport
     /// Stores the handle state associated with this instance.
     /// </summary>
     private readonly SafeFileHandle _handle;
+
+    /// <summary>
+    /// Stores the output buffer length required by the Windows HID collection.
+    /// </summary>
+    private readonly int _outputReportLength;
 
     /// <summary>
     /// Stores the cancelled state associated with this instance.
@@ -103,7 +110,7 @@ internal sealed class WindowsHIDTransport : IHIDTransport
         if (cancellationEvent != IntPtr.Zero
          && cancellationEvent != Kernel32.InvalidHandle)
         {
-            return new WindowsHIDTransport(handle, cancellationEvent);
+            return new WindowsHIDTransport(handle, cancellationEvent, device.MaximumOutputReportLength);
         }
 
         var cancellationError = Marshal.GetLastWin32Error();
@@ -170,7 +177,23 @@ internal sealed class WindowsHIDTransport : IHIDTransport
     /// <inheritdoc/>
     public int Write(byte[] buffer, int timeoutMilliseconds)
     {
-        return PerformIO(buffer, true, timeoutMilliseconds);
+        var report = buffer;
+
+        // Windows requires the collection's maximum output length even for shorter report IDs.
+        // Linux hidraw, in contrast, must receive the length supplied by the device protocol.
+        if (buffer.Length < _outputReportLength)
+        {
+            report = new byte[_outputReportLength];
+
+            Buffer.BlockCopy(buffer, 0, report, 0, buffer.Length);
+        }
+
+        if (PerformIO(report, true, timeoutMilliseconds) != report.Length)
+        {
+            throw new IOException("The HID output report was only partially written.");
+        }
+
+        return buffer.Length;
     }
 
     #endregion

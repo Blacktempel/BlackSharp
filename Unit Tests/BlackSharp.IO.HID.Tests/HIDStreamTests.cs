@@ -105,10 +105,10 @@ public sealed class HIDStreamTests
     }
 
     /// <summary>
-    /// Verifies that output only device does not start A read worker and pads reports.
+    /// Verifies that an output-only device does not start a read worker or alter the report length.
     /// </summary>
     [TestMethod]
-    public void OutputOnlyDeviceDoesNotStartAReadWorkerAndPadsReports()
+    public void OutputOnlyDeviceDoesNotStartAReadWorkerAndPreservesReportLength()
     {
         // Arrange
         var transport = new TestTransport();
@@ -122,8 +122,41 @@ public sealed class HIDStreamTests
         // Assert
         Assert.IsFalse(transport.ReadEntered.IsSet);
         CollectionAssert.AreEqual(
-            new byte[] { 1, 2, 3, 0, 0, 0, 0, 0 },
+            new byte[] { 1, 2, 3 },
             transport.LastWrite);
+    }
+
+    /// <summary>
+    /// Verifies that offset-based protocol reports are not padded to a larger descriptor maximum.
+    /// </summary>
+    [TestMethod]
+    public void WritePreservesProtocolReportLengthAndSelectedBufferRange()
+    {
+        // Arrange
+        var transport = new TestTransport();
+
+        var device = new HIDDevice("test", 0, 128);
+        var buffer = new byte[70];
+
+        buffer[ 0] = 0xFF;
+        buffer[ 3] = 0xD0;
+        buffer[ 4] = 0x40;
+        buffer[66] = 0xAB;
+        buffer[67] = 0xFF;
+
+        using var stream = new HIDStream(device, transport);
+
+        // Act
+        stream.Write(buffer, 3, 64);
+
+        // Assert
+        Assert.HasCount(64, transport.LastWrite);
+
+        Assert.AreEqual((byte)0xD0, transport.LastWrite[0]);
+        Assert.AreEqual((byte)0x40, transport.LastWrite[1]);
+        Assert.AreEqual((byte)0xAB, transport.LastWrite[63]);
+
+        Assert.AreNotSame(buffer, transport.LastWrite);
     }
 
     #endregion
