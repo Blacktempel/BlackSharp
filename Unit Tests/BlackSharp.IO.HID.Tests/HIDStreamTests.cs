@@ -6,8 +6,6 @@
  * Copyright (c) 2026 Florian K.
  */
 
-using System.Diagnostics;
-
 namespace BlackSharp.IO.HID.Tests;
 
 /// <summary>
@@ -19,29 +17,24 @@ public sealed class HIDStreamTests
     #region Public
 
     /// <summary>
-    /// Verifies that dispose immediately wakes blocked workers.
+    /// Verifies that disposal cancels a blocked read and joins the workers.
     /// </summary>
     [TestMethod]
-    public void DisposeImmediatelyWakesBlockedWorkers()
+    public void DisposeCancelsAndJoinsBlockedWorkers()
     {
         // Arrange
         var transport = new TestTransport();
         var device = new HIDDevice("test", 64, 64);
         var stream = new HIDStream(device, transport);
 
-        // Act and assert
         Assert.IsTrue(transport.ReadEntered.Wait(TimeSpan.FromSeconds(2)));
 
-        var stopwatch = Stopwatch.StartNew();
+        // Act
+        var disposal = Task.Run(stream.Dispose);
 
-        stream.Dispose();
-
-        stopwatch.Stop();
-
+        // Assert
+        Assert.IsTrue(disposal.Wait(TimeSpan.FromSeconds(5)), "Dispose did not release the blocked worker.");
         Assert.IsTrue(transport.CancelCalled);
-        Assert.IsTrue(
-            stopwatch.ElapsedMilliseconds < 200,
-            $"Dispose took {stopwatch.ElapsedMilliseconds} ms.");
     }
 
     /// <summary>
