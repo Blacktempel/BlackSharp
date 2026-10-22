@@ -1,4 +1,6 @@
-﻿namespace BlackSharp.IO.Ports.Interop.Windows;
+﻿// SPDX-License-Identifier: MPL-2.0
+
+namespace BlackSharp.IO.Ports.Interop.Windows;
 
 /// <summary>
 /// Provides higher-level read operations for <see cref="WindowsDeviceStream"/>.

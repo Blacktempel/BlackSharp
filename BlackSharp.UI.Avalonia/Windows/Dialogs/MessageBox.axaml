@@ -1,3 +1,5 @@
+﻿<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 <dialog:DialogBase xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,10 +10,10 @@
                    WindowStartupLocation="CenterOwner">
     <dialog:DialogBase.Content>
         <Grid ColumnDefinitions="Auto,*">
-		    <Image Grid.Column="0" Margin="10" Width="32" Height="32" VerticalAlignment="Top">
+            <Image Grid.Column="0" Margin="10" Width="32" Height="32" VerticalAlignment="Top">
                 <Image.Source>
                     <DrawingImage>
-				        <GeometryDrawing Geometry="{Binding IconData, RelativeSource={RelativeSource FindAncestor, AncestorType=dialog:DialogBase}}"
+                        <GeometryDrawing Geometry="{Binding IconData, RelativeSource={RelativeSource FindAncestor, AncestorType=dialog:DialogBase}}"
                                          Brush="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
                     </DrawingImage>
                 </Image.Source>

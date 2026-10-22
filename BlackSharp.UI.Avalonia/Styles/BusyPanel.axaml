@@ -1,4 +1,6 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
+﻿<!-- SPDX-License-Identifier: MPL-2.0 -->
+
+<Styles xmlns="https://github.com/avaloniaui"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:ctrl="using:BlackSharp.UI.Avalonia.Controls">
 	<Design.PreviewWith>

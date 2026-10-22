@@ -1,4 +1,6 @@
-﻿using BlackSharp.Core.Extensions;
+﻿// SPDX-License-Identifier: MPL-2.0
+
+using BlackSharp.Core.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
 

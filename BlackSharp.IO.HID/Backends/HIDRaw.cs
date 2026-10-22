@@ -1,4 +1,6 @@
-﻿using BlackSharp.Core.Interop.Linux.Native;
+﻿// SPDX-License-Identifier: MPL-2.0
+
+using BlackSharp.Core.Interop.Linux.Native;
 using System.Runtime.InteropServices;
 
 namespace BlackSharp.IO.HID.Backends;
