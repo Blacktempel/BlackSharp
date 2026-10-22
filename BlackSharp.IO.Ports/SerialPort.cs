@@ -14,14 +14,11 @@ using OS = BlackSharp.Core.Platform.OperatingSystem;
 namespace BlackSharp.IO.Ports;
 
 /// <summary>
-/// Cross-platform serial port implementation for Windows and Linux.<br/>
-/// This class intentionally does not wrap System.IO.Ports.SerialPort.<br/>
-/// It talks to the OS directly so <see cref="Close"/> can be implemented without blocking the caller
-/// forever when a USB/VCP driver hangs during close.
+/// Provides serial port access on Windows and Linux through native operating-system APIs.<br/>
+/// <see cref="Close"/> uses a bounded wait when releasing a USB or virtual COM port.
 /// </summary>
 /// <remarks>
-/// Supported core API: Open, Close, Read, Write, DTR/RTS, read/write timeouts, input/output purge.<br/>
-/// Not implemented: DataReceived event, BaseStream, pin-changed events, Encoding-heavy text helpers.
+/// Supports opening, closing, reading, writing, DTR/RTS, read/write timeouts and input/output purge.
 /// </remarks>
 public class SerialPort : IDisposable
 {
@@ -292,7 +289,7 @@ public class SerialPort : IDisposable
     }
 
     /// <summary>
-    /// Attempts to close the port without allowing the caller to block forever.<br/>
+    /// Attempts to close the port with a bounded wait for the caller.<br/>
     /// Returns true if the native close completed within the timeout; false if close continues on
     /// a background thread.<br/>
     /// After a false result, discard this SerialPort instance.

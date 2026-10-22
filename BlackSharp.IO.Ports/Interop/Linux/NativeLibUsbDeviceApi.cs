@@ -7,7 +7,7 @@
  */
 
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
+using static BlackSharp.IO.Ports.Interop.Linux.LibUsb;
 
 namespace BlackSharp.IO.Ports.Interop.Linux;
 
@@ -18,8 +18,6 @@ namespace BlackSharp.IO.Ports.Interop.Linux;
 internal sealed class NativeLibUsbDeviceApi : ILibUsbDeviceApi
 {
     #region Fields
-
-    private const string LibraryName = "libusb-1.0.so.0";
 
     internal static readonly NativeLibUsbDeviceApi Instance = new();
 
@@ -66,81 +64,6 @@ internal sealed class NativeLibUsbDeviceApi : ILibUsbDeviceApi
 
     public int TransferControl(IntPtr handle, byte requestType, byte request, ushort value, ushort index, byte[] data, ushort length, uint timeout)
         => libusb_control_transfer(handle, requestType, request, value, index, data, length, timeout);
-
-    #endregion
-
-    #region Imports
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_attach_kernel_driver(IntPtr handle, int interfaceNumber);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_bulk_transfer(
-        IntPtr handle,
-        byte endpoint,
-        [In, Out] byte[] data,
-        int length,
-        out int transferred,
-        uint timeout);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_claim_interface(IntPtr handle, int interfaceNumber);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_clear_halt(IntPtr handle, byte endpoint);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern void libusb_close(IntPtr handle);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_control_transfer(
-        IntPtr handle,
-        byte requestType,
-        byte request,
-        ushort value,
-        ushort index,
-        [In, Out] byte[] data,
-        ushort length,
-        uint timeout);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_detach_kernel_driver(IntPtr handle, int interfaceNumber);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern void libusb_exit(IntPtr context);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern void libusb_free_device_list(IntPtr list, int unrefDevices);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern byte libusb_get_bus_number(IntPtr device);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_get_configuration(IntPtr handle, out int configuration);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern byte libusb_get_device_address(IntPtr device);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_get_device_descriptor(IntPtr device, out LibUsbDeviceDescriptor descriptor);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr libusb_get_device_list(IntPtr context, out IntPtr list);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_kernel_driver_active(IntPtr handle, int interfaceNumber);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_init(out IntPtr context);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_open(IntPtr device, out IntPtr handle);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_release_interface(IntPtr handle, int interfaceNumber);
-
-    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-    private static extern int libusb_set_configuration(IntPtr handle, int configuration);
 
     #endregion
 }

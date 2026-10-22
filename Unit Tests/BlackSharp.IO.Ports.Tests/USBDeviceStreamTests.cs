@@ -106,7 +106,7 @@ public sealed class USBDeviceStreamTests
     #region Nested Types
 
     /// <summary>
-    /// Provides deterministic libusb behavior without requiring USB hardware.
+    /// Provides deterministic simulated libusb behavior for stream tests.
     /// </summary>
     private sealed class TestLibUsbDeviceApi : ILibUsbDeviceApi
     {

@@ -1,0 +1,41 @@
+<!--
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+  Copyright (c) 2026 Florian K.
+-->
+
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- KeyboardSwitchingTabControl creates the popup outside its control template. -->
+    <ControlTheme x:Key="{x:Type Border}" TargetType="Border">
+        <Style Selector="^.tab-switcher-popup">
+            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BoxShadow" Value="0 12 32 0 #44000000"/>
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="TabSwitcherItemTheme"
+                  TargetType="ListBoxItem"
+                  BasedOn="{StaticResource {x:Type ListBoxItem}}">
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Padding" Value="6,2"/>
+        <Setter Property="Margin" Value="0,1"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ListBox}"
+                  TargetType="ListBox"
+                  BasedOn="{StaticResource {x:Type ListBox}}">
+        <Style Selector="^.tab-switcher-items">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ItemContainerTheme" Value="{StaticResource TabSwitcherItemTheme}"/>
+        </Style>
+    </ControlTheme>
+
+</ResourceDictionary>

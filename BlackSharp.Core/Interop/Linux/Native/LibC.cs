@@ -84,13 +84,13 @@ public static class LibC
     public const uint CS7 = 0x00000020;
     /// <summary>Selects eight data bits per character.</summary>
     public const uint CS8 = 0x00000030;
-    /// <summary>Selects two stop bits instead of one.</summary>
+    /// <summary>Selects two stop bits.</summary>
     public const uint CSTOPB = 0x00000040;
     /// <summary>Enables the serial receiver.</summary>
     public const uint CREAD = 0x00000080;
     /// <summary>Enables parity generation and checking.</summary>
     public const uint PARENB = 0x00000100;
-    /// <summary>Selects odd parity instead of even parity.</summary>
+    /// <summary>Selects odd parity.</summary>
     public const uint PARODD = 0x00000200;
     /// <summary>Lowers modem control lines after the final close.</summary>
     public const uint HUPCL = 0x00000400;
@@ -194,6 +194,12 @@ public static class LibC
     #region Imports
 
     /// <summary>
+    /// Assigns a local address to a socket.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int bind(int descriptor, byte[] address, uint length);
+
+    /// <summary>
     /// Configures a terminal structure for raw input and output.
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
@@ -228,6 +234,18 @@ public static class LibC
     /// </summary>
     [DllImport(LIBRARY_NAME)]
     public static extern void free(IntPtr pointer);
+
+    /// <summary>
+    /// Gets the effective user identifier of the current process.
+    /// </summary>
+    [DllImport(LIBRARY_NAME)]
+    public static extern uint geteuid();
+
+    /// <summary>
+    /// Resolves a network interface name to its kernel index.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern uint if_nametoindex(string interfaceName);
 
     /// <summary>
     /// Performs a device-control request with an integer argument.
@@ -300,6 +318,18 @@ public static class LibC
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
     public static extern IntPtr realpath(string path, IntPtr resolvedPath);
+
+    /// <summary>
+    /// Sends a datagram to a socket address.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern IntPtr sendto(int descriptor, byte[] buffer, UIntPtr length, int flags, byte[] address, uint addressLength);
+
+    /// <summary>
+    /// Creates a socket with the supplied domain, type, and protocol.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int socket(int domain, int type, int protocol);
 
     /// <summary>
     /// Discards queued terminal input, output, or both.

@@ -25,7 +25,7 @@ namespace BlackSharp.UI.Avalonia.Behaviors
     /// Adds pointer-based row reordering to an Avalonia DataGrid-compatible control.
     /// </summary>
     /// <remarks>
-    /// The behavior intentionally targets <see cref="Control"/> instead of a concrete DataGrid type.
+    /// The behavior targets <see cref="Control"/> to support different DataGrid implementations.
     /// It can therefore be used with both Avalonia DataGrid and compatible implementations such as
     /// ProDataGrid. The associated control must expose registered <c>ItemsSource</c> and
     /// <c>SelectedItem</c> properties.
@@ -163,7 +163,7 @@ namespace BlackSharp.UI.Avalonia.Behaviors
         /// Gets or sets the template used to display the dragged item.
         /// </summary>
         /// <remarks>
-        /// If no template is assigned, the behavior displays a live visual copy of the dragged row.
+        /// The default preview is a live visual copy of the dragged row.
         /// </remarks>
         public IDataTemplate DragPreviewTemplate
         {
@@ -225,8 +225,7 @@ namespace BlackSharp.UI.Avalonia.Behaviors
         /// </summary>
         /// <remarks>
         /// The command parameter is an <see cref="ItemReorderRequestedEventArgs"/> instance.
-        /// If no command or event handler handles the request, the behavior attempts to move the
-        /// item in its writable items source.
+        /// The behavior moves the item in a writable items source as the default reorder action.
         /// </remarks>
         public ICommand ReorderCommand
         {

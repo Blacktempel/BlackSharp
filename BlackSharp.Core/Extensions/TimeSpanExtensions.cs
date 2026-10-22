@@ -16,7 +16,7 @@ namespace BlackSharp.Core.Extensions
         #region Public
 
         /// <summary>
-        /// Converts a duration to non-negative whole milliseconds without under-reporting partial milliseconds.
+        /// Converts a duration to non-negative whole milliseconds, rounding partial milliseconds upward.
         /// </summary>
         /// <param name="duration">Duration to convert.</param>
         /// <returns>The non-negative duration in whole milliseconds, rounded towards positive infinity.</returns>

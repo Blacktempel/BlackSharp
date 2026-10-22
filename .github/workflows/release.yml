@@ -129,6 +129,7 @@ jobs:
             'BlackSharp.IO.HID'
             'BlackSharp.IO.Ports'
             'BlackSharp.MVVM'
+            'BlackSharp.Platform.Startup'
             'BlackSharp.UI.Avalonia'
           )
           $packages = @(Get-ChildItem -LiteralPath 'staging/NuGet' -Filter '*.nupkg' -File | Sort-Object Name)
@@ -304,6 +305,7 @@ jobs:
             'BlackSharp.IO.HID'
             'BlackSharp.IO.Ports'
             'BlackSharp.MVVM'
+            'BlackSharp.Platform.Startup'
             'BlackSharp.UI.Avalonia'
           )
           $packages = @(Get-ChildItem -LiteralPath 'dist/packages/NuGet' -Filter '*.nupkg' -File | Sort-Object Name)

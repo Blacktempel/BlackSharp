@@ -45,7 +45,10 @@
     <AvaloniaResource Include="Styles\BusyPanel.axaml" />
     <AvaloniaResource Include="Styles\Styles.axaml" />
     <AvaloniaResource Include="Themes\DialogBase.axaml" />
+    <AvaloniaResource Include="Themes\DecoratedWindow.axaml" />
     <AvaloniaResource Include="Themes\Geometries.axaml" />
+    <AvaloniaResource Include="Themes\GlobalFontThemes.axaml" />
+    <AvaloniaResource Include="Themes\KeyboardSwitchingTabControl.axaml" />
     <AvaloniaResource Include="Themes\TextBoxNumber.axaml" />
     <AvaloniaResource Include="Themes\Themes.axaml" />
   </ItemGroup>

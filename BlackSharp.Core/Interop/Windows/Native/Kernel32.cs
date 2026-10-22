@@ -12,6 +12,7 @@ using Microsoft.Win32.SafeHandles;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Text;
 
 namespace BlackSharp.Core.Interop.Windows.Native
 {
@@ -212,7 +213,7 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public static extern SafeFileHandle CreateFileS(string lpFileName, DesiredAccess dwDesiredAccess, FileShareMode dwShareMode, ref SecurityAttributes lpSecurityAttributes, FileCreationDisposition dwCreationDisposition, FileFlagsAndAttributes dwFlagsAndAttributes, IntPtr hTemplateFile);
 
         /// <summary>
-        /// Creates or opens a mutex without explicit security attributes.
+        /// Creates or opens a mutex using the default security attributes.
         /// </summary>
         [DllImport(DLL_NAME, CharSet = CharSet.Unicode)]
         public static extern IntPtr CreateMutex(IntPtr lpMutexAttributes, bool bInitialOwner, string lpName);
@@ -250,6 +251,26 @@ namespace BlackSharp.Core.Interop.Windows.Native
         [DllImport(DLL_NAME, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool EscapeCommFunction(IntPtr hFile, uint dwFunc);
+
+        /// <summary>
+        /// Begins enumeration of Windows volume GUID paths.
+        /// </summary>
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern IntPtr FindFirstVolume(StringBuilder volumeName, int bufferLength);
+
+        /// <summary>
+        /// Reads the next volume GUID path.
+        /// </summary>
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FindNextVolume(IntPtr findHandle, StringBuilder volumeName, int bufferLength);
+
+        /// <summary>
+        /// Closes a volume enumeration handle.
+        /// </summary>
+        [DllImport(DLL_NAME, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FindVolumeClose(IntPtr findHandle);
 
         /// <summary>
         /// Releases a loaded dynamic-link library.
@@ -358,6 +379,12 @@ namespace BlackSharp.Core.Interop.Windows.Native
         [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static extern IntPtr LoadLibrary(string lpFileName);
+
+        /// <summary>
+        /// Releases memory allocated by a Windows local-memory function.
+        /// </summary>
+        [DllImport(DLL_NAME, SetLastError = true)]
+        public static extern IntPtr LocalFree(IntPtr hMem);
 
         /// <summary>
         /// Opens an existing named mutex.

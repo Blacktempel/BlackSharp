@@ -84,8 +84,7 @@ namespace BlackSharp.UI.Avalonia.Data
         /// Provides this binding instance when the binding is used as an Avalonia XAML markup extension.
         /// </summary>
         /// <param name="serviceProvider">
-        /// The XAML service provider supplied by Avalonia.<br/>
-        /// This binding does not require it because all binding configuration is already stored on the instance.
+        /// The XAML service provider supplied by Avalonia.
         /// </param>
         /// <returns>
         /// The current <see cref="ScaleBinding"/> instance.

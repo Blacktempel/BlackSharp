@@ -174,6 +174,11 @@ namespace BlackSharp.Core.Logging
         private readonly List<LogItem> _log = new List<LogItem>();
 
         /// <summary>
+        /// Stores the minimum severity with visibility across logging and configuration threads.
+        /// </summary>
+        private int _minimumLogLevel = (int)LogLevel.Error;
+
+        /// <summary>
         /// Tracks which in-memory entries were already appended to each destination file.
         /// </summary>
         private readonly Dictionary<string, int> _savedEntryCounts = new Dictionary<string, int>(
@@ -206,7 +211,11 @@ namespace BlackSharp.Core.Logging
         /// <summary>
         /// Gets or sets the minimum severity. The memory-only default is <see cref="LogLevel.Error"/>.
         /// </summary>
-        public LogLevel LogLevel { get; set; } = LogLevel.Error;
+        public LogLevel LogLevel
+        {
+            get => (LogLevel)Volatile.Read(ref _minimumLogLevel);
+            set => Volatile.Write(ref _minimumLogLevel, (int)value);
+        }
 
         #endregion
 
@@ -289,7 +298,7 @@ namespace BlackSharp.Core.Logging
 
         /// <summary>
         /// Appends a preformatted entry to a file-backed logger using the same rotation rules.
-        /// Raw entries intentionally bypass severity filtering so crash and audit records are not discarded.
+        /// Writes raw crash and audit entries directly while applying file rotation.
         /// </summary>
         /// <param name="entry">The complete entry text.</param>
         /// <returns>Whether the entry was written successfully; memory-only loggers return <see langword="false"/>.</returns>

@@ -13,8 +13,7 @@ namespace BlackSharp.UI.Avalonia.Attached
     /// <summary>
     /// Provides an attached property for associating arbitrary user-defined data with Avalonia objects.
     /// </summary>
-    /// <remarks>The attached property enables developers to store custom data on Avalonia objects without
-    /// modifying their types.<br/>
+    /// <remarks>The attached property enables developers to associate custom data with Avalonia objects.<br/>
     /// This is useful for scenarios where additional information needs to be associated with UI
     /// elements, such as tagging, metadata, or context-specific values.</remarks>
     public static class UserData

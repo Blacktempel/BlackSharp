@@ -150,7 +150,7 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
         public DialogButtonType Result { get; protected set; }
 
         /// <summary>
-        /// Gets or sets whether this dialog may be shown without a desktop main window as its owner.
+        /// Gets or sets whether this dialog supports an ownerless desktop window.
         /// The default is <see langword="false"/>.
         /// </summary>
         public bool AllowOwnerlessDisplay { get; set; }
@@ -223,8 +223,8 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
         /// <param name="title">The text to display in the title bar of the dialog box. Cannot be null.</param>
         /// <param name="message">The message to display in the body of the dialog box. Cannot be null.</param>
         /// <param name="dialogButtons">A value that specifies which buttons to display in the dialog box.</param>
-        /// <param name="customButtons">A collection of custom buttons to display in addition to or instead of the standard buttons.<br/>
-        /// Can be null or empty if no custom buttons are needed.</param>
+        /// <param name="customButtons">A collection of custom buttons that may supplement or replace the standard buttons.<br/>
+        /// Pass <see langword="null"/> or an empty collection to use the standard buttons.</param>
         public void Show(string title, string message, DialogButtons dialogButtons, IEnumerable<DialogButton> customButtons)
         {
             ShowWindow(title, message, dialogButtons, customButtons, false);
@@ -265,8 +265,8 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
         /// <param name="title">The text to display in the title bar of the dialog box. Cannot be null.</param>
         /// <param name="message">The message to display in the body of the dialog box. Cannot be null.</param>
         /// <param name="dialogButtons">A value that specifies which buttons to display in the dialog box.</param>
-        /// <param name="customButtons">A collection of custom buttons to display in addition to or instead of the standard buttons.<br/>
-        /// Can be null or empty if no custom buttons are needed.</param>
+        /// <param name="customButtons">A collection of custom buttons that may supplement or replace the standard buttons.<br/>
+        /// Pass <see langword="null"/> or an empty collection to use the standard buttons.</param>
         public void ShowDialog(string title, string message, DialogButtons dialogButtons, IEnumerable<DialogButton> customButtons)
         {
             ShowWindow(title, message, dialogButtons, customButtons, true);
@@ -323,7 +323,7 @@ namespace BlackSharp.UI.Avalonia.Windows.Dialogs
         #region Private
 
         /// <summary>
-        /// Shows this dialog with the desktop main window as owner, or without an owner when explicitly allowed.
+        /// Shows this dialog with its configured desktop window ownership.
         /// </summary>
         /// <param name="title">The dialog title.</param>
         /// <param name="message">The dialog message.</param>

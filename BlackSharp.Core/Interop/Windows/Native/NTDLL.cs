@@ -32,6 +32,12 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public static extern int NtQuerySystemInformation(int systemInformationClass, IntPtr systemInformation, uint systemInformationLength, out uint returnLength);
 
         /// <summary>
+        /// Retrieves code-integrity system information into a typed buffer.
+        /// </summary>
+        [DllImport(DLL_NAME)]
+        public static extern int NtQuerySystemInformation(int systemInformationClass, ref SystemCodeIntegrityInformation systemInformation, uint systemInformationLength, out uint returnLength);
+
+        /// <summary>
         /// Retrieves the operating-system version from the native runtime library.
         /// </summary>
         [SecurityCritical]

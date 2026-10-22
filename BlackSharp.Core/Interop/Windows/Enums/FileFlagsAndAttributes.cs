@@ -30,7 +30,7 @@ namespace BlackSharp.Core.Interop.Windows.Enums
         Archive             = 0x00000020,
         /// <summary>Identifies a reserved device attribute.</summary>
         Device              = 0x00000040,
-        /// <summary>Identifies a file without other attributes.</summary>
+        /// <summary>Identifies a file with the normal attribute.</summary>
         Normal              = 0x00000080,
         /// <summary>Marks a file as temporary.</summary>
         Temporary           = 0x00000100,
@@ -72,7 +72,7 @@ namespace BlackSharp.Core.Interop.Windows.Enums
         PosixSemantics      = 0x01000000,
         /// <summary>Restricts a file handle to the creating session.</summary>
         SessionAware        = 0x00800000,
-        /// <summary>Opens a reparse point instead of its target.</summary>
+        /// <summary>Opens the reparse point itself.</summary>
         OpenReparsePoint    = 0x00200000,
         /// <summary>Prevents recall of offline file data.</summary>
         OpenNoRecall        = 0x00100000,
@@ -82,7 +82,7 @@ namespace BlackSharp.Core.Interop.Windows.Enums
         //Security QoS flags - also passed via dwFlagsAndAttributes
         /// <summary>Uses anonymous impersonation.</summary>
         SecurityAnonymous       = 0x00000000,
-        /// <summary>Allows identification of the caller without impersonation.</summary>
+        /// <summary>Allows the server to identify the caller at the identification level.</summary>
         SecurityIdentification  = 0x00010000,
         /// <summary>Allows impersonation of the caller on the local system.</summary>
         SecurityImpersonation   = 0x00020000,

@@ -16,7 +16,7 @@ public static class HIDDeviceExtensions
     #region Public
 
     /// <summary>
-    /// Gets the device path, using an empty string when the device does not expose one.
+    /// Gets the device path, using an empty string for an unspecified path.
     /// </summary>
     /// <param name="device">The HID device to inspect.</param>
     /// <returns>The device path.</returns>

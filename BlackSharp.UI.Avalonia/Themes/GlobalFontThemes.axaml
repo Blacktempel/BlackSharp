@@ -1,0 +1,203 @@
+<!--
+  This Source Code Form is subject to the terms of the Mozilla Public
+  License, v. 2.0. If a copy of the MPL was not distributed with this
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+  Copyright (c) 2026 Florian K.
+-->
+
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fonts="using:BlackSharp.UI.Avalonia.Global"
+                    xmlns:controls="using:BlackSharp.UI.Avalonia.Controls">
+
+    <!-- Include this dictionary after the application's visual theme to opt into global typography. -->
+
+    <ControlTheme x:Key="{x:Type controls:DecoratedWindow}"
+                  TargetType="controls:DecoratedWindow"
+                  BasedOn="{StaticResource DecoratedWindowBaseTheme}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type Window}"
+                  TargetType="Window"
+                  BasedOn="{StaticResource {x:Type Window}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type Button}"
+                  TargetType="Button"
+                  BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type TextBox}"
+                  TargetType="TextBox"
+                  BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type NumericUpDown}"
+                  TargetType="NumericUpDown"
+                  BasedOn="{StaticResource {x:Type NumericUpDown}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ComboBox}"
+                  TargetType="ComboBox"
+                  BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type CheckBox}"
+                  TargetType="CheckBox"
+                  BasedOn="{StaticResource {x:Type CheckBox}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ListBox}"
+                  TargetType="ListBox"
+                  BasedOn="{StaticResource {x:Type ListBox}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ListBoxItem}"
+                  TargetType="ListBoxItem"
+                  BasedOn="{StaticResource {x:Type ListBoxItem}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type TabControl}"
+                  TargetType="TabControl"
+                  BasedOn="{StaticResource {x:Type TabControl}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type TabItem}"
+                  TargetType="TabItem"
+                  BasedOn="{StaticResource {x:Type TabItem}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type Menu}"
+                  TargetType="Menu"
+                  BasedOn="{StaticResource {x:Type Menu}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type MenuItem}"
+                  TargetType="MenuItem"
+                  BasedOn="{StaticResource {x:Type MenuItem}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type RadioButton}"
+                  TargetType="RadioButton"
+                  BasedOn="{StaticResource {x:Type RadioButton}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type Slider}"
+                  TargetType="Slider"
+                  BasedOn="{StaticResource {x:Type Slider}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ProgressBar}"
+                  TargetType="ProgressBar"
+                  BasedOn="{StaticResource {x:Type ProgressBar}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type TreeView}"
+                  TargetType="TreeView"
+                  BasedOn="{StaticResource {x:Type TreeView}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type TreeViewItem}"
+                  TargetType="TreeViewItem"
+                  BasedOn="{StaticResource {x:Type TreeViewItem}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ScrollViewer}"
+                  TargetType="ScrollViewer"
+                  BasedOn="{StaticResource {x:Type ScrollViewer}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ToolTip}"
+                  TargetType="ToolTip"
+                  BasedOn="{StaticResource {x:Type ToolTip}}">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type TextBlock}" TargetType="TextBlock">
+        <Setter Property="FontFamily"
+                Value="{Binding FontFamily, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+        <Setter Property="FontSize"
+                Value="{Binding FontSize, Source={x:Static fonts:GlobalFontSettings.Current}}"/>
+    </ControlTheme>
+
+</ResourceDictionary>

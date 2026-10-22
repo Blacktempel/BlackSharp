@@ -62,7 +62,7 @@ public sealed class HIDStreamTests
     }
 
     /// <summary>
-    /// Verifies that queued write is not sent after its timeout.
+    /// Verifies expiration of a queued write after its timeout.
     /// </summary>
     [TestMethod]
     public void QueuedWriteIsNotSentAfterItsTimeout()
@@ -98,7 +98,7 @@ public sealed class HIDStreamTests
     }
 
     /// <summary>
-    /// Verifies that an output-only device does not start a read worker or alter the report length.
+    /// Verifies output-only device setup and report-length preservation.
     /// </summary>
     [TestMethod]
     public void OutputOnlyDeviceDoesNotStartAReadWorkerAndPreservesReportLength()
@@ -120,7 +120,7 @@ public sealed class HIDStreamTests
     }
 
     /// <summary>
-    /// Verifies that offset-based protocol reports are not padded to a larger descriptor maximum.
+    /// Verifies the protocol-defined length of offset-based reports.
     /// </summary>
     [TestMethod]
     public void WritePreservesProtocolReportLengthAndSelectedBufferRange()

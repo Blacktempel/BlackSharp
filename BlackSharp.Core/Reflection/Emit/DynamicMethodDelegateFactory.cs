@@ -23,7 +23,7 @@ namespace BlackSharp.Core.Reflection.Emit
     public delegate TRet DynamicMethodDelegate<TRet>(object target, params object[] args);
 
     /// <summary>
-    /// Invokes a dynamically generated method without a return value.
+    /// Invokes a dynamically generated void method.
     /// </summary>
     /// <param name="target">The target instance, or <see langword="null"/> for a static method.</param>
     /// <param name="args">The method arguments.</param>

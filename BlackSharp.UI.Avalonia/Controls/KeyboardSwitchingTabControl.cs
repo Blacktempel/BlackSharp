@@ -25,15 +25,15 @@ namespace BlackSharp.UI.Avalonia.Controls
     /// while Escape cancels the preview. The displayed item template is supplied by the application.
     /// The overlay border receives the <c>tab-switcher-popup</c> class and its list receives
     /// <c>tab-switcher-items</c>. Applications can style those elements and the list's
-    /// <see cref="ListBoxItem"/> containers. These styles are optional for keyboard behavior;
-    /// without them, Avalonia's default list appearance is used.
+    /// <see cref="ListBoxItem"/> containers. Avalonia's default list appearance supports
+    /// the keyboard behavior as well.
     /// </remarks>
     public class KeyboardSwitchingTabControl : ReorderableTabControl
     {
         #region Fields
 
         /// <summary>
-        /// Provides a text-only preview when neither a switcher nor a tab item template is supplied.
+        /// Provides the default text preview for switcher items.
         /// </summary>
         private static readonly IDataTemplate s_defaultSwitchItemTemplate =
             new FuncDataTemplate<object>((item, _) => new TextBlock
@@ -62,7 +62,7 @@ namespace BlackSharp.UI.Avalonia.Controls
         private int _switcherIndex;
 
         /// <summary>
-        /// Hosts the popup above the window content without changing tab layout.
+        /// Hosts the tab-switching popup above the window content.
         /// </summary>
         private OverlayLayer _overlayLayer;
 

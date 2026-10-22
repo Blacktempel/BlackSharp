@@ -12,9 +12,8 @@
 **Reusable .NET building blocks for application logic, device communication and desktop interfaces.**
 
 BlackSharp brings commonly needed functionality into a set of focused libraries:
-core utilities, USB HID communication, native serial and raw USB access, MVVM
-helpers and Avalonia controls. Share proven building blocks across applications
-without copying infrastructure code into every project.
+core utilities, USB HID communication, native serial and raw USB access, Startup services,
+MVVM helpers and Avalonia controls.
 
 The libraries are general-purpose components.
 
@@ -26,6 +25,7 @@ The libraries are general-purpose components.
   cancellable worker-based I/O on Windows and Linux
 - **Native serial and raw USB access** with configurable timeouts, flow control,
   device discovery and platform-specific transports
+- **Startup services** for Windows and Linux, including service registration and management
 - **MVVM foundations** built on
   [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet),
   including view-model bases, drag-and-drop contracts and shared dialog models
@@ -43,6 +43,9 @@ Start with `BlackSharp.Core` for shared application utilities.
 Add `BlackSharp.IO.HID` for HID devices or `BlackSharp.IO.Ports` for serial and raw
 USB communication.
 
+Use `BlackSharp.Platform.Startup` to register boot or login startup commands
+and check process privileges on Windows and Linux.
+
 Use `BlackSharp.MVVM` for view-model infrastructure and
 `BlackSharp.UI.Avalonia` for the Avalonia integration.
 
@@ -54,11 +57,12 @@ Use `BlackSharp.MVVM` for view-model infrastructure and
 | [`BlackSharp.IO.HID`](BlackSharp.IO.HID/) | [![NuGet](https://img.shields.io/nuget/v/BlackSharp.IO.HID?label=NuGet&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.IO.HID/) | [![Downloads](https://img.shields.io/nuget/dt/BlackSharp.IO.HID?label=Downloads&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.IO.HID/) | USB HID discovery, report handling and device streams |
 | [`BlackSharp.IO.Ports`](BlackSharp.IO.Ports/) | [![NuGet](https://img.shields.io/nuget/v/BlackSharp.IO.Ports?label=NuGet&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.IO.Ports/) | [![Downloads](https://img.shields.io/nuget/dt/BlackSharp.IO.Ports?label=Downloads&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.IO.Ports/) | Native serial communication and raw USB device access |
 | [`BlackSharp.MVVM`](BlackSharp.MVVM/) | [![NuGet](https://img.shields.io/nuget/v/BlackSharp.MVVM?label=NuGet&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.MVVM/) | [![Downloads](https://img.shields.io/nuget/dt/BlackSharp.MVVM?label=Downloads&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.MVVM/) | View-model bases and shared MVVM contracts |
+| [`BlackSharp.Platform.Startup`](BlackSharp.Platform.Startup/) | [![NuGet](https://img.shields.io/nuget/v/BlackSharp.Platform.Startup?label=NuGet&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.Platform.Startup/) | [![Downloads](https://img.shields.io/nuget/dt/BlackSharp.Platform.Startup?label=Downloads&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.Platform.Startup/) | Cross-platform startup services for applications |
 | [`BlackSharp.UI.Avalonia`](BlackSharp.UI.Avalonia/) | [![NuGet](https://img.shields.io/nuget/v/BlackSharp.UI.Avalonia?label=NuGet&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.UI.Avalonia/) | [![Downloads](https://img.shields.io/nuget/dt/BlackSharp.UI.Avalonia?label=Downloads&logo=nuget&logoColor=white)](https://www.nuget.org/packages/BlackSharp.UI.Avalonia/) | Avalonia controls, dialogs, behaviors, styles and desktop integration |
 
 ## Supported .NET versions
 
-| Target | Core, IO.HID and IO.Ports | MVVM and UI.Avalonia |
+| Target | Core, IO.HID and IO.Ports | Platform.Startup, MVVM and UI.Avalonia |
 | --- | --- | --- |
 | .NET Framework 4.7.2 | ✅ | ❌ |
 | .NET Framework 4.8.1 | ✅ | ❌ |
@@ -106,7 +110,7 @@ consumer.
 ## Versioning
 
 [`Versions/BLACKSHARP.VERSION`](Versions/BLACKSHARP.VERSION) is the single
-authoritative version for the five NuGet packages and the projects that produce
+authoritative version for all NuGet packages and the projects that produce
 them. Change only this file to prepare the next version; individual project
 files do not carry separate release numbers.
 

@@ -171,7 +171,7 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public static extern bool SetupDiGetDeviceInstanceId(IntPtr deviceInfoSet, ref DeviceInfoData deviceInfoData, [Out] char[] deviceInstanceId, int deviceInstanceIdSize, out int requiredSize);
 
         /// <summary>
-        /// Retrieves device-interface detail without returning device information.
+        /// Retrieves the device-interface detail for the specified interface.
         /// </summary>
         [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>Cross-platform startup services for applications.</Description>
+    <Copyright>Florian K.</Copyright>
+    <PackageProjectUrl>https://github.com/Blacktempel/BlackSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
+    <PackageTags>startup;autostart;systemd;task-scheduler;windows;linux</PackageTags>
+    <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
+    <Version>$(BlackSharpVersion)</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TaskScheduler" Version="2.12.2" />
+    <ProjectReference Include="..\BlackSharp.Core\BlackSharp.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

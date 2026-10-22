@@ -215,6 +215,12 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public static extern int RegEnumKeyEx(IntPtr key, uint index, StringBuilder name, ref uint nameLength, IntPtr reserved, IntPtr keyClass, IntPtr keyClassLength, IntPtr lastWriteTime);
 
         /// <summary>
+        /// Reads a registry value with optional type restrictions.
+        /// </summary>
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode)]
+        public static extern int RegGetValue(IntPtr key, string subKey, string value, uint flags, out uint type, out uint data, ref uint dataSize);
+
+        /// <summary>
         /// Opens a registry key.
         /// </summary>
         [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
