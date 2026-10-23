@@ -5,6 +5,10 @@ using BlackSharp.Platform.Startup.Utilities;
 using System.Text;
 using PlatformOperatingSystem = BlackSharp.Core.Platform.OperatingSystem;
 
+#if !NET8_0_OR_GREATER
+using BlackSharp.Core.Interop.Linux.Native;
+#endif
+
 #pragma warning disable CA1416 // Platform compatibility warning
 
 namespace BlackSharp.Platform.Startup.Platform.Linux
@@ -14,6 +18,15 @@ namespace BlackSharp.Platform.Startup.Platform.Linux
     /// </summary>
     public static class LinuxDesktopAutostartRegistration
     {
+        #region Fields
+
+#if !NET8_0_OR_GREATER
+        /// <summary>Grants the owner read/write and everyone else read access (0644).</summary>
+        private const uint WORLD_READABLE_FILE_MODE = 0x1A4;
+#endif
+
+#endregion
+
         #region Public
 
         /// <summary>
@@ -72,8 +85,15 @@ namespace BlackSharp.Platform.Startup.Platform.Linux
 
             if (worldReadable)
             {
+#if NET8_0_OR_GREATER
                 File.SetUnixFileMode(desktopEntryPath,
                     UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.GroupRead | UnixFileMode.OtherRead);
+#else
+                if (LibC.chmod(desktopEntryPath, WORLD_READABLE_FILE_MODE) != 0)
+                {
+                    throw new IOException($"Could not set permissions for '{desktopEntryPath}'.", LibC.LastErrnoException());
+                }
+#endif
             }
         }
 
@@ -104,7 +124,7 @@ namespace BlackSharp.Platform.Startup.Platform.Linux
                 + "Terminal=false\nNoDisplay=true\n";
         }
 
-        #endregion
+#endregion
     }
 }
 

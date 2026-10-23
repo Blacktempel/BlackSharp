@@ -161,10 +161,14 @@ namespace BlackSharp.Platform.Startup.Platform.Linux
                 UseShellExecute        = false,
             };
 
+#if NET8_0_OR_GREATER
             foreach (var argument in arguments)
             {
                 startInfo.ArgumentList.Add(argument);
             }
+#else
+            startInfo.Arguments = string.Join(" ", arguments.Select(StartupArgumentQuoting.QuoteWindowsArgument));
+#endif
 
             using var process = Process.Start(startInfo)
                 ?? throw new InvalidOperationException($"The startup registration utility '{executablePath}' could not be started.");
@@ -197,6 +201,6 @@ namespace BlackSharp.Platform.Startup.Platform.Linux
                 $"The startup registration utility '{executablePath}' failed with exit code {result.ExitCode}: {message.Trim()}");
         }
 
-        #endregion
+#endregion
     }
 }

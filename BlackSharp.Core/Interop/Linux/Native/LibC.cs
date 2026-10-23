@@ -212,6 +212,12 @@ public static class LibC
     public static extern int cfsetospeed(ref Termios termios, uint speed);
 
     /// <summary>
+    /// Changes the permission bits of a file or directory.
+    /// </summary>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int chmod(string path, uint mode);
+
+    /// <summary>
     /// Closes a file descriptor.
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
