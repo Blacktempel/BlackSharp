@@ -1,5 +1,9 @@
 ﻿<h1 align="center">BlackSharp</h1>
 
+<p align="center">
+    <img src="https://raw.githubusercontent.com/Blacktempel/BlackSharp/master/Assets/BlackSharpFull.png" width="128" height="128"/>
+</p>
+
 [![Windows](https://img.shields.io/badge/Windows-supported-0078D4?logo=windows)](#platform-support)
 [![Linux](https://img.shields.io/badge/Linux-supported-FCC624?logo=linux&logoColor=black)](#platform-support)
 [![Build](https://img.shields.io/github/actions/workflow/status/Blacktempel/BlackSharp/master.yml?branch=master&label=Build&logo=githubactions&logoColor=white)](https://github.com/Blacktempel/BlackSharp/actions/workflows/master.yml)
