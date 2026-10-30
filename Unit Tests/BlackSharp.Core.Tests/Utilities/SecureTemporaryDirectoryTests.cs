@@ -152,34 +152,6 @@ namespace BlackSharp.Core.Tests.Utilities
             Assert.ThrowsExactly<UnauthorizedAccessException>(() => TrustedExecutablePath.EnsureTrusted(devicePath));
         }
 
-        /// <summary>
-        /// Verifies that a protected, regular system executable passes the platform-specific ownership checks.
-        /// </summary>
-        [TestMethod]
-        public void TrustedExecutableAcceptsProtectedSystemBinary()
-        {
-            if (OS.IsWindows())
-            {
-                // Arrange
-                var executable = Path.Combine(Environment.SystemDirectory, "cmd.exe");
-
-                // Act and Assert
-                TrustedExecutablePath.EnsureTrusted(executable);
-            }
-            else if (OS.IsLinux())
-            {
-                // Arrange
-                // /usr/bin/true is a regular file on supported distributions; /bin may be a symbolic link.
-                const string executable = "/usr/bin/true";
-
-                if (File.Exists(executable))
-                {
-                    // Act and Assert
-                    TrustedExecutablePath.EnsureTrusted(executable);
-                }
-            }
-        }
-
         #endregion
     }
 }

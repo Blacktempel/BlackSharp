@@ -45,6 +45,16 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public const uint OPEN_EXISTING = 3;
 
         /// <summary>
+        /// Searches the loaded library's directory when resolving its dependencies from an absolute library path.
+        /// </summary>
+        public const uint LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR = 0x00000100;
+
+        /// <summary>
+        /// Searches the operating system's System32 directory when resolving library dependencies.
+        /// </summary>
+        public const uint LOAD_LIBRARY_SEARCH_SYSTEM32 = 0x00000800;
+
+        /// <summary>
         /// Terminates pending transmit operations.
         /// </summary>
         public const uint PurgeTxAbort = 0x0001;
@@ -383,6 +393,17 @@ namespace BlackSharp.Core.Interop.Windows.Native
         [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static extern IntPtr LoadLibrary(string lpFileName);
+
+        /// <summary>
+        /// Loads a dynamic-link library using explicit dependency-search flags.
+        /// </summary>
+        /// <param name="path">The library path; an absolute path is required when searching the loaded library's directory.</param>
+        /// <param name="reserved">The reserved file handle, which must be zero.</param>
+        /// <param name="flags">The loading and dependency-search flags.</param>
+        /// <returns>The loaded module handle, or zero on failure with the last Windows error set.</returns>
+        [DllImport(DLL_NAME, EntryPoint = "LoadLibraryExW", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static extern IntPtr LoadLibraryEx(string path, IntPtr reserved, uint flags);
 
         /// <summary>
         /// Releases memory allocated by a Windows local-memory function.
