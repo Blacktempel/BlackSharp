@@ -120,7 +120,10 @@ namespace BlackSharp.Core.Interop.Windows.Mutexes
 
             if (_WorldMutex != IntPtr.Zero)
             {
-                return Kernel32.WaitForSingleObject(_WorldMutex, millisecondsTimeout) == 0;
+                // WAIT_ABANDONED also transfers ownership to this thread; the guard must release it.
+                var result = Kernel32.WaitForSingleObject(_WorldMutex, millisecondsTimeout);
+
+                return result == 0 || result == 0x80;
             }
 
             return false;

@@ -1,6 +1,6 @@
 ﻿// SPDX-License-Identifier: MPL-2.0
 
-using System.Runtime.InteropServices;
+using OS = BlackSharp.Core.Platform.OperatingSystem;
 
 namespace BlackSharp.IO.HID;
 
@@ -9,6 +9,8 @@ namespace BlackSharp.IO.HID;
 /// </summary>
 internal static class HIDBackendFactory
 {
+    #region Public
+
     /// <summary>
     /// Processes open for the HID backend component.
     /// </summary>
@@ -17,21 +19,23 @@ internal static class HIDBackendFactory
     /// <exception cref="PlatformNotSupportedException">Thrown when the operation cannot be completed.</exception>
     public static IHIDTransport Open(HIDDevice device)
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OS.IsWindows())
         {
             return Backends.WindowsHIDTransport.Open(device);
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (OS.IsLinux())
         {
             return Backends.LinuxHIDTransport.Open(device);
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (OS.IsMacOS())
         {
             throw new PlatformNotSupportedException("The macOS BlackSharp.IO.HID backend has not been implemented yet.");
         }
 
         throw new PlatformNotSupportedException("The current platform does not provide a BlackSharp.IO.HID backend.");
     }
+
+    #endregion
 }

@@ -154,6 +154,28 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public static extern bool ControlService(IntPtr service, uint control, IntPtr serviceStatus);
 
         /// <summary>
+        /// Converts a security identifier to its canonical string representation.
+        /// </summary>
+        /// <param name="sid">The native security identifier.</param>
+        /// <param name="text">Receives a UTF-16 string that the caller must release with Kernel32.LocalFree.</param>
+        /// <returns>Whether conversion succeeded; the last Windows error is set on failure.</returns>
+        [DllImport(DLL_NAME, EntryPoint = "ConvertSidToStringSidW", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ConvertSidToStringSid(IntPtr sid, out IntPtr text);
+
+        /// <summary>
+        /// Converts a security descriptor string into a self-relative native security descriptor.
+        /// </summary>
+        /// <param name="value">The security descriptor in SDDL format.</param>
+        /// <param name="revision">The security descriptor revision.</param>
+        /// <param name="descriptor">Receives a descriptor that the caller must release with Kernel32.LocalFree.</param>
+        /// <param name="size">Receives the descriptor size in bytes.</param>
+        /// <returns>Whether conversion succeeded; the last Windows error is set on failure.</returns>
+        [DllImport(DLL_NAME, EntryPoint = "ConvertStringSecurityDescriptorToSecurityDescriptorW", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ConvertStringSecurityDescriptorToSecurityDescriptor(string value, uint revision, out IntPtr descriptor, out uint size);
+
+        /// <summary>
         /// Creates a service in the service-control database.
         /// </summary>
         [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
@@ -171,6 +193,32 @@ namespace BlackSharp.Core.Interop.Windows.Native
         /// </summary>
         [DllImport(DLL_NAME)]
         public static extern IntPtr FreeSid(IntPtr pSid);
+
+        /// <summary>
+        /// Retrieves an entry from a native access-control list.
+        /// </summary>
+        /// <param name="acl">The access-control list to inspect.</param>
+        /// <param name="index">The zero-based entry index.</param>
+        /// <param name="ace">Receives a pointer into the supplied access-control list.</param>
+        /// <returns>Whether the entry exists; the last Windows error is set on failure.</returns>
+        [DllImport(DLL_NAME, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetAce(IntPtr acl, uint index, out IntPtr ace);
+
+        /// <summary>
+        /// Retrieves selected security information for a named Windows object.
+        /// </summary>
+        /// <param name="path">The name or path of the object.</param>
+        /// <param name="type">The native SE_OBJECT_TYPE value identifying the object kind.</param>
+        /// <param name="information">The requested SECURITY_INFORMATION flags.</param>
+        /// <param name="owner">Receives the owner identifier within the returned descriptor.</param>
+        /// <param name="group">Receives the primary group identifier within the returned descriptor.</param>
+        /// <param name="dacl">Receives the discretionary access-control list within the returned descriptor.</param>
+        /// <param name="sacl">Receives the system access-control list within the returned descriptor.</param>
+        /// <param name="descriptor">Receives a descriptor that the caller must release with Kernel32.LocalFree.</param>
+        /// <returns>Zero on success, or the Windows error code on failure.</returns>
+        [DllImport(DLL_NAME, EntryPoint = "GetNamedSecurityInfoW", CharSet = CharSet.Unicode)]
+        public static extern uint GetNamedSecurityInfo(string path, int type, uint information, out IntPtr owner, out IntPtr group, out IntPtr dacl, out IntPtr sacl, out IntPtr descriptor);
 
         /// <summary>
         /// Initializes an access-control list.

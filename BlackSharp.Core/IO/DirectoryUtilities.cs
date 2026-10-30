@@ -1,5 +1,9 @@
 ﻿// SPDX-License-Identifier: MPL-2.0
 
+#if NET6_0_OR_GREATER
+using OS = BlackSharp.Core.Platform.OperatingSystem;
+#endif
+
 namespace BlackSharp.Core.IO
 {
     /// <summary>
@@ -76,7 +80,7 @@ namespace BlackSharp.Core.IO
                 File.SetLastWriteTimeUtc(destination, File.GetLastWriteTimeUtc(file));
 
 #if NET6_0_OR_GREATER
-                if (!System.OperatingSystem.IsWindows())
+                if (!OS.IsWindows())
                 {
                     try
                     {

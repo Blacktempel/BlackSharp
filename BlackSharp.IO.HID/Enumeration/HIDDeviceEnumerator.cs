@@ -1,6 +1,6 @@
 ﻿// SPDX-License-Identifier: MPL-2.0
 
-using System.Runtime.InteropServices;
+using OS = BlackSharp.Core.Platform.OperatingSystem;
 
 namespace BlackSharp.IO.HID;
 
@@ -14,14 +14,15 @@ public static class HIDDeviceEnumerator
     /// <summary>
     /// Returns the currently present HID interfaces.
     /// </summary>
+    /// <returns>The HID interfaces discovered by the current platform backend.</returns>
     public static IReadOnlyList<HIDDevice> GetDevices()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OS.IsWindows())
         {
             return Backends.WindowsHIDDeviceEnumerator.GetDevices();
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (OS.IsLinux())
         {
             return Backends.LinuxHIDDeviceEnumerator.GetDevices();
         }
@@ -39,12 +40,12 @@ public static class HIDDeviceEnumerator
     /// <returns>The requested device paths entries.</returns>
     internal static IReadOnlyList<string> GetDevicePaths()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OS.IsWindows())
         {
             return Backends.WindowsHIDDeviceEnumerator.GetDevicePaths();
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (OS.IsLinux())
         {
             return Backends.LinuxHIDDeviceEnumerator.GetDevicePaths();
         }

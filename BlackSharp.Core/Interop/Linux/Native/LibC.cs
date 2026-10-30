@@ -278,6 +278,14 @@ public static class LibC
     public static extern int ioctl(SafeFileHandle fd, UIntPtr request, IntPtr argument);
 
     /// <summary>
+    /// Atomically creates a private directory by replacing the final six X characters in a UTF-8 template.
+    /// </summary>
+    /// <param name="template">The writable, null-terminated template containing the generated path on success.</param>
+    /// <returns>A pointer into the supplied buffer on success, or zero with the native error number set on failure.</returns>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern IntPtr mkdtemp([In, Out] byte[] template);
+
+    /// <summary>
     /// Opens a file using the supplied flags.
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
@@ -330,6 +338,21 @@ public static class LibC
     /// </summary>
     [DllImport(LIBRARY_NAME, SetLastError = true)]
     public static extern int socket(int domain, int type, int protocol);
+
+    /// <summary>
+    /// Reads selected filesystem metadata using the fixed Linux statx ABI.
+    /// </summary>
+    /// <param name="directory">The base directory descriptor, or AT_FDCWD for the current working directory.</param>
+    /// <param name="path">The UTF-8 path to inspect.</param>
+    /// <param name="flags">Path-resolution flags, including AT_SYMLINK_NOFOLLOW when inspecting links themselves.</param>
+    /// <param name="mask">The requested metadata fields.</param>
+    /// <param name="value">Receives the returned field mask, ownership, and mode.</param>
+    /// <returns>Zero on success, or -1 with the native error number set on failure.</returns>
+    /// <remarks>
+    /// The numeric marshal value denotes LPUTF8Str and remains available when targeting .NET Standard 2.0.
+    /// </remarks>
+    [DllImport(LIBRARY_NAME, SetLastError = true)]
+    public static extern int statx(int directory, [MarshalAs((UnmanagedType)48)] string path, int flags, uint mask, out LinuxStatx value);
 
     /// <summary>
     /// Discards queued terminal input, output, or both.

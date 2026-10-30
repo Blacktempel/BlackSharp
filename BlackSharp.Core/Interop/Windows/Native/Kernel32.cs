@@ -183,6 +183,16 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public static extern bool CloseHandle(IntPtr hObject);
 
         /// <summary>
+        /// Creates a directory with the supplied security descriptor applied atomically.
+        /// </summary>
+        /// <param name="path">The absolute path of the new directory.</param>
+        /// <param name="security">The security attributes and descriptor to apply during creation.</param>
+        /// <returns>Whether creation succeeded; the last Windows error is set on failure.</returns>
+        [DllImport(DLL_NAME, EntryPoint = "CreateDirectoryW", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CreateDirectory(string path, ref SecurityAttributes security);
+
+        /// <summary>
         /// Creates or opens an event object.
         /// </summary>
         [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]

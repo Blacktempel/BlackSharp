@@ -28,6 +28,10 @@ using BlackSharp.Core.Interop.Windows.Native;
 using BlackSharp.Core.Interop.Windows.Structures;
 using System.Runtime.InteropServices;
 
+#if NET8_0_OR_GREATER
+using System.Runtime.Versioning;
+#endif
+
 namespace BlackSharp.Core.Platform
 {
     /// <summary>
@@ -39,28 +43,34 @@ namespace BlackSharp.Core.Platform
 
         #region Constructor
 
+        /// <summary>
+        /// Initializes the cached platform flags from the runtime's operating system identification.
+        /// </summary>
         static OperatingSystem()
         {
-            switch (Environment.OSVersion.Platform)
-            {
-                case PlatformID.Win32S:
-                case PlatformID.Win32Windows:
-                case PlatformID.Win32NT:
-                case PlatformID.WinCE:
-                    _IsWindows = true;
-                    break;
-                case PlatformID.Unix:
-                    _IsLinux = true;
-                    break;
-            }
+            _IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            _IsLinux   = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            _IsMacOS   = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         }
 
         #endregion
 
         #region Fields
 
+        /// <summary>
+        /// Indicates whether the runtime identifies the current platform as Windows.
+        /// </summary>
         static readonly bool _IsWindows;
+
+        /// <summary>
+        /// Indicates whether the runtime identifies the current platform as Linux.
+        /// </summary>
         static readonly bool _IsLinux;
+
+        /// <summary>
+        /// Indicates whether the runtime identifies the current platform as macOS.
+        /// </summary>
+        static readonly bool _IsMacOS;
 
         #endregion
 
@@ -72,6 +82,9 @@ namespace BlackSharp.Core.Platform
         /// Indicates whether the current application is running on Windows.
         /// </summary>
         /// <returns>True if current application is running on Windows, false otherwise.</returns>
+#if NET8_0_OR_GREATER
+        [SupportedOSPlatformGuard("windows")]
+#endif
         public static bool IsWindows()
         {
 #if NET8_0_OR_GREATER
@@ -85,12 +98,31 @@ namespace BlackSharp.Core.Platform
         /// Indicates whether the current application is running on Linux.
         /// </summary>
         /// <returns>True if current application is running on Linux, false otherwise.</returns>
+#if NET8_0_OR_GREATER
+        [SupportedOSPlatformGuard("linux")]
+#endif
         public static bool IsLinux()
         {
 #if NET8_0_OR_GREATER
             return System.OperatingSystem.IsLinux();
 #else
             return _IsLinux;
+#endif
+        }
+
+        /// <summary>
+        /// Indicates whether the current application is running on macOS.
+        /// </summary>
+        /// <returns>True if the current application is running on macOS, false otherwise.</returns>
+#if NET8_0_OR_GREATER
+        [SupportedOSPlatformGuard("macos")]
+#endif
+        public static bool IsMacOS()
+        {
+#if NET8_0_OR_GREATER
+            return System.OperatingSystem.IsMacOS();
+#else
+            return _IsMacOS;
 #endif
         }
 
