@@ -135,12 +135,8 @@ serial numbers, credentials and other sensitive data before posting.
 
 ## Contributing
 
-Everyone is welcome and encouraged to contribute. Bug reports, documentation,
-tests, fixes and additional reusable components are all valuable. Keep changes
-focused and follow the existing architecture, naming, documentation, formatting
-and code style. Include or update tests and documentation where applicable,
-and describe the affected packages, platforms and validation in the pull
-request.
+Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidance on how to
+contribute to the project.
 
 ### AI-assisted contributions
 
