@@ -11,7 +11,7 @@
     <Copyright>Florian K.</Copyright>
     <PackageProjectUrl>https://github.com/Blacktempel/BlackSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
-    <PackageTags>usb;hid;hidraw;io;device;windows;linux;cross-platform</PackageTags>
+    <PackageTags>usb;usb-hid;hid;hidraw;human-interface-device;device-enumeration;hid-reports;device-stream;device-communication;windows;linux;cross-platform</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <Version>$(BlackSharpVersion)</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>

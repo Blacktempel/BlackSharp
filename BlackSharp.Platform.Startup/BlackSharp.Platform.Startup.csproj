@@ -10,7 +10,7 @@
     <Copyright>Florian K.</Copyright>
     <PackageProjectUrl>https://github.com/Blacktempel/BlackSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
-    <PackageTags>startup;autostart;systemd;task-scheduler;windows;linux</PackageTags>
+    <PackageTags>startup;autostart;boot;login;systemd;desktop-autostart;task-scheduler;process-privileges;administrator;windows;linux;cross-platform</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <Version>$(BlackSharpVersion)</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>

@@ -7,11 +7,11 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Description>A framework to eliminate duplicate code across projects.</Description>
+    <Description>Reusable Avalonia functionality for .NET applications.</Description>
     <Copyright>Florian K.</Copyright>
     <PackageProjectUrl>https://github.com/Blacktempel/BlackSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
-    <PackageTags>framework; code; shared</PackageTags>
+    <PackageTags>avalonia;avaloniaui;ui;controls;dialogs;themes;styles;behaviors;converters;mvvm;dragdrop;tabs;desktop;cross-platform</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <Version>$(BlackSharpVersion)</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>

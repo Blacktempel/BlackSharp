@@ -11,7 +11,7 @@
     <Copyright>Florian K.</Copyright>
     <PackageProjectUrl>https://github.com/Blacktempel/BlackSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
-    <PackageTags>serial;serialport;com;uart;rs232;usb;libusb;device;io;ports;communication;windows;linux;cross-platform</PackageTags>
+    <PackageTags>serial;serialport;serial-communication;com-port;uart;rs232;usb;usb-serial;raw-usb;libusb;bulk-transfer;control-transfer;device-enumeration;windows;linux;cross-platform</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <Version>$(BlackSharpVersion)</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>

@@ -7,11 +7,11 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Description>A framework to eliminate duplicate code across projects.</Description>
+    <Description>Reusable MVVM foundations for .NET applications.</Description>
     <Copyright>Florian K.</Copyright>
     <PackageProjectUrl>https://github.com/Blacktempel/BlackSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Blacktempel/BlackSharp</RepositoryUrl>
-    <PackageTags>framework; code; shared</PackageTags>
+    <PackageTags>mvvm;viewmodel;observable;propertychanged;databinding;communitytoolkit;dialogs;dragdrop;reordering;theming;dotnet</PackageTags>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <Version>$(BlackSharpVersion)</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
