@@ -66,14 +66,14 @@ Use `BlackSharp.MVVM` for view-model infrastructure and
 
 ## Supported .NET versions
 
-| Target | Core, IO.HID and IO.Ports | Platform.Startup, MVVM and UI.Avalonia |
-| --- | --- | --- |
-| .NET Framework 4.7.2 | ✅ | ❌ |
-| .NET Framework 4.8.1 | ✅ | ❌ |
-| .NET Standard 2.0 | ✅ | ❌ |
-| .NET 8 | ✅ | ✅ |
-| .NET 9 | ✅ | ✅ |
-| .NET 10 | ✅ | ✅ |
+| Target | Core | IO.HID | IO.Ports | Platform.Startup | MVVM | UI.Avalonia |
+| --- | --- | --- | --- | --- | --- | --- |
+| .NET Framework 4.7.2 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| .NET Framework 4.8.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| .NET Standard 2.0    | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| .NET 8               | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| .NET 9               | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| .NET 10              | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Quick start
 
