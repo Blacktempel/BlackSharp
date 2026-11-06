@@ -11,12 +11,30 @@ namespace BlackSharp.Core.Interop.Windows.Native
     {
         #region Fields
 
-        const string DLL_NAME = "user32.dll";
+        /// <summary>
+        /// Names the system user-interface library.
+        /// </summary>
+        private const string DLL_NAME = "user32.dll";
 
         /// <summary>
         /// Selects the monitor nearest to a rectangle when the rectangle does not intersect a display.
         /// </summary>
         public const int MonitorDefaultToNearest = 2;
+
+        /// <summary>
+        /// Selects a window's extended style flags.
+        /// </summary>
+        public const int WindowLongExtendedStyle = -20;
+
+        /// <summary>
+        /// Enables composited alpha rendering for a window.
+        /// </summary>
+        public const long WindowExStyleLayered = 0x00080000;
+
+        /// <summary>
+        /// Passes pointer input through a layered window.
+        /// </summary>
+        public const long WindowExStyleTransparent = 0x00000020;
 
         /// <summary>
         /// Restricts display-configuration queries to currently active paths.
@@ -99,6 +117,18 @@ namespace BlackSharp.Core.Interop.Windows.Native
         public static extern bool GetMonitorInfo(IntPtr monitor, IntPtr monitorInfo);
 
         /// <summary>
+        /// Retrieves a 32-bit window property.
+        /// </summary>
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern int GetWindowLong(IntPtr window, int index);
+
+        /// <summary>
+        /// Retrieves a pointer-sized window property.
+        /// </summary>
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern IntPtr GetWindowLongPtr(IntPtr window, int index);
+
+        /// <summary>
         /// Retrieves the monitor that intersects or is nearest to a rectangle.
         /// </summary>
         [DllImport(DLL_NAME)]
@@ -135,6 +165,18 @@ namespace BlackSharp.Core.Interop.Windows.Native
         [DllImport(DLL_NAME, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool RegisterHotKey(IntPtr window, int id, uint modifiers, uint virtualKey);
+
+        /// <summary>
+        /// Sets a 32-bit window property.
+        /// </summary>
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern int SetWindowLong(IntPtr window, int index, int value);
+
+        /// <summary>
+        /// Sets a pointer-sized window property.
+        /// </summary>
+        [DllImport(DLL_NAME, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern IntPtr SetWindowLongPtr(IntPtr window, int index, IntPtr value);
 
         /// <summary>
         /// Translates virtual-key messages into character messages.
