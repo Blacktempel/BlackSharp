@@ -35,7 +35,7 @@ public static class WindowsDeviceStreamExtensions
         }
 
         var buffer = new byte[bufferLength];
-        var total = 0;
+        int total = 0;
 
         while (total < minimumLength)
         {

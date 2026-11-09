@@ -165,7 +165,7 @@ public sealed class HIDDeviceList
                 return;
             }
 
-            var changed = false;
+            bool changed = false;
 
             lock (_sync)
             {

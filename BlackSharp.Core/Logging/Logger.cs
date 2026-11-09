@@ -344,9 +344,9 @@ namespace BlackSharp.Core.Logging
                 foreach (var path in _savedEntryCounts.Keys.ToArray())
                 {
                     var savedCount    = Math.Min(_savedEntryCounts[path], _log.Count);
-                    var removedCount = 0;
+                    int removedCount = 0;
 
-                    for (var index = 0; index < savedCount; ++index)
+                    for (int index = 0; index < savedCount; ++index)
                     {
                         if (_log[index].Level == level)
                         {

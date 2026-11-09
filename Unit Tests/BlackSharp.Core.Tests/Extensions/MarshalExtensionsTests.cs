@@ -70,7 +70,7 @@ namespace BlackSharp.Core.Tests.Extensions
         [TestMethod]
         public void Copy()
         {
-            var size = 512;
+            int size = 512;
 
             var source      = Marshal.AllocHGlobal(size);
             var destination = Marshal.AllocHGlobal(size);

@@ -24,7 +24,7 @@ namespace BlackSharp.Core.Extensions
                 return -1;
             }
 
-            for (var index = 0; index < values.Count; ++index)
+            for (int index = 0; index < values.Count; ++index)
             {
                 if (ReferenceEquals(values[index], value))
                 {

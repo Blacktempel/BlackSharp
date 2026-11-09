@@ -45,9 +45,9 @@ namespace BlackSharp.Core.Utilities
             separator ??= string.Empty;
 
             var chars = new char[length * 2 + Math.Max(0, length - 1) * separator.Length];
-            var position = 0;
+            int position = 0;
 
-            for (var index = 0; index < length; ++index)
+            for (int index = 0; index < length; ++index)
             {
                 if (index > 0)
                 {

@@ -139,7 +139,7 @@ namespace BlackSharp.Core.IO
                 };
 
                 // Create a unique directory name and attempt to create it with the private security descriptor.
-                for (var attempt = 0; attempt < 10; ++attempt)
+                for (int attempt = 0; attempt < 10; ++attempt)
                 {
                     var path = Path.Combine(Path.GetFullPath(parent), prefix + Guid.NewGuid().ToString("N"));
 

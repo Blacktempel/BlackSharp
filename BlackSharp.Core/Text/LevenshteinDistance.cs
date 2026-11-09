@@ -82,18 +82,18 @@ namespace BlackSharp.Core.Text
             try
             {
                 // Seed the first row with target-prefix lengths, or zero for substring starts.
-                for (var targetIndex = 0; targetIndex < rowLength; ++targetIndex)
+                for (int targetIndex = 0; targetIndex < rowLength; ++targetIndex)
                 {
                     previous[targetIndex] = closestSubstring ? 0 : targetIndex;
                 }
 
                 // Advance the matrix through each source character.
-                for (var sourceIndex = 1; sourceIndex <= sourceCharacters.Length; ++sourceIndex)
+                for (int sourceIndex = 1; sourceIndex <= sourceCharacters.Length; ++sourceIndex)
                 {
                     current[0] = sourceIndex;
 
                     // Compare the source prefix against every target prefix.
-                    for (var targetIndex = 1; targetIndex <= targetCharacters.Length; ++targetIndex)
+                    for (int targetIndex = 1; targetIndex <= targetCharacters.Length; ++targetIndex)
                     {
                         current[targetIndex] = Math.Min(
                             Math.Min(previous[targetIndex] + 1, current[targetIndex - 1] + 1),
@@ -121,7 +121,7 @@ namespace BlackSharp.Core.Text
                 var minimum = int.MaxValue;
 
                 // Find the best target endpoint for the closest-substring result.
-                for (var targetIndex = 0; targetIndex < rowLength; ++targetIndex)
+                for (int targetIndex = 0; targetIndex < rowLength; ++targetIndex)
                 {
                     minimum = Math.Min(minimum, previous[targetIndex]);
                 }
@@ -146,7 +146,7 @@ namespace BlackSharp.Core.Text
             var characters = new List<int>(text.Length);
 
             // Combine valid surrogate pairs and keep other UTF-16 characters as individual values.
-            for (var index = 0; index < text.Length; ++index)
+            for (int index = 0; index < text.Length; ++index)
             {
                 if (char.IsHighSurrogate(text[index])
                  && index + 1 < text.Length

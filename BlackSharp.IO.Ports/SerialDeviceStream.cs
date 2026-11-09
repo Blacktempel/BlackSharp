@@ -144,7 +144,7 @@ public sealed class SerialDeviceStream : IDisposable
         }
 
         var buffer    = new byte[bufferLength];
-        var total     = 0;
+        int total     = 0;
         var stopwatch = Stopwatch.StartNew();
 
         try

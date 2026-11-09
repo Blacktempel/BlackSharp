@@ -480,8 +480,8 @@ public sealed class USBDeviceStream : IDisposable
         var list    = IntPtr.Zero;
         var handle  = IntPtr.Zero;
 
-        var claimedInterface     = false;
-        var detachedKernelDriver = false;
+        bool claimedInterface     = false;
+        bool detachedKernelDriver = false;
 
         try
         {

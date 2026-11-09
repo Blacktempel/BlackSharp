@@ -282,7 +282,7 @@ namespace BlackSharp.UI.Avalonia.Controller
             try
             {
                 // Apply the input region to each native render child of the window.
-                for (var index = 0; index < childCount; ++index)
+                for (int index = 0; index < childCount; ++index)
                 {
                     var child = Marshal.ReadIntPtr(children, checked((int)index * IntPtr.Size));
 

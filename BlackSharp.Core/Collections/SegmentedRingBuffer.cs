@@ -144,7 +144,7 @@ namespace BlackSharp.Core.Collections
         {
             var result = new T[Count];
 
-            var offset = 0;
+            int offset = 0;
             var index = _headIndex;
 
             foreach (var segment in _segments)

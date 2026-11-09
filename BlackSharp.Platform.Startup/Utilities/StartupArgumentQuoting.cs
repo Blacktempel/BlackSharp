@@ -29,7 +29,7 @@ namespace BlackSharp.Platform.Startup.Utilities
             }
 
             var result = new StringBuilder(value.Length + 2);
-            var backslashCount = 0;
+            int backslashCount = 0;
 
             result.Append('"');
 

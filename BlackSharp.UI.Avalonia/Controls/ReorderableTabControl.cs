@@ -535,7 +535,7 @@ namespace BlackSharp.UI.Avalonia.Controls
             var item        = _draggedItem;
             var oldIndex    = _draggedItemIndex;
             var dropIndex   = _dropItemIndex;
-            var newIndex    = -1;
+            int newIndex    = -1;
 
             if (wasDragging && oldIndex >= 0 && dropIndex >= 0)
             {

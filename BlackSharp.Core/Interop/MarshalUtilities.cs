@@ -27,8 +27,8 @@ namespace BlackSharp.Core.Interop
                 throw new ArgumentNullException(nameof(action));
             }
 
-            var pointer     = Marshal.AllocHGlobal(Marshal.SizeOf<T>());
-            var initialized = false;
+            var  pointer     = Marshal.AllocHGlobal(Marshal.SizeOf<T>());
+            bool initialized = false;
 
             try
             {
@@ -76,11 +76,11 @@ namespace BlackSharp.Core.Interop
             var elementSize      = Marshal.SizeOf<T>();
             var bufferSize       = checked(elementSize * values.Length);
             var buffer           = Marshal.AllocHGlobal(bufferSize);
-            var initializedCount = 0;
+            int initializedCount = 0;
 
             try
             {
-                for (var index = 0; index < values.Length; ++index)
+                for (int index = 0; index < values.Length; ++index)
                 {
                     Marshal.StructureToPtr(values[index], IntPtr.Add(buffer, index * elementSize), false);
                     ++initializedCount;
@@ -88,7 +88,7 @@ namespace BlackSharp.Core.Interop
 
                 var result = action(buffer);
 
-                for (var index = 0; index < initializedCount; ++index)
+                for (int index = 0; index < initializedCount; ++index)
                 {
                     values[index] = Marshal.PtrToStructure<T>(IntPtr.Add(buffer, index * elementSize));
                 }
@@ -97,7 +97,7 @@ namespace BlackSharp.Core.Interop
             }
             finally
             {
-                for (var index = 0; index < initializedCount; ++index)
+                for (int index = 0; index < initializedCount; ++index)
                 {
                     Marshal.DestroyStructure<T>(IntPtr.Add(buffer, index * elementSize));
                 }

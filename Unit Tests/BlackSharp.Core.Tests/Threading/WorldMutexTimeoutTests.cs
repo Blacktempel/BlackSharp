@@ -91,7 +91,7 @@ namespace BlackSharp.Core.Tests.Threading
             }
 
             // Arrange
-            var acquired = false;
+            bool acquired = false;
 
             var next = new Thread(() =>
             {

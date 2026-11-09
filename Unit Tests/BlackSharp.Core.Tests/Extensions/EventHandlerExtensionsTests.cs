@@ -12,7 +12,7 @@ namespace BlackSharp.Core.Tests.Extensions
         [TestMethod]
         public void InvokeAllSafely()
         {
-            var invocationCount = 0;
+            int invocationCount = 0;
             EventHandler handlers = (_, _) => throw new InvalidOperationException();
             handlers += (_, _) => ++invocationCount;
 
@@ -24,7 +24,7 @@ namespace BlackSharp.Core.Tests.Extensions
         [TestMethod]
         public void InvokeAllSafely_Generic()
         {
-            var invocationCount = 0;
+            int invocationCount = 0;
             EventHandler<EventArgs> handlers = (_, _) => throw new InvalidOperationException();
             handlers += (_, _) => ++invocationCount;
 

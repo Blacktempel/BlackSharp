@@ -63,7 +63,7 @@ namespace BlackSharp.Core.Interop.Linux
         {
             var current = startDirectory;
 
-            for (var depth = 0; depth < maximumDepth && !string.IsNullOrWhiteSpace(current); ++depth)
+            for (int depth = 0; depth < maximumDepth && !string.IsNullOrWhiteSpace(current); ++depth)
             {
                 var candidate = Path.Combine(current, entryName);
 

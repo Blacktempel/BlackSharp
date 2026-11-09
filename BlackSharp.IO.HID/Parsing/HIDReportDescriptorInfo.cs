@@ -181,14 +181,16 @@ internal sealed class HIDReportDescriptorInfo
             throw new ArgumentNullException(nameof(descriptor));
         }
 
-        var inputBits = new Dictionary<int, long>();
-        var outputBits = new Dictionary<int, long>();
+        var inputBits   = new Dictionary<int, long>();
+        var outputBits  = new Dictionary<int, long>();
         var featureBits = new Dictionary<int, long>();
-        var globals = new GlobalState();
-        var globalStack = new Stack<GlobalState>();
-        var reportsUseID = false;
 
-        for (var offset = 0; offset < descriptor.Length;)
+        var globals     = new GlobalState();
+        var globalStack = new Stack<GlobalState>();
+
+        bool reportsUseID = false;
+
+        for (int offset = 0; offset < descriptor.Length;)
         {
             var prefix = descriptor[offset++];
 
@@ -353,7 +355,7 @@ internal sealed class HIDReportDescriptorInfo
     {
         uint value = 0;
 
-        for (var index = 0; index < size; ++index)
+        for (int index = 0; index < size; ++index)
         {
             value |= (uint)descriptor[offset + index] << (index * BitsPerByte);
         }

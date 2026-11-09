@@ -112,7 +112,7 @@ internal static class LinuxHIDDeviceEnumerator
         var serialNumber = properties.TryGetValue("HID_UNIQ", out var hidUnique)
             ? hidUnique
             : string.Empty;
-        var releaseNumberBcd = 0;
+        int releaseNumberBcd = 0;
         var interfaceNumber = TryFindInterfaceNumber(deviceDirectory);
 
         if (TryFindUSBParent(deviceDirectory, out var usbParent))
@@ -259,7 +259,7 @@ internal static class LinuxHIDDeviceEnumerator
     {
         var candidate = deviceDirectory;
 
-        for (var depth = 0; depth < 10; ++depth)
+        for (int depth = 0; depth < 10; ++depth)
         {
             if (File.Exists(Path.Combine(candidate, "idVendor"))
              && File.Exists(Path.Combine(candidate, "idProduct")))
@@ -286,7 +286,7 @@ internal static class LinuxHIDDeviceEnumerator
     {
         var candidate = deviceDirectory;
 
-        for (var depth = 0; depth < 6; ++depth)
+        for (int depth = 0; depth < 6; ++depth)
         {
             if (TryReadHexFile(Path.Combine(candidate, "bInterfaceNumber"), out var interfaceNumber))
             {

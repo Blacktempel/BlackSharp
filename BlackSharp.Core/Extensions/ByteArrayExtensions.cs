@@ -194,7 +194,7 @@ namespace BlackSharp.Core.Extensions
 
             ulong value = 0;
 
-            for (var index = 0; index < 8; ++index)
+            for (int index = 0; index < 8; ++index)
             {
                 value |= (ulong)data[offset + index] << (8 * index);
             }
@@ -230,7 +230,7 @@ namespace BlackSharp.Core.Extensions
 
             ulong value = 0;
 
-            for (var index = 0; index < 8; ++index)
+            for (int index = 0; index < 8; ++index)
             {
                 value = (value << 8) | data[offset + index];
             }
@@ -250,7 +250,7 @@ namespace BlackSharp.Core.Extensions
 
             ulong value = 0;
 
-            for (var index = 0; index < 6; ++index)
+            for (int index = 0; index < 6; ++index)
             {
                 value |= ((ulong)data[offset + index]) << (8 * index);
             }
@@ -324,7 +324,7 @@ namespace BlackSharp.Core.Extensions
         {
             ValidateRange(data, offset, sizeof(uint));
 
-            for (var index = 0; index < sizeof(uint); ++index)
+            for (int index = 0; index < sizeof(uint); ++index)
             {
                 data[offset + index] = (byte)(value >> (8 * index));
             }
@@ -340,7 +340,7 @@ namespace BlackSharp.Core.Extensions
         {
             ValidateRange(data, offset, sizeof(ulong));
 
-            for (var index = 0; index < sizeof(ulong); ++index)
+            for (int index = 0; index < sizeof(ulong); ++index)
             {
                 data[offset + index] = (byte)(value >> (8 * index));
             }
@@ -357,7 +357,7 @@ namespace BlackSharp.Core.Extensions
             const int byteCount = 6;
             ValidateRange(data, offset, byteCount);
 
-            for (var index = 0; index < byteCount; ++index)
+            for (int index = 0; index < byteCount; ++index)
             {
                 data[offset + index] = (byte)(value >> (8 * index));
             }
@@ -387,7 +387,7 @@ namespace BlackSharp.Core.Extensions
         {
             ValidateRange(data, offset, sizeof(uint));
 
-            for (var index = 0; index < sizeof(uint); ++index)
+            for (int index = 0; index < sizeof(uint); ++index)
             {
                 data[offset + index] = (byte)(value >> (8 * (sizeof(uint) - index - 1)));
             }
@@ -403,7 +403,7 @@ namespace BlackSharp.Core.Extensions
         {
             ValidateRange(data, offset, sizeof(ulong));
 
-            for (var index = 0; index < sizeof(ulong); ++index)
+            for (int index = 0; index < sizeof(ulong); ++index)
             {
                 data[offset + index] = (byte)(value >> (8 * (sizeof(ulong) - index - 1)));
             }
