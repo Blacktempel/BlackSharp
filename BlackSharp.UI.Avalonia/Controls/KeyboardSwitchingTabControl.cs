@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using System.Collections.Specialized;
 
@@ -17,6 +18,7 @@ namespace BlackSharp.UI.Avalonia.Controls
     /// <remarks>
     /// Ctrl+Tab and Ctrl+Shift+Tab move the preview selection. Releasing Ctrl activates it,
     /// while Escape cancels the preview. The displayed item template is supplied by the application.
+    /// When focus is lost or remains on the outgoing tab, the selected tab header receives it.
     /// The overlay border receives the <c>tab-switcher-popup</c> class and its list receives
     /// <c>tab-switcher-items</c>. Applications can style those elements and the list's
     /// <see cref="ListBoxItem"/> containers. Avalonia's default list appearance supports
@@ -161,6 +163,23 @@ namespace BlackSharp.UI.Avalonia.Controls
         #region Private
 
         /// <summary>
+        /// Checks whether an item at the given index can be activated by the switcher.
+        /// </summary>
+        /// <param name="index">The index in the tab items collection.</param>
+        /// <returns>Whether the item exists and its available header is visible and enabled.</returns>
+        private bool CanSwitchToTab(int index)
+        {
+            if (index < 0 || index >= Items.Count)
+            {
+                return false;
+            }
+
+            var tab = ContainerFromIndex(index) as TabItem ?? Items[index] as TabItem;
+
+            return tab == null || (tab.IsEffectivelyVisible && tab.IsEffectivelyEnabled);
+        }
+
+        /// <summary>
         /// Closes the switcher and optionally activates its preview selection.
         /// </summary>
         /// <param name="activateSelection">Whether to activate the previewed item.</param>
@@ -180,11 +199,32 @@ namespace BlackSharp.UI.Avalonia.Controls
             _switcherItems = null;
             _overlayLayer  = null;
 
-            // A tab can be closed while the preview is open. Never restore a removed item.
-            if (activateSelection && Items.Cast<object>().Contains(selectedItem))
+            // A tab can be removed, hidden or disabled while the preview is open.
+            if (!activateSelection
+             || !CanSwitchToTab(Items.IndexOf(selectedItem))
+             || Equals(SelectedItem, selectedItem))
             {
-                SelectedItem = selectedItem;
+                return;
             }
+
+            var topLevel      = _topLevel;
+            var previousFocus = topLevel?.FocusManager?.GetFocusedElement();
+
+            SelectedItem = selectedItem;
+
+            if (topLevel == null || TryRestoreTabFocus(topLevel, selectedItem, previousFocus))
+            {
+                return;
+            }
+
+            // Selection bindings can replace focused content during the next layout pass.
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (topLevel is not Window { IsActive: false })
+                {
+                    TryRestoreTabFocus(topLevel, selectedItem, previousFocus);
+                }
+            }, DispatcherPriority.Loaded);
         }
 
         /// <summary>
@@ -220,24 +260,37 @@ namespace BlackSharp.UI.Avalonia.Controls
         /// Opens the preview and advances it in the requested direction.
         /// </summary>
         /// <param name="direction">One for the next tab, or minus one for the previous tab.</param>
-        private void MovePreview(int direction)
+        /// <returns>Whether the preview moved.</returns>
+        private bool MovePreview(int direction)
         {
             if (_switcher == null)
             {
-                if (!IsEnabled || !IsVisible || Items.Count < 2)
+                if (!IsEffectivelyEnabled || !IsEffectivelyVisible || Items.Count < 2)
                 {
-                    return;
+                    return false;
+                }
+
+                var switcherItems = Items.Where((_, index) => CanSwitchToTab(index)).ToArray();
+
+                if (switcherItems.Length < 2)
+                {
+                    return false;
                 }
 
                 _overlayLayer = OverlayLayer.GetOverlayLayer(this);
 
                 if (_overlayLayer == null)
                 {
-                    return;
+                    return false;
                 }
 
-                _switcherItems = Items.Cast<object>().ToArray();
-                _switcherIndex = SelectedIndex;
+                _switcherItems = switcherItems;
+                _switcherIndex = Array.IndexOf(_switcherItems, SelectedItem);
+
+                if (_switcherIndex < 0 && direction < 0)
+                {
+                    _switcherIndex = 0;
+                }
 
                 _switcherList = new ListBox
                 {
@@ -266,6 +319,8 @@ namespace BlackSharp.UI.Avalonia.Controls
 
             _switcherList.SelectedIndex = _switcherIndex;
             _switcherList.ScrollIntoView(_switcherItems[_switcherIndex]);
+
+            return true;
         }
 
         /// <summary>
@@ -304,14 +359,10 @@ namespace BlackSharp.UI.Avalonia.Controls
                 return;
             }
 
-            if (_switcher == null && (!IsEnabled || !IsVisible || Items.Count < 2))
+            if (MovePreview(e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? -1 : 1))
             {
-                return;
+                e.Handled = true;
             }
-
-            MovePreview(e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? -1 : 1);
-
-            e.Handled = true;
         }
 
         /// <summary>
@@ -411,6 +462,42 @@ namespace BlackSharp.UI.Avalonia.Controls
 
             Canvas.SetLeft(_switcher, Math.Max(0, (size.Width  - width ) / 2));
             Canvas.SetTop (_switcher, Math.Max(0, (size.Height - height) / 2));
+        }
+
+        /// <summary>
+        /// Moves lost or outgoing tab focus to the selected tab header.
+        /// </summary>
+        /// <param name="topLevel">The host where the switch was committed.</param>
+        /// <param name="selectedItem">The item activated by that switch.</param>
+        /// <param name="previousFocus">The previously focused element, or null if no element was focused.</param>
+        /// <returns>Whether focus was restored, moved elsewhere, or the switch no longer applies.</returns>
+        private bool TryRestoreTabFocus(TopLevel topLevel, object selectedItem, IInputElement previousFocus)
+        {
+            if (!ReferenceEquals(_topLevel, topLevel)
+             || _switcher != null
+             || !Equals(SelectedItem, selectedItem))
+            {
+                return true;
+            }
+
+            if (topLevel.FocusManager?.GetFocusedElement()
+                is InputElement { IsEffectivelyEnabled: true, IsEffectivelyVisible: true } focused
+             && ReferenceEquals(TopLevel.GetTopLevel(focused), topLevel))
+            {
+                // Respect focus explicitly assigned by the consumer in response to the selection change.
+                if (!ReferenceEquals(focused, previousFocus))
+                {
+                    return true;
+                }
+
+                // An unchanged, external target can still be valid, for example a shared sensor grid.
+                if (!ReferenceEquals(focused, this) && !this.IsVisualAncestorOf(focused))
+                {
+                    return false;
+                }
+            }
+
+            return ContainerFromIndex(SelectedIndex) is TabItem tab && tab.Focus(NavigationMethod.Unspecified);
         }
 
         #endregion
