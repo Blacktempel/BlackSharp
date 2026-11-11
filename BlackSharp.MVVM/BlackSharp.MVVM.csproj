@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+	<TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
 	<LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -16,6 +16,10 @@
     <Version>$(BlackSharpVersion)</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>BlackSharp.png</PackageIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net11.0'">
+    <Features>$(Features);runtime-async=on</Features>
   </PropertyGroup>
 
   <ItemGroup>

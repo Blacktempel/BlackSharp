@@ -74,6 +74,7 @@ Use `BlackSharp.MVVM` for view-model infrastructure and
 | .NET 8               | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | .NET 9               | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | .NET 10              | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| .NET 11              | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Quick start
 
