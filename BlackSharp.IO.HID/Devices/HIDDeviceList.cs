@@ -5,7 +5,7 @@ namespace BlackSharp.IO.HID;
 /// <summary>
 /// Provides HID enumeration and change notifications for the local computer.
 /// </summary>
-public sealed class HIDDeviceList
+public sealed class HIDDeviceList : IHIDDeviceEnumerator
 {
     #region Constructor
 

@@ -5,7 +5,7 @@ namespace BlackSharp.IO.HID;
 /// <summary>
 /// Describes a HID device connection and applies consistent stream timeouts when opening it.
 /// </summary>
-public sealed class HIDDeviceConnection
+public sealed class HIDDeviceConnection : IHIDReportConnection
 {
     #region Constructor
 
@@ -89,7 +89,32 @@ public sealed class HIDDeviceConnection
         catch (UnauthorizedAccessException)
         {
             stream?.Dispose();
+            stream = null;
 
+            return false;
+        }
+    }
+
+    #endregion
+
+    #region Private
+
+    /// <inheritdoc/>
+    bool IHIDReportConnection.TryOpenStream(out Stream stream)
+    {
+        HIDStream hidStream = null;
+
+        try
+        {
+            var opened = TryOpenStream(out hidStream);
+            stream = hidStream;
+
+            return opened;
+        }
+        catch (NotSupportedException)
+        {
+            // Stream opening or timeout configuration can fail on unsupported transports.
+            hidStream?.Dispose();
             stream = null;
 
             return false;

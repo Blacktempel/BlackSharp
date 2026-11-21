@@ -16,13 +16,33 @@ namespace BlackSharp.IO.Ports;
 /// <summary>
 /// Enumerates USB serial devices exposed by the operating system.
 /// </summary>
-public static class SerialDeviceEnumerator
+public sealed class SerialDeviceEnumerator : ISerialDeviceEnumerator
 {
+    #region Constructor
+
+    /// <summary>
+    /// Initializes the local serial device enumerator.
+    /// </summary>
+    private SerialDeviceEnumerator()
+    {
+    }
+
+    #endregion
+
     #region Fields
 
     private const string LinuxTTYClassPath = "/sys/class/tty";
     private const string LinuxDevicePath = "/dev";
     private const int MaximumLinuxParentDepth = 10;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Gets the enumerator for USB serial devices on the local computer.
+    /// </summary>
+    public static ISerialDeviceEnumerator Local { get; } = new SerialDeviceEnumerator();
 
     #endregion
 
@@ -200,6 +220,12 @@ public static class SerialDeviceEnumerator
         }
 
         return result;
+    }
+
+    /// <inheritdoc/>
+    IReadOnlyList<SerialDeviceInfo> ISerialDeviceEnumerator.GetDevices()
+    {
+        return GetDevices();
     }
 
     private static string ReadRegistryString(RegistryKey key, string name)
