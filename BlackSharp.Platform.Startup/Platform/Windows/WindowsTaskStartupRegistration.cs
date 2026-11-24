@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Security.Principal;
 using PlatformOperatingSystem = BlackSharp.Core.Platform.OperatingSystem;
 
-#pragma warning disable CA1416 // Callers select this service only on Windows.
+#pragma warning disable CA1416 // Platform compatibility warning
 
 namespace BlackSharp.Platform.Startup.Platform.Windows
 {
@@ -27,6 +27,32 @@ namespace BlackSharp.Platform.Startup.Platform.Windows
         /// <param name="enabled">Whether the task should be registered.</param>
         public static void SetBootTaskEnabled(string taskName, string description, StartupCommand command, bool enabled)
         {
+            SetBootTaskEnabled(taskName, description, command, enabled, ProcessPriorityClass.BelowNormal);
+        }
+
+        /// <summary>
+        /// Creates a boot task with the specified priority or removes the task.
+        /// </summary>
+        /// <param name="taskName">The registered task name.</param>
+        /// <param name="description">The task description.</param>
+        /// <param name="command">The command to run when enabling the task.</param>
+        /// <param name="enabled">Whether the task should be registered.</param>
+        /// <param name="taskPriority">The process priority class for the boot task.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="taskPriority"/> is not a defined priority class.</exception>
+        /// <exception cref="PlatformNotSupportedException">The current operating system is not Windows.</exception>
+        /// <exception cref="ArgumentNullException">The task is enabled and <paramref name="command"/> is null.</exception>
+        public static void SetBootTaskEnabled(
+            string taskName,
+            string description,
+            StartupCommand command,
+            bool enabled,
+            ProcessPriorityClass taskPriority)
+        {
+            if (!Enum.IsDefined(typeof(ProcessPriorityClass), taskPriority))
+            {
+                throw new ArgumentOutOfRangeException(nameof(taskPriority));
+            }
+
             if (!PlatformOperatingSystem.IsWindows())
             {
                 throw new PlatformNotSupportedException("Task Scheduler startup registration requires Windows.");
@@ -70,7 +96,7 @@ namespace BlackSharp.Platform.Startup.Platform.Windows
             settings.RunOnlyIfIdle              = false;
             settings.WakeToRun                  = false;
             settings.ExecutionTimeLimit         = TimeSpan.Zero;
-            settings.Priority                   = ProcessPriorityClass.BelowNormal;
+            settings.Priority                   = taskPriority;
             settings.RestartInterval            = TimeSpan.FromMinutes(1);
             settings.RestartCount               = 3;
 
